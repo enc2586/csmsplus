@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "COURSEMOS PDF Downloader",
+  "version": "1.0.0",
+  "description": "Download COURSEMOS PDF documents with a single click",
+  "permissions": [
+    "activeTab",
+    "downloads"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "https://lms.gist.ac.kr/*",
+    "https://doc.coursemos.co.kr/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://lms.gist.ac.kr/local/ubdoc/*"
+      ],
+      "js": [
+        "pdf-lib.min.js",
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
