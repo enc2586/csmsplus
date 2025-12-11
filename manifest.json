@@ -5,7 +5,8 @@
   "description": "Download PDF documents with a single click",
   "permissions": [
     "activeTab",
-    "downloads"
+    "downloads",
+    "storage"
   ],
   "background": {
     "service_worker": "background.js"
@@ -25,6 +26,25 @@
       ],
       "css": [
         "styles.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://lms.gist.ac.kr/course/view.php*"
+      ],
+      "js": [
+        "assignment-tracker.js"
+      ],
+      "css": [
+        "assignment-styles.css"
+      ]
+    },
+    {
+      "matches": [
+        "https://lms.gist.ac.kr/mod/assign/view.php*"
+      ],
+      "js": [
+        "assignment-cache-updater.js"
       ]
     }
   ],
