@@ -316,17 +316,19 @@
     }
 
     // Process a single course
-    async function processCourse(courseId, courseDiv) {
+    async function processCourse(courseId, courseDiv, onProgress) {
         // console.log(`[Processing] Course ${courseId} - START`);
 
         // Initial Loading State (0%)
         renderCourseStats(courseDiv, { completed: 0, urgent: 0, remaining: 0 }, courseId, true, 0);
+        if (onProgress) onProgress(0);
 
         // Fetch assignment list (Rate Limited)
         const assignments = await enqueueFetch(() => fetchCourseAssignments(courseId));
 
         if (assignments.length === 0) {
             renderCourseStats(courseDiv, { completed: 0, urgent: 0, remaining: 0 }, courseId, false);
+            if (onProgress) onProgress(1); // 100%
             return;
         }
 
@@ -339,10 +341,8 @@
         const updateProgress = () => {
             const progress = totalAssignments > 0 ? processedCount / totalAssignments : 0;
             renderCourseStats(courseDiv, {}, courseId, true, progress);
+            if (onProgress) onProgress(progress);
         };
-
-        // 10% progress just for fetching list
-        // updateProgress(); // Don't jump too fast
 
         chrome.storage.local.get(cacheKeys, async (result) => {
             const cachedData = [];
@@ -390,6 +390,9 @@
             const stats = calculateStats(cachedData, courseId);
             renderCourseStats(courseDiv, stats, courseId, false);
 
+            // Ensure 100% on completion
+            if (onProgress) onProgress(1);
+
             // console.log(`[Course ${courseId}] - COMPLETE`);
         });
     }
@@ -418,9 +421,56 @@
         if (advancedOptions.cacheTtl) CurrentConfig.CACHE_TTL_DEFAULT = advancedOptions.cacheTtl;
         if (advancedOptions.cacheTtlSubmitted) CurrentConfig.CACHE_TTL_SUBMITTED = advancedOptions.cacheTtlSubmitted;
 
+        const courseListContainer = document.querySelector('.progress_courses .course_lists');
         const courseCards = document.querySelectorAll('.progress_courses .course_lists ul > li');
 
-        // console.log(`[Course Parser] Found ${courseCards.length} course cards`);
+        // Insert Global Progress Bar
+        if (courseListContainer) {
+            const existingBar = courseListContainer.querySelector('.global-progress-bar');
+            if (existingBar) existingBar.remove();
+
+            const progressBar = document.createElement('div');
+            progressBar.className = 'global-progress-bar';
+            progressBar.innerHTML = '<div class="global-progress-bar-fill"></div>';
+
+            // Insert before UL
+            const ul = courseListContainer.querySelector('ul');
+            if (ul) {
+                courseListContainer.insertBefore(progressBar, ul);
+            } else {
+                courseListContainer.prepend(progressBar);
+            }
+        }
+
+        const totalCourses = courseCards.length;
+        const globalState = new Array(totalCourses).fill(0);
+
+        const updateGlobalBar = () => {
+            const sum = globalState.reduce((a, b) => a + b, 0);
+            const avg = totalCourses > 0 ? sum / totalCourses : 0;
+            const fill = document.querySelector('.global-progress-bar-fill');
+
+            if (fill) {
+                fill.style.width = `${Math.min(100, avg * 100)}%`;
+
+                // Fade out on completion
+                if (avg >= 0.999) {
+                    setTimeout(() => {
+                        const bar = document.querySelector('.global-progress-bar');
+                        if (bar) {
+                            // Collapse height and fade out
+                            bar.style.height = '0px';
+                            bar.style.opacity = '0';
+                            bar.style.marginTop = '0px';
+                            bar.style.marginBottom = '0px';
+
+                            setTimeout(() => { if (bar) bar.remove(); }, 500);
+                        }
+                    }, 800);
+                }
+            }
+        };
+
 
         courseCards.forEach((card, index) => {
             const courseLink = card.querySelector('a.course_link');
@@ -434,20 +484,11 @@
                 const courseDiv = card.querySelector('div');
                 if (!courseId || !courseDiv) return;
 
-                // Extract course name and professor
-                const courseNameElement = courseLink.querySelector('h3');
-                let courseName = courseNameElement ? courseNameElement.textContent.trim() : null;
-                if (courseName) {
-                    courseName = courseName.replace(/NEW\s*/g, '').trim();
-                }
-
-                const professorNameElement = courseLink.querySelector('p');
-                const professorName = professorNameElement ? professorNameElement.textContent.trim() : 'Unknown';
-
-                // console.log(`[${index + 1}] ${courseName} (ID: ${courseId}) - ${professorName}`);
-
                 // Process course directly (queue handles throttling)
-                processCourse(courseId, courseDiv);
+                processCourse(courseId, courseDiv, (progress) => {
+                    globalState[index] = progress;
+                    updateGlobalBar();
+                });
 
             } catch (e) {
                 // console.error('Error processing course card:', e);

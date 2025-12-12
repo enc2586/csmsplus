@@ -172,4 +172,28 @@
     }
 }
 
-/* Hide on small screens (viewport width <= 50%) */
+/* Global Progress Bar (Top of Course List) */
+.global-progress-bar {
+    position: relative;
+    width: 100%;
+    height: 3px;
+    /* Thin */
+    background-color: rgba(0, 0, 0, 0.05);
+    margin-bottom: 0px;
+    /* Flush with bottom content */
+    margin-top: -5px;
+    /* Pull up closer to whatever is above if needed, or just 0 */
+    overflow: hidden;
+    transition: height 0.5s ease-in-out, opacity 0.5s ease-in-out, margin 0.5s ease;
+}
+
+.global-progress-bar-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #4a90e2;
+    /* Blue accent */
+    width: 0%;
+    transition: width 0.3s ease-out;
+}
