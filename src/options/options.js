@@ -41,6 +41,7 @@ const elements = {
     saveBar: document.getElementById('save-bar'),
     saveBtn: document.getElementById('save-btn'),
     saveStatus: document.getElementById('save-status'),
+    clearCacheBtn: document.getElementById('clear-cache-btn'),
     versionNumber: document.getElementById('version-number')
 };
 
@@ -180,6 +181,31 @@ function setupEventListeners() {
 
     // Save Button
     elements.saveBtn.addEventListener('click', saveSettings);
+
+    // Clear Cache Button
+    if (elements.clearCacheBtn) {
+        elements.clearCacheBtn.addEventListener('click', clearCache);
+    }
+}
+
+function clearCache() {
+    if (!confirm('정말 모든 캐시 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
+        return;
+    }
+
+    chrome.storage.local.get(null, (items) => {
+        const keysToRemove = Object.keys(items).filter(key => key !== 'options');
+
+        if (keysToRemove.length === 0) {
+            alert('삭제할 캐시 데이터가 없습니다.');
+            return;
+        }
+
+        chrome.storage.local.remove(keysToRemove, () => {
+            alert('캐시 데이터가 성공적으로 삭제되었습니다.');
+            // Optional: visual feedback
+        });
+    });
 }
 
 function showSaveStatus() {

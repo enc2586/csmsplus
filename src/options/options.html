@@ -143,6 +143,19 @@
         <section class="option-section">
           <h2>고급 설정</h2>
 
+          <div class="warning-banner">
+            <span class="icon">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
+                </path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </span>
+            <p><strong>주의:</strong> 이 설정들은 확장 프로그램의 성능에 큰 영향을 미칠 수 있습니다. 무엇을 하는지 정확히 알고 있는 경우에만 변경하세요.</p>
+          </div>
+
           <div class="option-item">
             <div class="option-label">
               <span class="label-text">데이터 요청 간격 (Fetch Interval)</span>
@@ -180,6 +193,29 @@
               </div>
               <span class="converted-value" id="advanced-cacheTtlSubmitted-preview"></span>
             </div>
+          </div>
+        </section>
+
+        <!-- Danger Zone / Cache -->
+        <section class="option-section danger-zone">
+          <h2>데이터 관리</h2>
+          <div class="option-item">
+            <div class="option-label">
+              <span class="label-text">캐시 데이터 삭제</span>
+              <span class="label-desc">저장된 모든 과제 데이터 및 임시 파일을 삭제합니다. 설정은 유지됩니다.</span>
+            </div>
+            <button id="clear-cache-btn" class="danger-btn">
+              <span class="icon">
+                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </span>
+              캐시 삭제
+            </button>
           </div>
         </section>
 
