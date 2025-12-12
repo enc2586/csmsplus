@@ -20,6 +20,7 @@
         },
 
         init: function (config = {}) {
+            // console.log('Tracker Dashboard Module Loaded');
             this.state.showContent = config.showBody !== undefined ? config.showBody : true;
             this.state.urgentThresholdHours = config.urgentThresholdHours || 72;
             this.state.enableSummary = config.enableSummaryAtLecture !== undefined ? config.enableSummaryAtLecture : true;
@@ -116,6 +117,7 @@
                     container = document.createElement('li');
                     container.id = 'assignment-dashboard-root';
                     container.className = 'section main assignment-dashboard-container';
+                    // console.log('[Dashboard] Initialized');
 
                     const section0 = topicsList.querySelector('#section-0');
 
@@ -236,9 +238,6 @@
                 });
                 html += `</div>`;
             }
-
-            html += `</div>`; // Close .content
-            container.innerHTML = html;
 
             html += `</div>`; // Close .content
             container.innerHTML = html;

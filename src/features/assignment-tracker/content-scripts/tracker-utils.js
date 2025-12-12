@@ -48,7 +48,7 @@
 
                 return null;
             } catch (e) {
-                console.error('Date parsing error:', e);
+                // console.error('Date parsing error:', e);
                 return null;
             }
         },

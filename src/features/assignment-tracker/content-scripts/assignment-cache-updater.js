@@ -4,7 +4,7 @@
 (function () {
   'use strict';
 
-  console.log('Assignment Cache Updater loaded');
+  // console.log('Assignment Cache Updater loaded');
 
   // Helper: Parse Date string
   function parseDate(dateStr) {
@@ -24,7 +24,7 @@
 
       return null;
     } catch (e) {
-      console.error('Date parsing error:', e);
+      // console.error('Date parsing error:', e);
       return null;
     }
   }
@@ -79,7 +79,7 @@
     const dueDate = getValueByHeader('종료 일시');
 
     if (!submissionStatus && !dueDate) {
-      console.log('Could not find submission status or due date');
+      // console.log('Could not find submission status or due date');
       return;
     }
 

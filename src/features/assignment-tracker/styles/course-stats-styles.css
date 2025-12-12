@@ -116,8 +116,3 @@
 }
 
 /* Hide on small screens (viewport width <= 50%) */
-@media (max-width: 960px) {
-    .course-assignment-stats {
-        display: none !important;
-    }
-}

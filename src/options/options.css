@@ -487,60 +487,80 @@ input[type="number"]:focus {
   text-decoration: underline;
 }
 
-/* Patch Notes */
-.patch-note-item {
-  background-color: var(--card-bg);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+/* Warning Banner */
+.warning-banner {
+  background-color: rgba(255, 165, 0, 0.1);
+  border: 1px solid rgba(255, 165, 0, 0.3);
+  border-radius: 8px;
   padding: 24px;
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.patch-header {
+  margin-bottom: 24px;
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  padding-bottom: 12px;
+  text-align: center;
+  color: #ffb74d;
 }
 
-.patch-version {
-  font-size: 1.2rem;
+.warning-icon {
+  margin-bottom: 12px;
+  color: #ffb74d;
+  background-color: rgba(255, 165, 0, 0.1);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.warning-text {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.warning-title {
+  font-size: 16px;
   font-weight: 700;
-  color: var(--accent-color);
+  color: #ffb74d;
 }
 
-.patch-date {
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  font-family: monospace;
-}
-
-.patch-summary {
-  font-size: 1.05rem;
-  font-weight: 600;
-  margin-bottom: 12px;
-  color: var(--text-color);
-}
-
-.patch-changes {
-  list-style: none;
-  padding: 0;
-}
-
-.patch-changes li {
-  position: relative;
-  padding-left: 18px;
-  margin-bottom: 6px;
+.warning-desc {
+  font-size: 14px;
   color: var(--text-secondary);
   line-height: 1.5;
+  margin: 0;
 }
 
-.patch-changes li::before {
-  content: "-";
-  position: absolute;
-  left: 0;
-  color: var(--text-secondary);
+/* Sub Section Title */
+.sub-section-title {
+  font-size: 16px;
+  color: var(--text-color);
+  margin-top: 32px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  padding-left: 8px;
+  border-left: 3px solid var(--accent-color);
+  line-height: 1.2;
+}
+
+/* Danger Button */
+.danger-btn {
+  background-color: rgba(211, 47, 47, 0.1);
+  color: #ff5252;
+  border: 1px solid rgba(211, 47, 47, 0.3);
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.danger-btn:hover {
+  background-color: rgba(211, 47, 47, 0.2);
+  border-color: #ff5252;
 }

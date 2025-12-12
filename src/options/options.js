@@ -105,7 +105,7 @@ function getSettingsFromUI() {
             urgentThresholdHours: parseInt(elements.tracker.urgentThresholdHours.value, 10)
         },
         advanced: {
-            fetchInterval: parseInt(elements.advanced.fetchInterval.value, 10),
+            fetchInterval: Math.max(10, parseInt(elements.advanced.fetchInterval.value, 10) || 100),
             cacheTtl: parseInt(elements.advanced.cacheTtl.value, 10),
             cacheTtlSubmitted: parseInt(elements.advanced.cacheTtlSubmitted.value, 10)
         }
@@ -279,7 +279,7 @@ async function loadPatchNotes() {
 
         listContainer.innerHTML = html;
     } catch (error) {
-        console.error('Failed to load patch notes:', error);
+        // console.error('Failed to load patch notes:', error);
         listContainer.innerHTML = '<p class="error">패치 노트를 불러올 수 없습니다.</p>';
     }
 }

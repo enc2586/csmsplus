@@ -139,21 +139,23 @@
           </div>
         </section>
 
-        <!-- Advanced Section -->
         <section class="option-section">
           <h2>고급 설정</h2>
 
           <div class="warning-banner">
-            <span class="icon">
-              <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"
+            <div class="warning-icon">
+              <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none"
                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
                 </path>
                 <line x1="12" y1="9" x2="12" y2="13"></line>
                 <line x1="12" y1="17" x2="12.01" y2="17"></line>
               </svg>
-            </span>
-            <p><strong>주의:</strong> 이 설정들은 확장 프로그램의 성능에 큰 영향을 미칠 수 있습니다. 무엇을 하는지 정확히 알고 있는 경우에만 변경하세요.</p>
+            </div>
+            <div class="warning-text">
+              <strong class="warning-title">주의</strong>
+              <p class="warning-desc">이 설정들은 확장 프로그램의 성능에 큰 영향을 미칠 수 있습니다.<br>무엇을 하는지 정확히 알고 있는 경우에만 변경하세요.</p>
+            </div>
           </div>
 
           <div class="option-item">
@@ -194,11 +196,8 @@
               <span class="converted-value" id="advanced-cacheTtlSubmitted-preview"></span>
             </div>
           </div>
-        </section>
 
-        <!-- Danger Zone / Cache -->
-        <section class="option-section danger-zone">
-          <h2>데이터 관리</h2>
+          <h3 class="sub-section-title">데이터 관리</h3>
           <div class="option-item">
             <div class="option-label">
               <span class="label-text">캐시 데이터 삭제</span>

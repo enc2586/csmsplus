@@ -247,7 +247,7 @@
       }, 2000);
 
     } catch (error) {
-      console.error('Download failed:', error);
+      // console.error('Download failed:', error);
       alert('Failed to create PDF: ' + error.message);
       hideProgress();
       button.classList.remove('downloading');
@@ -262,7 +262,7 @@
     const pdfdlEnabled = options.pdfdl && options.pdfdl.enable !== undefined ? options.pdfdl.enable : true; // Default true
 
     if (!pdfdlEnabled) {
-      console.log('COURSEMOS PDF Downloader is disabled via options.');
+      // console.log('COURSEMOS PDF Downloader is disabled via options.');
       return;
     }
 
@@ -284,7 +284,7 @@
       const button = createDownloadButton();
       button.addEventListener('click', () => downloadAsPDF(iframe));
 
-      console.log('COURSEMOS PDF Downloader initialized');
+      // console.log('COURSEMOS PDF Downloader initialized');
     } catch (error) {
       console.error('Failed to initialize:', error.message);
     }

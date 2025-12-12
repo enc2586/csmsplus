@@ -20,10 +20,10 @@
                 const title = doc.querySelector('title')?.textContent || '';
                 const hasContent = text.includes('제출 상황');
 
-                console.log(`[Tracker] Fetched ${id}: Title="${title}", HasContent=${hasContent}`);
+                // console.log(`[Tracker] Fetched ${id}: Title="${title}", HasContent=${hasContent}`);
 
                 if (!hasContent) {
-                    console.warn(`[Tracker] "제출 상황" missing! Redirected? URL=${response.url}`);
+                    // console.warn(`[Tracker] "제출 상황" missing! Redirected? URL=${response.url}`);
                     return null;
                 }
 
@@ -112,12 +112,12 @@
                 }
 
                 if (!submissionStatus && !dueDate) {
-                    console.error(`[Tracker] Parsing Failed for ${id}. Available Headers:`,
-                        Array.from(doc.querySelectorAll('th')).map(th => th.textContent.trim())
-                    );
+                    // console.error(`[Tracker] Parsing Failed for ${id}. Available Headers:`,
+                    // Array.from(doc.querySelectorAll('th')).map(th => th.textContent.trim())
+                    // );
                 }
 
-                console.log(`[Tracker] Parsed ${id}: Title=${assignmentTitle}, Status=${submissionStatus}, Due=${dueDate}, Content=${assignmentContent}`);
+                // console.log(`[Tracker] Parsed ${id}: Title=${assignmentTitle}, Status=${submissionStatus}, Due=${dueDate}, Content=${assignmentContent}`);
 
                 return {
                     id,
@@ -129,7 +129,7 @@
                     timestamp: Date.now()
                 };
             } catch (e) {
-                console.error('Fetch error:', e);
+                // console.error('Fetch error:', e);
                 return null;
             }
         }

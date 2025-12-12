@@ -4,7 +4,7 @@
 (function () {
     'use strict';
 
-    console.log('Course List Parser with Assignment Stats loaded');
+    // console.log('Course List Parser with Assignment Stats loaded');
 
     // Check if we're on the main page
     if (window.location.pathname !== '/' && !window.location.pathname.includes('index.php')) {
@@ -38,7 +38,7 @@
             const result = await fn();
             resolve(result);
         } catch (e) {
-            console.error('Queue task error:', e);
+            // console.error('Queue task error:', e);
             reject(e);
         }
 
@@ -71,7 +71,7 @@
 
             return null;
         } catch (e) {
-            console.error('Date parsing error:', e);
+            // console.error('Date parsing error:', e);
             return null;
 
         }
@@ -140,7 +140,7 @@
                 assignmentContent = contentElement.textContent.trim().substring(0, 200);
             }
 
-            console.log(`[Parser] Fetched Details for ${id}: ${assignmentTitle}, Due: ${dueDate}, Submitted: ${isSubmitted}`);
+            // console.log(`[Parser] Fetched Details for ${id}: ${assignmentTitle}, Due: ${dueDate}, Submitted: ${isSubmitted}`);
 
             return {
                 id,
@@ -152,7 +152,7 @@
                 timestamp: Date.now()
             };
         } catch (e) {
-            console.error(`Error fetching assignment details ${id}:`, e);
+            // console.error(`Error fetching assignment details ${id}:`, e);
             return null;
         }
     }
@@ -183,10 +183,10 @@
                 }
             });
 
-            console.log(`[Course ${courseId}] Found ${assignments.length} unique assignments (from ${links.length} links)`);
+            // console.log(`[Course ${courseId}] Found ${assignments.length} unique assignments (from ${links.length} links)`);
             return assignments;
         } catch (e) {
-            console.error(`Error fetching course ${courseId}:`, e);
+            // console.error(`Error fetching course ${courseId}:`, e);
             return [];
         }
     }
@@ -196,55 +196,60 @@
         const now = new Date();
         const urgentThreshold = CurrentConfig.URGENT_THRESHOLD_HOURS * 60 * 60 * 1000;
 
+        /* 
         console.log(`[Course ${courseId}] === Calculating Stats ===`);
         console.log(`[Course ${courseId}] Total assignments in cache: ${assignments.length}`);
         console.log(`[Course ${courseId}] Urgent threshold: ${CurrentConfig.URGENT_THRESHOLD_HOURS} hours (${urgentThreshold}ms)`);
         console.log(`[Course ${courseId}] Current time: ${now.toISOString()}`);
+        */
 
         assignments.forEach((assignment, index) => {
             if (!assignment) {
-                console.log(`[Course ${courseId}] Assignment ${index}: NULL/UNDEFINED - SKIPPED`);
                 return;
             }
 
+            /*
             console.log(`[Course ${courseId}] Assignment ${assignment.id}:`);
             console.log(`  - Title: ${assignment.title || 'N/A'}`);
             console.log(`  - Submitted: ${assignment.isSubmitted}`);
             console.log(`  - Deadline: ${assignment.deadline}`);
+            */
 
             if (assignment.isSubmitted) {
                 stats.completed++;
-                console.log(`  => COMPLETED (제출완료)`);
+                // console.log(`  => COMPLETED (제출완료)`);
             } else {
                 const dueDate = parseDate(assignment.deadline);
-                console.log(`  - Parsed due date: ${dueDate ? dueDate.toISOString() : 'NULL'}`);
+                // console.log(`  - Parsed due date: ${dueDate ? dueDate.toISOString() : 'NULL'}`);
 
                 if (dueDate) {
                     const diff = dueDate - now;
-                    const diffDays = diff / (24 * 60 * 60 * 1000);
-                    console.log(`  - Time diff: ${diff}ms (${diffDays.toFixed(2)} days)`);
-                    console.log(`  - Urgent threshold check: ${diff} <= ${urgentThreshold}?`);
+                    // const diffDays = diff / (24 * 60 * 60 * 1000);
+                    // console.log(`  - Time diff: ${diff}ms (${diffDays.toFixed(2)} days)`);
+                    // console.log(`  - Urgent threshold check: ${diff} <= ${urgentThreshold}?`);
 
                     // Changed: overdue OR within 7 days = urgent/overdue
                     if (diff < 0) {
                         stats.urgent++;
-                        console.log(`  => URGENT/OVERDUE (마감지남, ${Math.abs(diffDays).toFixed(2)} days ago)`);
+                        // console.log(`  => URGENT/OVERDUE (마감지남, ${Math.abs(diffDays).toFixed(2)} days ago)`);
                     } else if (diff <= urgentThreshold) {
                         stats.urgent++;
-                        console.log(`  => URGENT (7일 이내: ${diffDays.toFixed(2)} days left)`);
+                        // console.log(`  => URGENT (7일 이내: ${diffDays.toFixed(2)} days left)`);
                     } else {
                         stats.remaining++;
-                        console.log(`  => REMAINING (7일 이상: ${diffDays.toFixed(2)} days left)`);
+                        // console.log(`  => REMAINING (7일 이상: ${diffDays.toFixed(2)} days left)`);
                     }
                 } else {
                     stats.remaining++;
-                    console.log(`  => REMAINING (no valid deadline)`);
+                    // console.log(`  => REMAINING (no valid deadline)`);
                 }
             }
         });
 
+        /*
         console.log(`[Course ${courseId}] === Final Stats ===`);
         console.log(`[Course ${courseId}] Completed: ${stats.completed}, Urgent: ${stats.urgent}, Remaining: ${stats.remaining}`);
+        */
 
         return stats;
     }
@@ -290,14 +295,14 @@
 
     // Process a single course
     async function processCourse(courseId, courseDiv) {
-        console.log(`[Processing] Course ${courseId} - START`);
+        // console.log(`[Processing] Course ${courseId} - START`);
 
         // Show loading state
         renderCourseStats(courseDiv, { completed: 0, urgent: 0, remaining: 0 }, courseId, true);
 
         // Fetch assignment list (Rate Limited)
         const assignments = await enqueueFetch(() => fetchCourseAssignments(courseId));
-        console.log(`[Course ${courseId}] Fetched ${assignments.length} assignment links`);
+        // console.log(`[Course ${courseId}] Fetched ${assignments.length} assignment links`);
 
         if (assignments.length === 0) {
             renderCourseStats(courseDiv, { completed: 0, urgent: 0, remaining: 0 }, courseId, false);
@@ -329,11 +334,11 @@
                 }
             });
 
-            console.log(`[Course ${courseId}] Valid Cache: ${cachedData.length}, Missing/Invalid: ${missingOrInvalid.length}`);
+            // console.log(`[Course ${courseId}] Valid Cache: ${cachedData.length}, Missing/Invalid: ${missingOrInvalid.length}`);
 
             // Fetch missing assignments
             for (const assignment of missingOrInvalid) {
-                console.log(`[Course ${courseId}] Fetching details for ${assignment.id}...`);
+                // console.log(`[Course ${courseId}] Fetching details for ${assignment.id}...`);
                 // Rate limited fetch
                 const data = await enqueueFetch(() => fetchAssignmentDetails(assignment.url, assignment.id, courseId));
 
@@ -349,7 +354,7 @@
             const stats = calculateStats(cachedData, courseId);
             renderCourseStats(courseDiv, stats, courseId, false);
 
-            console.log(`[Course ${courseId}] - COMPLETE`);
+            // console.log(`[Course ${courseId}] - COMPLETE`);
         });
     }
 
@@ -367,7 +372,7 @@
             : true;
 
         if (!enableSummaryAtDashboard) {
-            console.log('[Course List Parser] Disabled via options');
+            // console.log('[Course List Parser] Disabled via options');
             return;
         }
 
@@ -379,7 +384,7 @@
 
         const courseCards = document.querySelectorAll('.progress_courses .course_lists ul > li');
 
-        console.log(`[Course Parser] Found ${courseCards.length} course cards`);
+        // console.log(`[Course Parser] Found ${courseCards.length} course cards`);
 
         courseCards.forEach((card, index) => {
             const courseLink = card.querySelector('a.course_link');
@@ -403,13 +408,13 @@
                 const professorNameElement = courseLink.querySelector('p');
                 const professorName = professorNameElement ? professorNameElement.textContent.trim() : 'Unknown';
 
-                console.log(`[${index + 1}] ${courseName} (ID: ${courseId}) - ${professorName}`);
+                // console.log(`[${index + 1}] ${courseName} (ID: ${courseId}) - ${professorName}`);
 
                 // Process course directly (queue handles throttling)
                 processCourse(courseId, courseDiv);
 
             } catch (e) {
-                console.error('Error processing course card:', e);
+                // console.error('Error processing course card:', e);
             }
         });
     }

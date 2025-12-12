@@ -110,7 +110,7 @@
         }
 
         // Check Cache
-        const cacheKey = `assignment_${id}`;
+        const cacheKey = `assignment_${id} `;
         chrome.storage.local.get([cacheKey], (result) => {
             const cached = result[cacheKey];
             const now = Date.now();

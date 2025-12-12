@@ -21,7 +21,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 const base64 = arrayBufferToBase64(arrayBuffer);
                 sendResponse({ success: true, data: base64 });
             } catch (error) {
-                console.error('Background fetch error:', error);
+                // console.error('Background fetch error:', error);
                 sendResponse({ success: false, error: error.message });
             }
         })();
@@ -43,15 +43,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     saveAs: false
                 }, (downloadId) => {
                     if (chrome.runtime.lastError) {
-                        console.error('Download error:', chrome.runtime.lastError);
+                        // console.error('Download error:', chrome.runtime.lastError);
                         sendResponse({ success: false, error: chrome.runtime.lastError.message });
                     } else {
-                        console.log('PDF download started:', downloadId);
+                        // console.log('PDF download started:', downloadId);
                         sendResponse({ success: true, downloadId: downloadId });
                     }
                 });
             } catch (error) {
-                console.error('PDF creation error:', error);
+                // console.error('PDF creation error:', error);
                 sendResponse({ success: false, error: error.message });
             }
         })();
@@ -81,7 +81,7 @@ function base64ToBlob(base64, mimeType) {
     return new Blob([byteArray], { type: mimeType });
 }
 
-console.log('COURSEMOS PDF Downloader background service worker loaded');
+// console.log('COURSEMOS PDF Downloader background service worker loaded');
 
 // Open Options Page when extension icon is clicked
 chrome.action.onClicked.addListener(() => {
