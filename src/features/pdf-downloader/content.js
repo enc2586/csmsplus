@@ -256,6 +256,16 @@
 
   // Initialize
   async function init() {
+    // Check options first
+    const result = await chrome.storage.local.get(['options']);
+    const options = result.options || {};
+    const pdfdlEnabled = options.pdfdl && options.pdfdl.enable !== undefined ? options.pdfdl.enable : true; // Default true
+
+    if (!pdfdlEnabled) {
+      console.log('COURSEMOS PDF Downloader is disabled via options.');
+      return;
+    }
+
     // First check if we're on the correct URL
     if (!isCoursemosURL()) {
       console.log('Not a COURSEMOS document page URL');

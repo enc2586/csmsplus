@@ -19,12 +19,45 @@
             totalCount: 0
         },
 
-        init: function () {
-            // Load settings
-            chrome.storage.local.get(['showAssignmentContent'], (result) => {
-                this.state.showContent = result.showAssignmentContent !== undefined ? result.showAssignmentContent : true;
+        init: function (config = {}) {
+            this.state.showContent = config.showBody !== undefined ? config.showBody : true;
+            this.state.urgentThresholdHours = config.urgentThresholdHours || 72;
+            this.state.enableSummary = config.enableSummaryAtLecture !== undefined ? config.enableSummaryAtLecture : true;
+
+            if (!this.state.enableSummary) return;
+
+            // Listen for global settings changes if needed? 
+            // tracker-main.js handles the listener and calls updateConfig
+        },
+
+        updateConfig: function (config) {
+            let changed = false;
+
+            if (config.showBody !== undefined && config.showBody !== this.state.showContent) {
+                this.state.showContent = config.showBody;
+                changed = true;
+            }
+            if (config.urgentThresholdHours !== undefined && config.urgentThresholdHours !== this.state.urgentThresholdHours) {
+                this.state.urgentThresholdHours = config.urgentThresholdHours;
+                changed = true;
+            }
+            if (config.enableSummaryAtLecture !== undefined) {
+                this.state.enableSummary = config.enableSummaryAtLecture;
+                // If disabled, remove UI?
+                if (!this.state.enableSummary) {
+                    const root = document.getElementById('assignment-dashboard-root');
+                    if (root) root.remove();
+                    this.state.rendered = false;
+                    return;
+                } else {
+                    // if enabled and not rendered, render() will be called below if changed
+                    changed = true;
+                }
+            }
+
+            if (changed) {
                 this.render();
-            });
+            }
         },
 
         registerAssignment: function (id, link, title) {
@@ -66,58 +99,13 @@
             this.state.timer = setTimeout(() => this.render(), debounceMs);
         },
 
-        toggleSettingsModal: function () {
-            let modal = document.getElementById('assignment-settings-modal');
-            if (modal) {
-                modal.remove();
-            } else {
-                this.showSettingsModal();
-            }
-        },
-
-        showSettingsModal: function () {
-            const modal = document.createElement('div');
-            modal.id = 'assignment-settings-modal';
-            modal.className = 'assignment-modal-overlay';
-
-            modal.innerHTML = `
-                <div class="assignment-modal-content">
-                    <div class="assignment-modal-header">
-                        <h3>과제 표시 설정</h3>
-                        <button class="assignment-modal-close" id="close-modal-btn">&times;</button>
-                    </div>
-                    <div class="assignment-modal-body">
-                        <label class="assignment-checkbox-label">
-                            <input type="checkbox" id="show-content-checkbox" ${this.state.showContent ? 'checked' : ''}>
-                            <span>과제 본문 표시</span>
-                        </label>
-                    </div>
-                </div>
-            `;
-
-            document.body.appendChild(modal);
-
-            document.getElementById('close-modal-btn').addEventListener('click', () => modal.remove());
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) modal.remove();
-            });
-
-            document.getElementById('show-content-checkbox').addEventListener('change', (e) => {
-                this.state.showContent = e.target.checked;
-                chrome.storage.local.set({ showAssignmentContent: this.state.showContent });
-                this.render();
-
-                // Broadcast to update individual items
-                // This requires a way to notify the main app or UI to re-render all items.
-                // We'll dispatch a custom event.
-                const event = new CustomEvent('GistAssignmentTracker:SettingsChanged', {
-                    detail: { showContent: this.state.showContent }
-                });
-                window.dispatchEvent(event);
-            });
-        },
+        // Deprecated: Settings Modal removed in favor of Options Page
+        toggleSettingsModal: function () { },
+        showSettingsModal: function () { },
 
         render: function () {
+            if (!this.state.enableSummary) return;
+
             // 1. Find Insertion Point
             let container = document.getElementById('assignment-dashboard-root');
             if (!container) {
@@ -157,7 +145,7 @@
             let overdueList = [];
 
             const now = new Date();
-            const urgentThresholdMs = 72 * 60 * 60 * 1000;
+            const urgentThresholdMs = (this.state.urgentThresholdHours || 72) * 60 * 60 * 1000;
 
             assignments.forEach(a => {
                 if (a.isSubmitted) {
@@ -187,12 +175,6 @@
             <div class="dashboard-divider"></div>
             <div class="dashboard-header">
               <span>과제 개요</span>
-              <button class="dashboard-settings-btn" id="dashboard-settings-btn" title="설정">
-                <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="3"></circle>
-                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                </svg>
-              </button>
             </div>
             
             <div class="dashboard-stats">
@@ -258,10 +240,8 @@
             html += `</div>`; // Close .content
             container.innerHTML = html;
 
-            const settingsBtn = document.getElementById('dashboard-settings-btn');
-            if (settingsBtn) {
-                settingsBtn.addEventListener('click', () => this.toggleSettingsModal());
-            }
+            html += `</div>`; // Close .content
+            container.innerHTML = html;
         }
     };
 })();

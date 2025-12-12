@@ -13,7 +13,7 @@
             return container;
         },
 
-        renderAssignmentInfo: function (container, data, error = null, assignmentUrl = null, isCompact = false) {
+        renderAssignmentInfo: function (container, data, error = null, assignmentUrl = null, isCompact = false, config = {}) {
             container.innerHTML = '';
 
             if (error) return;
@@ -40,12 +40,13 @@
             const { chipText, chipClass, dueDate } = statusData;
 
             // Calculate remaining time
-            // For compact view: text only, no parens
-            // For normal view: with parens
             const now = new Date();
             let remainingTimeText = '';
 
-            if (!isSubmitted && dueDate && dueDate > now) {
+            // Allow override or default to true/false based on typical usage
+            const showRemaining = config.showRemainingTime !== undefined ? config.showRemainingTime : true;
+
+            if (showRemaining && !isSubmitted && dueDate && dueDate > now) {
                 remainingTimeText = Utils.calculateTimeRemaining(dueDate);
             }
 
@@ -65,34 +66,32 @@
             } else {
                 // Normal View Logic
                 const formattedDeadline = deadline ? Utils.formatDateWithPadding(deadline) + '까지' : '마감일 정보 없음';
+                const showContent = config.showBody !== undefined ? config.showBody : true;
 
-                chrome.storage.local.get(['showAssignmentContent'], (result) => {
-                    const showContent = result.showAssignmentContent !== undefined ? result.showAssignmentContent : true;
-                    const contentHtml = showContent && content
-                        ? `<div class="assignment-content-preview">${content}</div>`
-                        : '';
+                const contentHtml = showContent && content
+                    ? `<div class="assignment-content-preview">${content}</div>`
+                    : '';
 
-                    // Common inner HTML structure
-                    const innerStructure = `
-                        <div class="assignment-status-row">
-                            <div class="assignment-status-chip ${chipClass}">
-                                ${chipText}
-                            </div>
-                            <div class="assignment-deadline-text">${formattedDeadline}${remainingTimeText}</div>
+                // Common inner HTML structure
+                const innerStructure = `
+                    <div class="assignment-status-row">
+                        <div class="assignment-status-chip ${chipClass}">
+                            ${chipText}
                         </div>
-                        ${contentHtml}
-                    `;
+                        <div class="assignment-deadline-text">${formattedDeadline}${remainingTimeText}</div>
+                    </div>
+                    ${contentHtml}
+                `;
 
-                    if (assignmentUrl) {
-                        container.innerHTML = `
-                          <a href="${assignmentUrl}" class="assignment-info-link">
-                            ${innerStructure}
-                          </a>
-                        `;
-                    } else {
-                        container.innerHTML = innerStructure;
-                    }
-                });
+                if (assignmentUrl) {
+                    container.innerHTML = `
+                      <a href="${assignmentUrl}" class="assignment-info-link">
+                        ${innerStructure}
+                      </a>
+                    `;
+                } else {
+                    container.innerHTML = innerStructure;
+                }
             }
         }
     };

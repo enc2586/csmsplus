@@ -11,11 +11,15 @@
         return;
     }
 
-    // Configuration
-    const FETCH_INTERVAL = 100; // 0.1s global rate limit delay
-    const CACHE_TTL_DEFAULT = 60 * 1000; // 1 minute
-    const CACHE_TTL_SUBMITTED = 7 * 24 * 60 * 60 * 1000; // 1 week
-    const URGENT_THRESHOLD_HOURS = 72; // 72 hours for urgent assignments
+    // Configuration (Defaults)
+    const DEFAULT_CONFIG = {
+        FETCH_INTERVAL: 100,
+        CACHE_TTL_DEFAULT: 60 * 1000,
+        CACHE_TTL_SUBMITTED: 7 * 24 * 60 * 60 * 1000,
+        URGENT_THRESHOLD_HOURS: 72
+    };
+
+    let CurrentConfig = { ...DEFAULT_CONFIG };
 
     // Queue system for rate limiting (Promisified)
     const fetchQueue = [];
@@ -39,7 +43,7 @@
         }
 
         // Wait for FETCH_INTERVAL before processing next task
-        setTimeout(processQueue, FETCH_INTERVAL);
+        setTimeout(processQueue, CurrentConfig.FETCH_INTERVAL);
     }
 
     function enqueueFetch(fn) {
@@ -187,15 +191,14 @@
         }
     }
 
-    // Calculate statistics from cached assignments
     function calculateStats(assignments, courseId) {
         const stats = { completed: 0, urgent: 0, remaining: 0 };
         const now = new Date();
-        const urgentThreshold = URGENT_THRESHOLD_HOURS * 60 * 60 * 1000;
+        const urgentThreshold = CurrentConfig.URGENT_THRESHOLD_HOURS * 60 * 60 * 1000;
 
         console.log(`[Course ${courseId}] === Calculating Stats ===`);
         console.log(`[Course ${courseId}] Total assignments in cache: ${assignments.length}`);
-        console.log(`[Course ${courseId}] Urgent threshold: ${URGENT_THRESHOLD_HOURS} hours (${urgentThreshold}ms)`);
+        console.log(`[Course ${courseId}] Urgent threshold: ${CurrentConfig.URGENT_THRESHOLD_HOURS} hours (${urgentThreshold}ms)`);
         console.log(`[Course ${courseId}] Current time: ${now.toISOString()}`);
 
         assignments.forEach((assignment, index) => {
@@ -315,7 +318,7 @@
                 let isValid = false;
 
                 if (cached) {
-                    const ttl = cached.isSubmitted ? CACHE_TTL_SUBMITTED : CACHE_TTL_DEFAULT;
+                    const ttl = cached.isSubmitted ? CurrentConfig.CACHE_TTL_SUBMITTED : CurrentConfig.CACHE_TTL_DEFAULT;
                     isValid = (now - cached.timestamp) < ttl;
                 }
 
@@ -351,7 +354,29 @@
     }
 
     // Main function to parse course list and process
-    function parseCourseListAndFetchStats() {
+    async function parseCourseListAndFetchStats() {
+        // Load Options first
+        const result = await chrome.storage.local.get(['options']);
+        const options = result.options || {};
+        const trackerOptions = options.tracker || {};
+        const advancedOptions = options.advanced || {};
+
+        // Check if feature is enabled
+        const enableSummaryAtDashboard = trackerOptions.enableSummaryAtDashboard !== undefined
+            ? trackerOptions.enableSummaryAtDashboard
+            : true;
+
+        if (!enableSummaryAtDashboard) {
+            console.log('[Course List Parser] Disabled via options');
+            return;
+        }
+
+        // Update Config
+        if (trackerOptions.urgentThresholdHours) CurrentConfig.URGENT_THRESHOLD_HOURS = trackerOptions.urgentThresholdHours;
+        if (advancedOptions.fetchInterval) CurrentConfig.FETCH_INTERVAL = advancedOptions.fetchInterval;
+        if (advancedOptions.cacheTtl) CurrentConfig.CACHE_TTL_DEFAULT = advancedOptions.cacheTtl;
+        if (advancedOptions.cacheTtlSubmitted) CurrentConfig.CACHE_TTL_SUBMITTED = advancedOptions.cacheTtlSubmitted;
+
         const courseCards = document.querySelectorAll('.progress_courses .course_lists ul > li');
 
         console.log(`[Course Parser] Found ${courseCards.length} course cards`);

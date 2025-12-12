@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSMS+ 설정</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+
+<body>
+  <div class="app-container">
+    <nav class="sidebar">
+      <div class="logo">CSMS+</div>
+      <ul class="nav-links">
+        <li class="nav-item active" data-tab="settings">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path
+                d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
+              </path>
+            </svg>
+          </span> Options
+        </li>
+        <li class="nav-item" data-tab="about">
+          <span class="icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </span> About
+        </li>
+      </ul>
+    </nav>
+    <main class="main-content">
+      <!-- Settings Tab -->
+      <div id="tab-settings" class="tab-content active">
+        <h1>Options</h1>
+
+        <!-- PDF Download Section -->
+        <section class="option-section">
+          <h2>PDF 다운로드</h2>
+          <div class="option-item">
+            <div class="option-label">
+              <span class="label-text">PDF 다운로드 기능 사용</span>
+              <span class="label-desc">강의 자료 페이지에 PDF 다운로드 버튼을 표시합니다.</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="pdfdl-enable">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Tracker Section -->
+        <section class="option-section">
+          <h2>과제 트래커</h2>
+
+          <div class="option-item">
+            <div class="option-label">
+              <span class="label-text">메인 페이지 과제 요약</span>
+              <span class="label-desc">LMS 메인 페이지의 강좌 카드에 과제 현황(완료/임박/남음)을 표시합니다.</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="tracker-enableSummaryAtDashboard">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="option-item">
+            <div class="option-label">
+              <span class="label-text">강좌 페이지 과제 대시보드</span>
+              <span class="label-desc">강좌 페이지 상단에 전체 과제 현황 대시보드를 표시합니다.</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="tracker-enableSummaryAtLecture">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="option-item">
+            <div class="option-label">
+              <span class="label-text">강좌 페이지 과제별 정보</span>
+              <span class="label-desc">각 과제 링크 아래에 상태 칩과 마감 정보를 표시합니다.</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="tracker-enableAssignmentDetail">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="option-item sub-option">
+            <div class="option-label">
+              <span class="label-text">과제 본문 미리보기 표시</span>
+              <span class="label-desc">과제 정보에 본문 내용을 짧게 미리 보여줍니다.</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="tracker-showBody">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="option-item sub-option">
+            <div class="option-label">
+              <span class="label-text">마감까지 남은 시간 표시</span>
+              <span class="label-desc">마감일 옆에 남은 시간을 텍스트로 표시합니다.</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="tracker-showRemainingTime">
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="option-item">
+            <div class="option-label">
+              <span class="label-text">마감 임박 기준 (시간)</span>
+              <span class="label-desc">'임박'으로 표시할 마감 전 시간을 설정합니다. (기본값: 72시간)</span>
+            </div>
+            <div class="input-wrapper">
+              <input type="number" id="tracker-urgentThresholdHours" min="1" max="168">
+              <span class="unit">시간</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Advanced Section -->
+        <section class="option-section">
+          <h2>고급 설정</h2>
+
+          <div class="option-item">
+            <div class="option-label">
+              <span class="label-text">데이터 요청 간격 (Fetch Interval)</span>
+              <span class="label-desc">서버 부하 방지를 위한 요청 사이의 대기 시간입니다. (최소 10ms)</span>
+            </div>
+            <div class="input-wrapper">
+              <input type="number" id="advanced-fetchInterval" min="10" step="10">
+              <span class="unit">ms</span>
+            </div>
+          </div>
+
+          <div class="option-item">
+            <div class="option-label">
+              <span class="label-text">기본 캐시 유효 시간 (TTL)</span>
+              <span class="label-desc">완료되지 않은 과제 데이터의 캐시 유효 기간입니다.</span>
+            </div>
+            <div class="input-group-column">
+              <div class="input-row">
+                <input type="number" id="advanced-cacheTtl" min="1000" step="1000">
+                <span class="unit">ms</span>
+              </div>
+              <span class="converted-value" id="advanced-cacheTtl-preview"></span>
+            </div>
+          </div>
+
+          <div class="option-item">
+            <div class="option-label">
+              <span class="label-text">제출된 과제 캐시 유효 시간 (Submitted TTL)</span>
+              <span class="label-desc">이미 제출한 과제 데이터의 캐시 유효 기간입니다.</span>
+            </div>
+            <div class="input-group-column">
+              <div class="input-row">
+                <input type="number" id="advanced-cacheTtlSubmitted" min="1000" step="1000">
+                <span class="unit">ms</span>
+              </div>
+              <span class="converted-value" id="advanced-cacheTtlSubmitted-preview"></span>
+            </div>
+          </div>
+        </section>
+
+        <div class="save-bar" id="save-bar">
+          <div class="status-container">
+            <span class="unsaved-status">변경사항이 있어요!</span>
+            <span class="save-status" id="save-status">저장되었습니다.</span>
+          </div>
+          <button id="save-btn" class="primary-btn">저장하기</button>
+        </div>
+      </div>
+
+      <!-- About Tab -->
+      <div id="tab-about" class="tab-content">
+        <h1>About</h1>
+        <div class="about-card">
+          <div class="about-header">
+            <img src="/assets/icons/icon128.png" alt="CSMS+ Logo" class="about-logo">
+            <h2>CSMS+</h2>
+            <p class="version">v<span id="version-number">2.0.0</span></p>
+          </div>
+          <p class="description">GIST LMS를 더 편하게 만들어드려요.</p>
+
+          <div class="links">
+            <a href="https://github.com/enc2586/csmsplus" target="_blank" class="link-btn">
+              <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"
+                stroke-linecap="round" stroke-linejoin="round" class="icon">
+                <path
+                  d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22">
+                </path>
+              </svg>
+              GitHub 저장소
+            </a>
+          </div>
+
+          <div class="contact-section">
+            <h3>버그 제보 및 기능 제안</h3>
+            <p>문제가 발생했거나 새로운 기능이 필요하다면 언제든 알려주세요!</p>
+            <ul>
+              <li>
+                <a href="https://forms.gle/i81z4jLKyXF1oXKBA" target="_blank">Google Forms로 제보하기</a>
+              </li>
+              <li>
+                <a href="https://github.com/enc2586/csmsplus/issues" target="_blank">GitHub Issue 생성하기</a>
+              </li>
+              <li>
+                이메일 문의: <a href="mailto:enc25867@gm.gist.ac.kr">enc25867@gm.gist.ac.kr</a>
+              </li>
+            </ul>
+          </div>
+
+          <div class="license-info">
+            <h3>License</h3>
+            <p>Licensed under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA
+                4.0</a></p>
+            <p class="copyright">Copyright © <span id="copyright-year"></span> 최홍제</p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <script src="options.js"></script>
+</body>
+
+</html>
