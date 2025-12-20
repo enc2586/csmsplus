@@ -17,9 +17,9 @@ VERSION=$(grep -o '"version": "[^"]*"' manifest.json | cut -d'"' -f4)
 mkdir -p dist
 
 # Define output filename
-OUTPUT_FILE="dist/csmsdl-extension-v${VERSION}.zip"
+OUTPUT_FILE="dist/csmsplus-v${VERSION}.zip"
 
-echo -e "${BLUE}Building CSMSDL Extension v${VERSION}...${NC}"
+echo -e "${BLUE}Building CSMS+ v${VERSION}...${NC}"
 
 # Remove old zip file if exists
 if [ -f "$OUTPUT_FILE" ]; then
