@@ -194,6 +194,7 @@
 /* Stats Grid */
 .dashboard-stats {
   display: flex;
+  flex-wrap: wrap;
   /* Changed from grid to flex row for simpler left-align flow or justified */
   gap: 30px;
   margin-bottom: 20px;
@@ -236,6 +237,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 16px;
 }
 
 .dashboard-task-item {

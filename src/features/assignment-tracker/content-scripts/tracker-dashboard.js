@@ -151,8 +151,8 @@
                     }
 
                     this.updateProgressBar();
-                    this.scheduleUpdate();
                 }
+                this.scheduleUpdate();
             }
         },
 
@@ -208,7 +208,8 @@
                         </div>
                         <div class="dashboard-stats" style="opacity: 0.5;">
                            <div class="stat-item"><div class="stat-value">-</div><div class="stat-label">완료</div></div>
-                           <div class="stat-item"><div class="stat-value">-</div><div class="stat-label">임박/지각</div></div>
+                           <div class="stat-item"><div class="stat-value">-</div><div class="stat-label">마감 임박</div></div>
+                           <div class="stat-item"><div class="stat-value">-</div><div class="stat-label">마감 지남</div></div>
                            <div class="stat-item"><div class="stat-value">-</div><div class="stat-label">남음</div></div>
                         </div>
                       </div>`;
@@ -239,29 +240,21 @@
             let overdueList = [];
 
             const now = new Date();
-            const urgentThresholdMs = (this.state.urgentThresholdHours || 72) * 60 * 60 * 1000;
-
             assignments.forEach(a => {
-                if (a.isSubmitted) {
+                const { status, dueDate } = Utils.getAssignmentStatus(a.deadline, a.isSubmitted, this.state.urgentThresholdHours, now);
+                if (status === 'submitted') {
                     completed++;
-                } else {
-                    const dueDate = Utils.parseDate(a.deadline);
-                    if (dueDate) {
-                        const diff = dueDate - now;
-                        if (diff < 0) {
-                            overdueList.push({ ...a, diff });
-                        } else if (diff <= urgentThresholdMs) {
-                            urgentList.push({ ...a, diff });
-                        }
-                    }
+                } else if (status === 'overdue') {
+                    overdueList.push({ ...a, diff: dueDate - now });
+                } else if (status === 'urgent') {
+                    urgentList.push({ ...a, diff: dueDate - now });
                 }
             });
 
             urgentList.sort((a, b) => a.diff - b.diff);
             overdueList.sort((a, b) => b.diff - a.diff);
 
-            const urgentAndOverdue = urgentList.length + overdueList.length;
-            const remaining = total - completed - urgentAndOverdue;
+            const remaining = total - completed - urgentList.length - overdueList.length;
 
             // 3. Render HTML
             // Note: Progress Bar is separate. Content goes into wrapper.
@@ -278,8 +271,12 @@
                 <div class="stat-label">완료</div>
               </div>
               <div class="stat-item">
-                <div class="stat-value" style="color: #c62828">${urgentAndOverdue}</div>
-                <div class="stat-label">임박/지각</div>
+                <div class="stat-value" style="color: #f57c00">${urgentList.length}</div>
+                <div class="stat-label">마감 임박</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value" style="color: #c62828">${overdueList.length}</div>
+                <div class="stat-label">마감 지남</div>
               </div>
               <div class="stat-item">
                 <div class="stat-value" style="color: #757575">${remaining}</div>
@@ -288,48 +285,49 @@
             </div>
         `;
 
-            const itemsToShow = [...overdueList, ...urgentList];
-
-            if (itemsToShow.length === 0) {
+            if (urgentList.length + overdueList.length === 0) {
                 html += `
              <div class="dashboard-empty">
                지금은 마감이 임박하거나 지난 과제가 없습니다.
              </div>
            `;
             } else {
-                html += `<div class="task-list-title">임박/지각 과제</div>
+                for (const [title, itemsToShow] of [['마감 임박 과제', urgentList], ['마감 지남 과제', overdueList]]) {
+                    if (itemsToShow.length === 0) continue;
+                    html += `<div class="task-list-title">${title}</div>
                     <div class="dashboard-task-list">`;
 
-                itemsToShow.forEach(item => {
-                    let chipClass = 'status-warning';
-                    let chipText = '마감임박';
-                    if (item.diff < 0) {
-                        chipClass = 'status-overdue';
-                        chipText = '마감지남';
-                    }
+                    itemsToShow.forEach(item => {
+                        let chipClass = 'status-warning';
+                        let chipText = '마감 임박';
+                        if (item.diff < 0) {
+                            chipClass = 'status-overdue';
+                            chipText = '마감 지남';
+                        }
 
-                    const formattedDeadline = item.deadline ? Utils.formatDateWithPadding(item.deadline) + '까지' : '';
-                    const dueDate = Utils.parseDate(item.deadline);
-                    const remainingTime = (dueDate && item.diff > 0) ? Utils.calculateTimeRemaining(dueDate) : '';
+                        const formattedDeadline = item.deadline ? Utils.formatDateWithPadding(item.deadline) + '까지' : '';
+                        const dueDate = Utils.parseDate(item.deadline);
+                        const remainingTime = (dueDate && item.diff > 0) ? Utils.calculateTimeRemaining(dueDate) : '';
 
-                    const contentHtml = this.state.showContent && item.content
-                        ? `<div class="task-content">${item.content}</div>`
-                        : '';
+                        const contentHtml = this.state.showContent && item.content
+                            ? `<div class="task-content">${item.content}</div>`
+                            : '';
 
-                    html += `
-               <a href="${item.link}" class="dashboard-task-item">
-                 <div class="task-left">
-                   <span class="assignment-status-chip ${chipClass}">${chipText}</span>
-                   <div class="task-info">
-                     <span class="task-title" title="${item.title}">${item.title}</span>
-                     ${contentHtml}
-                   </div>
-                 </div>
-                 <span class="task-due">${formattedDeadline}${remainingTime}</span>
-               </a>
-             `;
-                });
-                html += `</div>`;
+                        html += `
+                   <a href="${item.link}" class="dashboard-task-item">
+                     <div class="task-left">
+                       <span class="assignment-status-chip ${chipClass}">${chipText}</span>
+                       <div class="task-info">
+                         <span class="task-title" title="${item.title}">${item.title}</span>
+                         ${contentHtml}
+                       </div>
+                     </div>
+                     <span class="task-due">${formattedDeadline}${remainingTime}</span>
+                   </a>
+                 `;
+                    });
+                    html += `</div>`;
+                }
             }
 
             html += `</div>`; // Close .content

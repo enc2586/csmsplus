@@ -60,6 +60,7 @@
         "https://lms.gist.ac.kr/index.php*"
       ],
       "js": [
+        "src/features/assignment-tracker/content-scripts/tracker-utils.js",
         "src/features/assignment-tracker/content-scripts/course-list-parser.js"
       ],
       "css": [

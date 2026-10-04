@@ -91,9 +91,8 @@
         },
 
         // Helper: Determine status based on deadline and submission
-        getAssignmentStatus: function (deadline, isSubmitted) {
+        getAssignmentStatus: function (deadline, isSubmitted, urgentThresholdHours = 72, now = new Date()) {
             const dueDate = this.parseDate(deadline);
-            const now = new Date();
 
             let chipText = '미제출';
             let chipClass = 'status-default';
@@ -108,11 +107,11 @@
                 const diffHours = diffMs / (1000 * 60 * 60);
 
                 if (diffMs < 0) {
-                    chipText = '마감지남';
+                    chipText = '마감 지남';
                     chipClass = 'status-overdue';
                     status = 'overdue';
-                } else if (diffHours <= 72) {
-                    chipText = '마감임박';
+                } else if (diffHours <= (urgentThresholdHours || 72)) {
+                    chipText = '마감 임박';
                     chipClass = 'status-warning';
                     status = 'urgent';
                 }

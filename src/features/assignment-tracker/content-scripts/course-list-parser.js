@@ -20,6 +20,7 @@
     };
 
     let CurrentConfig = { ...DEFAULT_CONFIG };
+    const Utils = window.GistAssignmentTracker.Utils;
 
     // Queue system for rate limiting (Promisified)
     const fetchQueue = [];
@@ -191,66 +192,14 @@
         }
     }
 
-    function calculateStats(assignments, courseId) {
-        const stats = { completed: 0, urgent: 0, remaining: 0 };
+    function calculateStats(assignments) {
+        const stats = { completed: 0, urgent: 0, overdue: 0, remaining: 0 };
         const now = new Date();
-        const urgentThreshold = CurrentConfig.URGENT_THRESHOLD_HOURS * 60 * 60 * 1000;
-
-        /* 
-        console.log(`[Course ${courseId}] === Calculating Stats ===`);
-        console.log(`[Course ${courseId}] Total assignments in cache: ${assignments.length}`);
-        console.log(`[Course ${courseId}] Urgent threshold: ${CurrentConfig.URGENT_THRESHOLD_HOURS} hours (${urgentThreshold}ms)`);
-        console.log(`[Course ${courseId}] Current time: ${now.toISOString()}`);
-        */
-
-        assignments.forEach((assignment, index) => {
-            if (!assignment) {
-                return;
-            }
-
-            /*
-            console.log(`[Course ${courseId}] Assignment ${assignment.id}:`);
-            console.log(`  - Title: ${assignment.title || 'N/A'}`);
-            console.log(`  - Submitted: ${assignment.isSubmitted}`);
-            console.log(`  - Deadline: ${assignment.deadline}`);
-            */
-
-            if (assignment.isSubmitted) {
-                stats.completed++;
-                // console.log(`  => COMPLETED (제출완료)`);
-            } else {
-                const dueDate = parseDate(assignment.deadline);
-                // console.log(`  - Parsed due date: ${dueDate ? dueDate.toISOString() : 'NULL'}`);
-
-                if (dueDate) {
-                    const diff = dueDate - now;
-                    // const diffDays = diff / (24 * 60 * 60 * 1000);
-                    // console.log(`  - Time diff: ${diff}ms (${diffDays.toFixed(2)} days)`);
-                    // console.log(`  - Urgent threshold check: ${diff} <= ${urgentThreshold}?`);
-
-                    // Changed: overdue OR within 7 days = urgent/overdue
-                    if (diff < 0) {
-                        stats.urgent++;
-                        // console.log(`  => URGENT/OVERDUE (마감지남, ${Math.abs(diffDays).toFixed(2)} days ago)`);
-                    } else if (diff <= urgentThreshold) {
-                        stats.urgent++;
-                        // console.log(`  => URGENT (7일 이내: ${diffDays.toFixed(2)} days left)`);
-                    } else {
-                        stats.remaining++;
-                        // console.log(`  => REMAINING (7일 이상: ${diffDays.toFixed(2)} days left)`);
-                    }
-                } else {
-                    stats.remaining++;
-                    // console.log(`  => REMAINING (no valid deadline)`);
-                }
-            }
+        assignments.forEach(assignment => {
+            if (!assignment) return;
+            const { status } = Utils.getAssignmentStatus(assignment.deadline, assignment.isSubmitted, CurrentConfig.URGENT_THRESHOLD_HOURS, now);
+            stats[status === 'submitted' ? 'completed' : status]++;
         });
-
-        /*
-        console.log(`[Course ${courseId}] === Final Stats ===`);
-        console.log(`[Course ${courseId}] Completed: ${stats.completed}, Urgent: ${stats.urgent}, Remaining: ${stats.remaining}`);
-        */
-
         return stats;
     }
 
@@ -296,6 +245,7 @@
             }
         } else {
             // Add 'has-urgent' class if urgent count > 0
+            const overdueClass = stats.overdue > 0 ? 'stat-overdue has-overdue' : 'stat-overdue';
             const urgentClass = stats.urgent > 0 ? 'stat-urgent has-urgent' : 'stat-urgent';
 
             statsContainer.innerHTML = `
@@ -304,8 +254,12 @@
                 <div class="stat-value">${stats.completed}</div>
               </div>
               <div class="stat-item ${urgentClass}">
-                <div class="stat-label">임박/지각</div>
+                <div class="stat-label">마감 임박</div>
                 <div class="stat-value">${stats.urgent}</div>
+              </div>
+              <div class="stat-item ${overdueClass}">
+                <div class="stat-label">마감 지남</div>
+                <div class="stat-value">${stats.overdue}</div>
               </div>
               <div class="stat-item stat-remaining">
                 <div class="stat-label">남음</div>
@@ -320,14 +274,14 @@
         // console.log(`[Processing] Course ${courseId} - START`);
 
         // Initial Loading State (0%)
-        renderCourseStats(courseDiv, { completed: 0, urgent: 0, remaining: 0 }, courseId, true, 0);
+        renderCourseStats(courseDiv, { completed: 0, urgent: 0, overdue: 0, remaining: 0 }, courseId, true, 0);
         if (onProgress) onProgress(0);
 
         // Fetch assignment list (Rate Limited)
         const assignments = await enqueueFetch(() => fetchCourseAssignments(courseId));
 
         if (assignments.length === 0) {
-            renderCourseStats(courseDiv, { completed: 0, urgent: 0, remaining: 0 }, courseId, false);
+            renderCourseStats(courseDiv, { completed: 0, urgent: 0, overdue: 0, remaining: 0 }, courseId, false);
             if (onProgress) onProgress(1); // 100%
             return;
         }
@@ -387,7 +341,7 @@
             }
 
             // Calculate and render stats with ALL data
-            const stats = calculateStats(cachedData, courseId);
+            const stats = calculateStats(cachedData);
             renderCourseStats(courseDiv, stats, courseId, false);
 
             // Ensure 100% on completion
@@ -414,6 +368,7 @@
             // console.log('[Course List Parser] Disabled via options');
             return;
         }
+
 
         // Update Config
         if (trackerOptions.urgentThresholdHours) CurrentConfig.URGENT_THRESHOLD_HOURS = trackerOptions.urgentThresholdHours;
