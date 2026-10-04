@@ -112,15 +112,6 @@ function getSettingsFromUI() {
     };
 }
 
-// Save settings to storage
-function saveSettings() {
-    const options = getSettingsFromUI();
-
-    chrome.storage.local.set({ options }, () => {
-        showSaveStatus();
-    });
-}
-
 // Helper: Deep Merge
 function deepMerge(target, source) {
     const output = Object.assign({}, target);
@@ -212,6 +203,8 @@ function clearCache() {
 
 // Show save feedback
 function saveSettings() {
+    if (!elements.tracker.urgentThresholdHours.reportValidity()) return;
+
     elements.saveBtn.disabled = true;
     const options = getSettingsFromUI();
 
