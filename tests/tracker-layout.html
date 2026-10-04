@@ -41,7 +41,9 @@ window.chrome = { storage: { onChanged: { addListener(fn) { listeners.push(fn); 
 const buttonPositions = new WeakMap();
 function checkLayout() {
   const failures = [];
-  document.querySelectorAll('.assignment-tracking-controls').forEach(controls => {
+  const controls = document.querySelectorAll('.assignment-tracking-controls');
+  if (controls.length !== 5) failures.push('과제 컨트롤이 5개 모두 렌더링되지 않음');
+  controls.forEach(controls => {
     const info = controls.parentElement.querySelector('.assignment-info-container');
     const chip = info.querySelector('.assignment-status-chip, .assignment-compact-chip');
     const button = controls.querySelector('button');

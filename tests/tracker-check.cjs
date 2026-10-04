@@ -188,5 +188,22 @@ function assertCounts(html, values) {
     await reload.window.GistAssignmentTracker.Utils.loadExcludedAssignments();
     assert(reload.window.GistAssignmentTracker.Utils.excludedAssignmentIds.has('6'));
 
+    const layoutHtml = fs.readFileSync(path.join(repo, 'tests/tracker-layout.html'), 'utf8');
+    const layoutScript = [...layoutHtml.matchAll(/<script>([\s\S]*?)<\/script>/g)].at(-1)[1];
+    const result = {};
+    let layoutControls = [];
+    const layout = vm.createContext({ window: { addEventListener() {} },
+        chrome: { storage: { onChanged: { addListener() {} } } },
+        document: { querySelectorAll: () => layoutControls, getElementById: () => result } });
+    vm.runInContext(layoutScript, layout);
+    for (const count of [0, 4, 5, 6]) {
+        layoutControls = Array.from({ length: count }, () => ({
+            parentElement: { querySelector: () => ({ hidden: true, querySelector: () => null }) },
+            querySelector: () => ({ textContent: '추적 제외', getBoundingClientRect: () => ({ left: 40, right: 60, width: 20 }) }),
+            closest: () => ({ getBoundingClientRect: () => ({ left: 0, right: 100, width: 100 }) })
+        }));
+        vm.runInContext('checkLayout()', layout);
+        assert(result.textContent.startsWith(count === 5 ? 'PASS:' : 'FAIL:'), `layout controls: ${count}`);
+    }
     console.log('tracker checks passed');
 })().catch(error => { console.error(error); process.exitCode = 1; });
