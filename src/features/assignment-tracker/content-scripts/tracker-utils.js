@@ -22,6 +22,27 @@
     }
 
     window.GistAssignmentTracker.Utils = {
+        excludedAssignmentIds: new Set(),
+
+        loadExcludedAssignments: async function () {
+            const stored = await chrome.storage.local.get(null);
+            this.excludedAssignmentIds = new Set(Object.keys(stored)
+                .filter(key => key.startsWith('excludedAssignment_') && stored[key] === true)
+                .map(key => key.slice('excludedAssignment_'.length)));
+        },
+
+        updateExcludedAssignments: function (changes) {
+            let changed = false;
+            for (const [key, change] of Object.entries(changes)) {
+                if (!key.startsWith('excludedAssignment_')) continue;
+                const id = key.slice('excludedAssignment_'.length);
+                if (change.newValue === true) this.excludedAssignmentIds.add(id);
+                else this.excludedAssignmentIds.delete(id);
+                changed = true;
+            }
+            return changed;
+        },
+
         enqueueFetch: function (fn) {
             fetchQueue.push(fn);
             if (!isProcessingQueue) {

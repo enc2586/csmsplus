@@ -232,7 +232,8 @@
             }
 
             // 2. Aggregate
-            const assignments = Object.values(this.state.assignments);
+            const assignments = Object.values(this.state.assignments)
+                .filter(a => !Utils.excludedAssignmentIds.has(a.id));
             const total = assignments.length;
 
             let completed = 0;

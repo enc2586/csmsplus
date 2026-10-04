@@ -21,6 +21,20 @@
 
     let CurrentConfig = { ...DEFAULT_CONFIG };
     const Utils = window.GistAssignmentTracker.Utils;
+    const courseSummaries = new Map();
+
+    chrome.storage.onChanged.addListener((changes, area) => {
+        if (area !== 'local') return;
+        const exclusionsChanged = Utils.updateExcludedAssignments(changes);
+        if (changes.options) {
+            CurrentConfig.URGENT_THRESHOLD_HOURS = changes.options.newValue?.tracker?.urgentThresholdHours || 72;
+        }
+        if (exclusionsChanged || changes.options) {
+            courseSummaries.forEach(({ courseDiv, assignments }, courseId) => {
+                renderCourseStats(courseDiv, calculateStats(assignments), courseId);
+            });
+        }
+    });
 
     // Queue system for rate limiting (Promisified)
     const fetchQueue = [];
@@ -196,7 +210,7 @@
         const stats = { completed: 0, urgent: 0, overdue: 0, remaining: 0 };
         const now = new Date();
         assignments.forEach(assignment => {
-            if (!assignment) return;
+            if (!assignment || Utils.excludedAssignmentIds.has(assignment.id)) return;
             const { status } = Utils.getAssignmentStatus(assignment.deadline, assignment.isSubmitted, CurrentConfig.URGENT_THRESHOLD_HOURS, now);
             stats[status === 'submitted' ? 'completed' : status]++;
         });
@@ -281,6 +295,7 @@
         const assignments = await enqueueFetch(() => fetchCourseAssignments(courseId));
 
         if (assignments.length === 0) {
+            courseSummaries.set(courseId, { courseDiv, assignments: [] });
             renderCourseStats(courseDiv, { completed: 0, urgent: 0, overdue: 0, remaining: 0 }, courseId, false);
             if (onProgress) onProgress(1); // 100%
             return;
@@ -341,6 +356,7 @@
             }
 
             // Calculate and render stats with ALL data
+            courseSummaries.set(courseId, { courseDiv, assignments: cachedData });
             const stats = calculateStats(cachedData);
             renderCourseStats(courseDiv, stats, courseId, false);
 
@@ -369,6 +385,7 @@
             return;
         }
 
+        await Utils.loadExcludedAssignments();
 
         // Update Config
         if (trackerOptions.urgentThresholdHours) CurrentConfig.URGENT_THRESHOLD_HOURS = trackerOptions.urgentThresholdHours;
