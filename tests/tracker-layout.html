@@ -25,7 +25,6 @@ body { font: 14px Arial, sans-serif; padding: 24px; color: #444; }
 const stored = { options: { tracker: { urgentThresholdHours: 24, enableSummaryAtLecture: false } }, excludedAssignment_2: true, excludedAssignment_3: true, excludedAssignment_5: true };
 const listeners = [];
 for (let id = 1; id <= 5; id++) stored[`assignment_${id}`] = { id: String(id), deadline: '2020-01-01 12:00', isSubmitted: false, timestamp: Date.now() };
-for (let id = 1; id <= 5; id++) stored[`assignment_${id} `] = stored[`assignment_${id}`];
 window.chrome = { storage: { onChanged: { addListener(fn) { listeners.push(fn); } }, local: {
   async get(keys, callback) { const value = keys === null ? { ...stored } : Object.fromEntries(keys.map(k => [k, stored[k]])); if (callback) callback(value); return value; },
   async set(items) { for (const [key, value] of Object.entries(items)) { stored[key] = value; listeners.forEach(fn => fn({ [key]: { newValue: value } }, 'local')); } },

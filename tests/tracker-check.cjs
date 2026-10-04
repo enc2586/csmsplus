@@ -33,7 +33,6 @@ const data = [
 ].map(a => ({ ...a, title: `과제 ${a.id}`, link: `https://lms.gist.ac.kr/mod/assign/view.php?id=${a.id}`, timestamp: now }));
 const stored = { options: { tracker: { urgentThresholdHours: 24, enableAssignmentDetail: false } }, excludedAssignment_6: true };
 for (const a of data.slice(0, 5)) stored[`assignment_${a.id}`] = a;
-for (const a of data.slice(0, 5)) stored[`assignment_${a.id} `] = a;
 const listeners = [];
 let failNextSave = false;
 const local = {
