@@ -63,15 +63,42 @@ node tests/tracker-check.cjs
 
 ```
 /
-├── assets/                 # 아이콘 및 정적 리소스
+├── assets/
+│   └── icons/                          # 확장 프로그램 아이콘
+├── demo/                               # 기능 예시 이미지
 ├── src/
 │   ├── features/
-│   │   ├── assignment-tracker/ # 과제 추적 및 대시보드 기능
-│   │   └── pdf-downloader/     # PDF 다운로드 기능
-│   ├── background/             # 백그라운드 서비스 워커
-│   └── options/                # 설정 화면 및 업데이트 로그
-├── tests/                      # 기능 및 브라우저 레이아웃 검사
-└── manifest.json
+│   │   ├── assignment-tracker/
+│   │   │   ├── content-scripts/
+│   │   │   │   ├── tracker-main.js              # 강의 페이지 초기화 및 추적 버튼
+│   │   │   │   ├── tracker-config.js            # 조회·캐시 기본 설정
+│   │   │   │   ├── tracker-utils.js             # 상태 판정·추적 제외·조회 큐
+│   │   │   │   ├── tracker-api.js               # 과제 상세 정보 조회
+│   │   │   │   ├── tracker-ui.js                # 개별 과제 상태 표시
+│   │   │   │   ├── tracker-dashboard.js         # 강의 상단 과제 요약
+│   │   │   │   ├── course-list-parser.js        # LMS 메인 강좌 카드 집계
+│   │   │   │   └── assignment-cache-updater.js  # 과제 방문 시 캐시 갱신
+│   │   │   └── styles/
+│   │   │       ├── assignment-styles.css
+│   │   │       └── course-stats-styles.css
+│   │   └── pdf-downloader/
+│   │       ├── content.js                       # PDF 다운로드 UI 및 변환
+│   │       ├── pdf-lib.min.js                   # 번들된 PDF 라이브러리
+│   │       └── styles.css
+│   ├── background/
+│   │   └── background.js                       # 다운로드 처리 및 설정 화면 열기
+│   └── options/
+│       ├── options.html
+│       ├── options.css
+│       ├── options.js                           # 설정 읽기·검증·저장
+│       └── patch_notes.json                     # 업데이트 로그
+├── tests/
+│   ├── tracker-check.cjs                        # 기능 회귀 검사
+│   └── tracker-layout.html                      # 브라우저 레이아웃 검사
+├── build.sh                                    # 배포용 ZIP 생성
+├── manifest.json                               # 권한 및 페이지별 스크립트 등록
+├── README.md
+└── LICENSE
 ```
 
 ## 라이선스
