@@ -22,6 +22,27 @@
     }
 
     window.GistAssignmentTracker.Utils = {
+        excludedAssignmentIds: new Set(),
+
+        loadExcludedAssignments: async function () {
+            const stored = await chrome.storage.local.get(null);
+            this.excludedAssignmentIds = new Set(Object.keys(stored)
+                .filter(key => key.startsWith('excludedAssignment_') && stored[key] === true)
+                .map(key => key.slice('excludedAssignment_'.length)));
+        },
+
+        updateExcludedAssignments: function (changes) {
+            let changed = false;
+            for (const [key, change] of Object.entries(changes)) {
+                if (!key.startsWith('excludedAssignment_')) continue;
+                const id = key.slice('excludedAssignment_'.length);
+                if (change.newValue === true) this.excludedAssignmentIds.add(id);
+                else this.excludedAssignmentIds.delete(id);
+                changed = true;
+            }
+            return changed;
+        },
+
         enqueueFetch: function (fn) {
             fetchQueue.push(fn);
             if (!isProcessingQueue) {
@@ -91,9 +112,8 @@
         },
 
         // Helper: Determine status based on deadline and submission
-        getAssignmentStatus: function (deadline, isSubmitted) {
+        getAssignmentStatus: function (deadline, isSubmitted, urgentThresholdHours = 72, now = new Date()) {
             const dueDate = this.parseDate(deadline);
-            const now = new Date();
 
             let chipText = '미제출';
             let chipClass = 'status-default';
@@ -108,11 +128,11 @@
                 const diffHours = diffMs / (1000 * 60 * 60);
 
                 if (diffMs < 0) {
-                    chipText = '마감지남';
+                    chipText = '마감 지남';
                     chipClass = 'status-overdue';
                     status = 'overdue';
-                } else if (diffHours <= 72) {
-                    chipText = '마감임박';
+                } else if (diffHours <= (urgentThresholdHours || 72)) {
+                    chipText = '마감 임박';
                     chipClass = 'status-warning';
                     status = 'urgent';
                 }

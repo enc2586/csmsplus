@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<title>과제 추적 레이아웃 검사</title>
+<link rel="stylesheet" href="../src/features/assignment-tracker/styles/assignment-styles.css">
+<style>
+body { font: 14px Arial, sans-serif; padding: 24px; color: #444; }
+.cards { display: flex; gap: 20px; margin-bottom: 32px; }
+.course_box0 { width: 100px; padding: 12px; border: 1px solid #ddd; border-radius: 6px; text-align: center; }
+.course_box0.wide { width: 180px; }
+.course_box0 .activityinstance > a { display: block; color: #666; text-decoration: none; padding: 12px 0; }
+.course_box0 .icon { display: block; width: 64px; height: 64px; margin: 0 auto 8px; border-radius: 50%; background: #e86a61; color: white; line-height: 64px; font-size: 30px; }
+.normal { margin: 12px 0; border: 1px solid #ddd; padding: 12px; max-width: 500px; }
+</style>
+<h1>과제 추적 레이아웃 검사</h1>
+<p id="result">검사 중</p>
+<section id="section-0" class="cards">
+  <div class="course_box0"><div class="activityinstance"><a href="https://lms.gist.ac.kr/mod/assign/view.php?id=1"><span class="icon">▤</span>presentation</a></div></div>
+  <div class="course_box0"><div class="activityinstance"><a href="https://lms.gist.ac.kr/mod/assign/view.php?id=2"><span class="icon">▤</span>presentation</a></div></div>
+  <div class="course_box0 wide"><div class="activityinstance"><a href="https://lms.gist.ac.kr/mod/assign/view.php?id=3"><span class="icon">▤</span>presentation</a></div></div>
+</section>
+<div class="normal activityinstance"><a href="https://lms.gist.ac.kr/mod/assign/view.php?id=4">일반 목록 과제</a></div>
+<div class="normal activityinstance"><a href="https://lms.gist.ac.kr/mod/assign/view.php?id=5">제외한 일반 목록 과제</a></div>
+<script>
+const stored = { options: { tracker: { urgentThresholdHours: 24, enableSummaryAtLecture: false } }, excludedAssignment_2: true, excludedAssignment_3: true, excludedAssignment_5: true };
+const listeners = [];
+for (let id = 1; id <= 5; id++) stored[`assignment_${id}`] = { id: String(id), deadline: '2020-01-01 12:00', isSubmitted: false, timestamp: Date.now() };
+window.chrome = { storage: { onChanged: { addListener(fn) { listeners.push(fn); } }, local: {
+  async get(keys, callback) { const value = keys === null ? { ...stored } : Object.fromEntries(keys.map(k => [k, stored[k]])); if (callback) callback(value); return value; },
+  async set(items) { for (const [key, value] of Object.entries(items)) { stored[key] = value; listeners.forEach(fn => fn({ [key]: { newValue: value } }, 'local')); } },
+  async remove(key) { delete stored[key]; listeners.forEach(fn => fn({ [key]: {} }, 'local')); }
+} } };
+</script>
+<script src="../src/features/assignment-tracker/content-scripts/tracker-config.js"></script>
+<script src="../src/features/assignment-tracker/content-scripts/tracker-utils.js"></script>
+<script src="../src/features/assignment-tracker/content-scripts/tracker-api.js"></script>
+<script src="../src/features/assignment-tracker/content-scripts/tracker-ui.js"></script>
+<script src="../src/features/assignment-tracker/content-scripts/tracker-dashboard.js"></script>
+<script src="../src/features/assignment-tracker/content-scripts/tracker-main.js"></script>
+<script>
+const buttonPositions = new WeakMap();
+function checkLayout() {
+  const failures = [];
+  const controls = document.querySelectorAll('.assignment-tracking-controls');
+  if (controls.length !== 5) failures.push('과제 컨트롤이 5개 모두 렌더링되지 않음');
+  controls.forEach(controls => {
+    const info = controls.parentElement.querySelector('.assignment-info-container');
+    const chip = info.querySelector('.assignment-status-chip, .assignment-compact-chip');
+    const button = controls.querySelector('button');
+    if (!button.textContent) { failures.push('버튼이 렌더링되지 않음'); return; }
+    if (chip && !info.hidden && chip.getBoundingClientRect().height > 26) failures.push('제외 칩이 여러 줄로 표시됨');
+    const card = controls.closest('.course_box0');
+    if (card) {
+      const center = card.getBoundingClientRect().left + card.getBoundingClientRect().width / 2;
+      for (const item of [button, ...(chip && !info.hidden ? [chip] : [])]) {
+        const rect = item.getBoundingClientRect();
+        if (Math.abs(rect.left + rect.width / 2 - center) > 2) failures.push('개요 카드 가운데 정렬 실패');
+        if (rect.left < card.getBoundingClientRect().left || rect.right > card.getBoundingClientRect().right) failures.push('카드 너비 초과');
+      }
+      if (chip && !info.hidden && Math.abs(chip.getBoundingClientRect().top - button.getBoundingClientRect().bottom - 6) > 1) failures.push('개요 버튼·칩 간격이 6px이 아님');
+    } else {
+      const title = controls.parentElement.querySelector('a');
+      const titleRect = title.getBoundingClientRect();
+      const buttonRect = button.getBoundingClientRect();
+      if (buttonRect.left < titleRect.right || Math.abs(buttonRect.top + buttonRect.height / 2 - titleRect.top - titleRect.height / 2) > 4) failures.push('주차 버튼이 과제명 오른쪽에 없음');
+      const parentRect = controls.parentElement.getBoundingClientRect();
+      const position = [buttonRect.left - parentRect.left, buttonRect.top - parentRect.top];
+      const previous = buttonPositions.get(button);
+      if (previous && position.some((value, i) => Math.abs(value - previous[i]) > 1)) failures.push('추적 전환 후 버튼 위치 변경');
+      buttonPositions.set(button, position);
+    }
+  });
+  document.getElementById('result').textContent = failures.length ? 'FAIL: ' + failures.join(', ') : 'PASS: 줄바꿈·카드 가운데 정렬·주차 버튼 위치';
+}
+window.addEventListener('load', () => requestAnimationFrame(() => requestAnimationFrame(checkLayout)));
+chrome.storage.onChanged.addListener(() => requestAnimationFrame(checkLayout));
+</script>
+</html>

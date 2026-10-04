@@ -36,7 +36,7 @@
             }
 
             const { deadline, isSubmitted, content } = data;
-            const statusData = Utils.getAssignmentStatus(deadline, isSubmitted);
+            const statusData = Utils.getAssignmentStatus(deadline, isSubmitted, config.urgentThresholdHours);
             const { chipText, chipClass, dueDate } = statusData;
 
             // Calculate remaining time

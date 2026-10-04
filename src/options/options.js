@@ -112,15 +112,6 @@ function getSettingsFromUI() {
     };
 }
 
-// Save settings to storage
-function saveSettings() {
-    const options = getSettingsFromUI();
-
-    chrome.storage.local.set({ options }, () => {
-        showSaveStatus();
-    });
-}
-
 // Helper: Deep Merge
 function deepMerge(target, source) {
     const output = Object.assign({}, target);
@@ -196,7 +187,7 @@ function clearCache() {
     }
 
     chrome.storage.local.get(null, (items) => {
-        const keysToRemove = Object.keys(items).filter(key => key !== 'options');
+        const keysToRemove = Object.keys(items).filter(key => key !== 'options' && !key.startsWith('excludedAssignment_'));
 
         if (keysToRemove.length === 0) {
             alert('삭제할 캐시 데이터가 없습니다.');
@@ -212,6 +203,8 @@ function clearCache() {
 
 // Show save feedback
 function saveSettings() {
+    if (!elements.tracker.urgentThresholdHours.reportValidity()) return;
+
     elements.saveBtn.disabled = true;
     const options = getSettingsFromUI();
 

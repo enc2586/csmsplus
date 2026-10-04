@@ -133,9 +133,13 @@
     /* Green */
 }
 
-.stat-urgent .stat-value {
+.stat-overdue .stat-value {
     color: #d32f2f;
     /* Red */
+}
+
+.stat-urgent .stat-value {
+    color: #f57c00;
 }
 
 .stat-remaining .stat-value {
@@ -146,7 +150,7 @@
 /* Special styling for urgent items with count > 0 */
 .stat-urgent.has-urgent .stat-label {
     color: #fff;
-    background-color: #d32f2f;
+    background-color: #f57c00;
     font-weight: 700;
     padding: 2px 6px;
     border-radius: 3px;
@@ -154,8 +158,16 @@
 }
 
 .stat-urgent.has-urgent .stat-value {
-    color: #d32f2f;
+    color: #f57c00;
     animation: blink 1.5s ease-out infinite;
+}
+
+.stat-overdue.has-overdue .stat-label {
+    color: #fff;
+    background-color: #d32f2f;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 3px;
 }
 
 /* Blinking animation: 1.2s visible (80%), 0.3s fade (20%) */

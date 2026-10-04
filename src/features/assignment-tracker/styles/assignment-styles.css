@@ -1,7 +1,46 @@
 /* Assignment Info Container */
+.assignment-tracking-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  vertical-align: middle;
+  font-size: 11px;
+  color: #666;
+}
+
+.assignment-tracking-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  min-height: 22px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  padding: 2px 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  color: #444;
+  font: inherit;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.assignment-tracking-button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.assignment-info-container[hidden],
+.assignment-tracking-controls [hidden] {
+  display: none !important;
+}
+
 .assignment-info-container {
   display: flex !important;
   flex-direction: column;
+  align-items: flex-start;
   gap: 4px;
   margin-top: 2px;
   /* Indent to align with text, bypassing the icon. 
@@ -76,6 +115,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  min-height: 22px;
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: 2px 8px;
   /* Reduced vertical padding for smaller height */
   font-size: 11px;
@@ -194,6 +237,7 @@
 /* Stats Grid */
 .dashboard-stats {
   display: flex;
+  flex-wrap: wrap;
   /* Changed from grid to flex row for simpler left-align flow or justified */
   gap: 30px;
   margin-bottom: 20px;
@@ -236,6 +280,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  margin-bottom: 16px;
 }
 
 .dashboard-task-item {
@@ -499,6 +544,10 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
+  min-height: 22px;
+  flex-shrink: 0;
+  white-space: nowrap;
   padding: 3px 8px;
   font-size: 11px;
   font-weight: 500;
@@ -514,7 +563,18 @@
 }
 
 /* Override for assignments in course overview section - remove left margin and center */
+.course_box0 .assignment-tracking-controls {
+  display: flex;
+  flex-direction: column;
+  margin: 4px 0 0;
+}
+
 .course_box0 .assignment-info-container {
+  align-items: center;
   margin-left: 0 !important;
-  margin-top: 0 !important;
+  margin-top: 6px !important;
+}
+
+.course_box0 .assignment-compact-link {
+  margin-top: 0;
 }

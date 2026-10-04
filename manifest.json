@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "CSMS+",
-  "version": "2.1.2",
+  "version": "2.1.3",
   "description": "Enhance your LMS experience",
   "permissions": [
     "downloads",
@@ -60,6 +60,7 @@
         "https://lms.gist.ac.kr/index.php*"
       ],
       "js": [
+        "src/features/assignment-tracker/content-scripts/tracker-utils.js",
         "src/features/assignment-tracker/content-scripts/course-list-parser.js"
       ],
       "css": [
