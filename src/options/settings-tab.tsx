@@ -99,11 +99,12 @@ function OptionItem({
 }
 
 // The legacy page never set a font on form controls, so they used Chrome's default (Arial).
-const controlFont = "font-[Arial]";
-const numberInput =
-  "w-120 rounded-4 border border-gray-333 bg-dark-input px-12 py-8 text-right text-14 text-gray-e0e0e0 focus:border-accent focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none " +
-  controlFont;
-const unit = "text-13 text-gray-aaa";
+const controlFont = cn("font-[Arial]");
+const numberInput = cn(
+  "w-120 rounded-4 border border-gray-333 bg-dark-input px-12 py-8 text-right text-14 text-gray-e0e0e0 focus:border-accent focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none",
+  controlFont,
+);
+const unit = cn("text-13 text-gray-aaa");
 
 export function SettingsTab() {
   const [draft, setDraft] = useState<Draft | null>(null);

@@ -76,7 +76,7 @@ export function DownloadButton({ params }: { params: DocumentParams }) {
           radius={28}
           strokeWidth={3}
           className="absolute top-1/2 left-1/2 -translate-1/2"
-          barClassName="stroke-success"
+          barClassName={cn("stroke-success")}
         />
         <svg
           viewBox="0 0 24 24"

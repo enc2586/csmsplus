@@ -1,8 +1,9 @@
 import { getYear } from "date-fns";
 import iconUrl from "../../assets/icons/icon128.png";
+import { cn } from "../ui/cn.ts";
 import { GitHubIcon } from "./icons.tsx";
 
-const link = "text-[color:LinkText] underline";
+const link = cn("text-[color:LinkText] underline");
 const year = getYear(Date.now());
 
 export function AboutTab() {

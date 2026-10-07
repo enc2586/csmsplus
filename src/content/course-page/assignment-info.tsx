@@ -10,8 +10,9 @@ import { cn } from "../../ui/cn.ts";
 import { StatusChip } from "../../ui/status-chip.tsx";
 import { courseStore } from "./store.ts";
 
-const spinner =
-  "mr-4 inline-block h-10 w-10 animate-spin rounded-full border-2 border-gray-f3f3f3 border-t-gray-555";
+const spinner = cn(
+  "mr-4 inline-block h-10 w-10 animate-spin rounded-full border-2 border-gray-f3f3f3 border-t-gray-555",
+);
 
 function Content({
   id,

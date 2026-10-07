@@ -10,16 +10,16 @@ export const STATUS_LABEL: Record<AssignmentStatus, string> = {
 };
 
 const tone: Record<AssignmentStatus, string> = {
-  submitted: "bg-status-submitted text-white",
-  overdue: "bg-status-overdue text-white",
-  urgent: "bg-status-urgent text-white",
-  remaining: "bg-status-default text-gray-333",
+  submitted: cn("bg-status-submitted text-white"),
+  overdue: cn("bg-status-overdue text-white"),
+  urgent: cn("bg-status-urgent text-white"),
+  remaining: cn("bg-status-default text-gray-333"),
 };
 
 const size = {
-  normal: "px-8 py-2 text-11",
-  compact: "px-8 py-3 text-11",
-  dense: "min-w-50 px-5 py-1 text-10",
+  normal: cn("px-8 py-2 text-11"),
+  compact: cn("px-8 py-3 text-11"),
+  dense: cn("min-w-50 px-5 py-1 text-10"),
 };
 
 export function StatusChip({

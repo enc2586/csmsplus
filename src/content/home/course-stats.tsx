@@ -5,9 +5,9 @@ import { cn } from "../../ui/cn.ts";
 import { ProgressRing } from "../../ui/progress-ring.tsx";
 import { homeStore } from "./store.ts";
 
-const label = "text-12 font-medium whitespace-nowrap text-gray-666";
-const badge = "rounded-3 px-6 py-2 font-bold text-white";
-const value = "min-w-16 text-right text-12 leading-none font-bold";
+const label = cn("text-12 font-medium whitespace-nowrap text-gray-666");
+const badge = cn("rounded-3 px-6 py-2 font-bold text-white");
+const value = cn("min-w-16 text-right text-12 leading-none font-bold");
 
 function Stat({
   name,
@@ -47,7 +47,7 @@ export function CourseStats({ courseId }: { courseId: string }) {
           const counts = countStatuses(course.records, excluded, threshold, now);
           return (
             <>
-              <Stat name="완료" count={counts.submitted} valueClassName="text-stat-done" />
+              <Stat name="완료" count={counts.submitted} valueClassName={cn("text-stat-done")} />
               <Stat
                 name="마감 임박"
                 count={counts.urgent}
@@ -58,9 +58,9 @@ export function CourseStats({ courseId }: { courseId: string }) {
                 name="마감 지남"
                 count={counts.overdue}
                 labelClassName={counts.overdue > 0 && cn(badge, "bg-status-overdue")}
-                valueClassName="text-status-overdue"
+                valueClassName={cn("text-status-overdue")}
               />
-              <Stat name="남음" count={counts.remaining} valueClassName="text-gray-9e9e9e" />
+              <Stat name="남음" count={counts.remaining} valueClassName={cn("text-gray-9e9e9e")} />
             </>
           );
         })()
@@ -71,8 +71,8 @@ export function CourseStats({ courseId }: { courseId: string }) {
             size={32}
             radius={12}
             strokeWidth={4}
-            barClassName="stroke-accent [stroke-linecap:round]"
-            trackClassName="stroke-black/10"
+            barClassName={cn("stroke-accent [stroke-linecap:round]")}
+            trackClassName={cn("stroke-black/10")}
           />
           <div className="absolute text-center text-8 font-bold text-gray-666">
             {Math.round(course.progress * 100)}%

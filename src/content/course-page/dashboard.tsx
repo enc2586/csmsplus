@@ -11,7 +11,7 @@ import { cn } from "../../ui/cn.ts";
 import { StatusChip } from "../../ui/status-chip.tsx";
 import { type Assignment, courseStore } from "./store.ts";
 
-const heading = "mb-10 text-13 font-semibold tracking-[0.5px] text-gray-666 uppercase";
+const heading = cn("mb-10 text-13 font-semibold tracking-[0.5px] text-gray-666 uppercase");
 
 type DueItem = Assignment & { record: NonNullable<Assignment["record"]>; diff: number };
 

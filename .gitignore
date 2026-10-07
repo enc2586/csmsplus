@@ -28,8 +28,10 @@ ehthumbs.db
 Thumbs.db
 Desktop.ini
 
-# IDE / Editor files
-.vscode/
+# IDE / Editor files (shared editor settings are kept)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo

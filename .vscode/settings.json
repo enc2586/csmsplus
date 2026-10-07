@@ -1,0 +1,6 @@
+{
+  // Class strings kept outside className (shared constants, *ClassName props) are always
+  // wrapped in cn(), so IntelliSense completes and validates them there too.
+  "tailwindCSS.classFunctions": ["cn"],
+  "tailwindCSS.experimental.configFile": "src/styles/tailwind.css"
+}
