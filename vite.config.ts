@@ -14,6 +14,8 @@ export default defineConfig({
   fmt: {
     printWidth: 100,
     ignorePatterns: ignored,
+    // Class order follows our theme, and strings inside cn() are sorted like className.
+    sortTailwindcss: { functions: ["cn"], stylesheet: "src/styles/tailwind.css" },
   },
   lint: {
     ignorePatterns: ignored,
