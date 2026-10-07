@@ -24,9 +24,8 @@ export const assignments: FixtureAssignment[] = [
   { id: "6", title: "과제 6", hoursFromNow: 1, submitted: false, intro: "여섯 번째 과제 설명" },
 ];
 
-// Deadlines have minute precision. Counting from a minute boundary over a minute ahead keeps
-// the shown remaining time ("10시간 1분 남음") stable for the minute after a test starts, and
-// fixing the base per test keeps served pages and assertions on the same deadline.
+// Fixing the base per test keeps served pages and assertions on the same deadline. The minutes
+// of a remaining time still drift while a test runs, which renderedText() leaves out.
 let baseTime: Date | number = 0;
 
 // Activities a test adds to the course page after its first visit, to look new.

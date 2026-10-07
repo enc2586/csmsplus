@@ -98,7 +98,7 @@ export { expect } from "@playwright/test";
 // Reads rendered text through open shadow roots, so assertions hold for both the
 // legacy light-DOM UI and the shadow-DOM rewrite.
 export async function renderedText(page: Page, selector: string): Promise<string> {
-  return page
+  const text = await page
     .locator(selector)
     .first()
     .evaluate((root) => {
@@ -112,8 +112,9 @@ export async function renderedText(page: Page, selector: string): Promise<string
         if (
           node instanceof HTMLElement &&
           (node.hidden || getComputedStyle(node).display === "none")
-        )
+        ) {
           return;
+        }
         if (["STYLE", "SCRIPT"].includes(node.tagName)) return;
         const children = node.shadowRoot ? node.shadowRoot.childNodes : node.childNodes;
         parts.push(" ");
@@ -123,4 +124,7 @@ export async function renderedText(page: Page, selector: string): Promise<string
       walk(root);
       return parts.join("").replace(/\s+/g, " ").trim();
     });
+  // "10시간 1분 남음" becomes "10시간 남음": the minutes depend on when in the minute a test
+  // happens to render, while hours and days are what the assertions are about.
+  return text.replace(/(\d+(?:일|시간)) \d+분 남음/g, "$1 남음");
 }

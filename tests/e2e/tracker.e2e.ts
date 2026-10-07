@@ -26,7 +26,7 @@ test("course page shows dashboard and per-assignment status", async ({ context, 
     .poll(() => renderedText(page, "#assignment-dashboard-root"), { timeout: 10_000 })
     .toBe(
       "과제 개요 1 완료 1 마감 임박 1 마감 지남 2 남음 " +
-        `마감 임박 과제 마감 임박 과제 1 첫 번째 과제 설명 ${due("1")}까지 (10시간 1분 남음) ` +
+        `마감 임박 과제 마감 임박 과제 1 첫 번째 과제 설명 ${due("1")}까지 (10시간 남음) ` +
         `마감 지남 과제 마감 지남 과제 2 두 번째 과제 설명 ${due("2")}까지`,
     );
   // Counts can settle before every row has loaded: assignment 5 has no deadline and is
@@ -35,10 +35,10 @@ test("course page shows dashboard and per-assignment status", async ({ context, 
   await expect(page.getByRole("progressbar")).toHaveCount(0);
   const week = (n: number) => `#section-1 li:nth-child(${n}) .activityinstance`;
   expect(await renderedText(page, "#section-0 .activityinstance")).toBe(
-    "과제 1 과제 추적 제외 마감 임박 10시간 1분 남음",
+    "과제 1 과제 추적 제외 마감 임박 10시간 남음",
   );
   expect(await renderedText(page, week(1))).toBe(
-    `과제 1 과제 추적 제외 마감 임박 ${due("1")}까지 (10시간 1분 남음) 첫 번째 과제 설명`,
+    `과제 1 과제 추적 제외 마감 임박 ${due("1")}까지 (10시간 남음) 첫 번째 과제 설명`,
   );
   expect(await renderedText(page, week(3))).toBe(
     `과제 3 과제 추적 제외 제출완료 ${due("3")}까지 세 번째 과제 설명`,
