@@ -38,6 +38,9 @@ const optionsSchema = z.object({
     token: z.catch(z.string(), ""),
     projectName: z.catch(z.string().check(z.minLength(1)), "CSMS+"),
   }),
+  appearance: section({
+    darkMode: z.catch(z.enum(["off", "on", "system"]), "off"),
+  }),
 });
 
 export type Options = z.infer<typeof optionsSchema>;

@@ -15,6 +15,7 @@
     "@date-fns/tz": "^1.5.0",
     "@doist/todoist-sdk": "15",
     "cn": "0.4.0",
+    "darkreader": "4",
     "date-fns": "^4.4.0",
     "jspdf": "^4.2.1",
     "p-queue": "^9.3.3",

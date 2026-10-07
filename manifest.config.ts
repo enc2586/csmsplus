@@ -38,6 +38,12 @@ const manifest = {
       matches: ["https://lms.gist.ac.kr/mod/assign/view.php*"],
       js: ["src/content/assignment-page/index.ts"],
     },
+    {
+      // As early as possible, so pages flash white for as short a time as possible.
+      matches: ["https://lms.gist.ac.kr/*"],
+      js: ["src/content/lms-theme/index.ts"],
+      run_at: "document_start",
+    },
   ],
   icons: {
     16: "assets/icons/icon16.png",

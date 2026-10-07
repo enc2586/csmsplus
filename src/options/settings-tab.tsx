@@ -292,6 +292,34 @@ export function SettingsTab() {
         </OptionItem>
       </Section>
 
+      <Section title="화면">
+        <OptionItem
+          label="LMS 다크 모드"
+          description="LMS 페이지를 어둡게 표시합니다. Dark Reader 확장 프로그램을 이미 쓰고 있다면 둘 중 하나만 켜세요."
+        >
+          <select
+            id="appearance-darkMode"
+            className={cn(numberInput, "w-160 text-left")}
+            value={draft.options.appearance.darkMode}
+            onChange={(event) =>
+              edit({
+                ...draft,
+                options: {
+                  ...draft.options,
+                  appearance: {
+                    darkMode: event.target.value as Options["appearance"]["darkMode"],
+                  },
+                },
+              })
+            }
+          >
+            <option value="off">끔</option>
+            <option value="on">켬</option>
+            <option value="system">시스템 설정 따름</option>
+          </select>
+        </OptionItem>
+      </Section>
+
       <Section title="마감 알림">
         <OptionItem
           label="마감 알림 받기"

@@ -144,3 +144,30 @@
     line-height: inherit;
   }
 }
+
+/* Dark Reader cannot recolor the shadow roots the extension renders into, so with LMS dark
+   mode on (the page root carries data-csms-theme="dark") the palette is swapped here instead.
+   Every colour goes through these variables, so components need no dark variants. */
+:host-context([data-csms-theme="dark"]) {
+  --color-white: #181a1b;
+  --color-black: #e8e6e3;
+  --color-gray-fcfcfc: #1e2022;
+  --color-gray-f3f3f3: #26292b;
+  --color-gray-eee: #303436;
+  --color-gray-e1e1e1: #363a3d;
+  --color-gray-e0e0e0: #363a3d;
+  --color-gray-ccc: #4a4f52;
+  --color-gray-aaa: #9d978f;
+  --color-gray-9e9e9e: #9d978f;
+  --color-gray-999: #a8a29a;
+  --color-gray-888: #b2aca4;
+  --color-gray-777: #bab4ac;
+  --color-gray-757575: #bab4ac;
+  --color-gray-666: #c4beb6;
+  --color-gray-555: #cfc9c1;
+  --color-gray-444: #d9d3cb;
+  --color-gray-333: #e8e6e3;
+  --color-status-default: #363a3d;
+  --color-stat-done: #66bb6a;
+  --color-stat-overdue: #ef5350;
+}
