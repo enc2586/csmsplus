@@ -7,7 +7,14 @@ import {
   type Page,
   type Worker,
 } from "@playwright/test";
-import { assignmentPage, coursePage, documentPage, homePage, PDF_DOC } from "./lms-fixtures.ts";
+import {
+  assignmentPage,
+  coursePage,
+  documentPage,
+  homePage,
+  PDF_DOC,
+  resetFixtureTime,
+} from "./lms-fixtures.ts";
 
 const distDir = path.resolve("dist");
 const pdfPages = ["icon16.png", "icon48.png", "icon128.png"].map((file) =>
@@ -28,6 +35,7 @@ export const test = base.extend<Fixtures>({
   // Playwright reads fixture dependencies from this destructuring pattern, so it must stay.
   // oxlint-disable-next-line no-empty-pattern
   context: async ({}, use) => {
+    resetFixtureTime();
     const context = await chromium.launchPersistentContext("", {
       channel: "chromium",
       timezoneId: "Asia/Seoul",

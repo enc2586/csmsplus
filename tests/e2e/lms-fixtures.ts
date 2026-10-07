@@ -22,9 +22,15 @@ export const assignments: FixtureAssignment[] = [
 ];
 
 // Deadlines have minute precision. Rounding up and adding a minute keeps the shown
-// remaining time ("10시간 1분 남음") stable for the minute after a page is served.
+// remaining time ("10시간 1분 남음") stable for the minute after a test starts, and fixing
+// the base per test keeps served pages and assertions on the same deadline.
+let baseTime = 0;
+
+export function resetFixtureTime() {
+  baseTime = Math.ceil(Date.now() / 60_000) * 60_000 + 60_000;
+}
+
 export function deadlineText(hoursFromNow: number): string {
-  const baseTime = Math.ceil(Date.now() / 60_000) * 60_000 + 60_000;
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Seoul",
     year: "numeric",
