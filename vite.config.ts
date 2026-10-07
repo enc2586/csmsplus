@@ -23,8 +23,14 @@ export default defineConfig({
     options: { typeAware: true, typeCheck: true },
   },
   resolve: {
-    // jsPDF lazily imports these for HTML/SVG rendering, which is never used here.
-    alias: { html2canvas: unsupported, canvg: unsupported, dompurify: unsupported },
+    alias: {
+      // jsPDF lazily imports these for HTML/SVG rendering, which is never used here.
+      html2canvas: unsupported,
+      canvg: unsupported,
+      dompurify: unsupported,
+      // The Todoist SDK loads undici only on Node; the extension passes its own fetch.
+      undici: unsupported,
+    },
   },
   build: {
     // Not referenced from the manifest, so CRXJS would not build it on its own.

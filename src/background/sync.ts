@@ -3,6 +3,8 @@ import type { ParseRequest } from "../shared/messages.ts";
 import { loadOptions } from "../shared/options.ts";
 import type { PageLoader } from "../shared/sync/pages.ts";
 import { type SyncStatus, syncAll } from "../shared/sync/sync-all.ts";
+import { sendReminders } from "./reminders.ts";
+import { runTodoist } from "./todoist.ts";
 
 const OFFSCREEN_URL = "src/offscreen/index.html";
 let creating: Promise<void> | null = null;
@@ -45,11 +47,17 @@ export function runSync(): Promise<SyncStatus> {
   running ??= (async () => {
     try {
       const options = await loadOptions();
-      return await syncAll({
+      const status = await syncAll({
         load: offscreenPageLoader,
         queue: createFetchQueue(options.advanced.fetchInterval),
         options,
       });
+      // Reminders and Todoist act on fresh data only; a failed sync leaves them for next time.
+      if (status.state === "ok") {
+        await sendReminders();
+        await runTodoist();
+      }
+      return status;
     } finally {
       running = null;
     }

@@ -31,7 +31,7 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 });
 
 chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === SYNC_ALARM) void runSync().then(sendReminders);
+  if (alarm.name === SYNC_ALARM) void runSync();
   if (alarm.name === BADGE_ALARM) {
     void updateBadge();
     void sendReminders();

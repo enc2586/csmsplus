@@ -9,6 +9,7 @@ const manifest = {
   permissions: ["storage", "alarms", "offscreen"],
   // Requested from the options page when reminders are turned on, so updating never prompts.
   optional_permissions: ["notifications"],
+  optional_host_permissions: ["https://api.todoist.com/*"],
   action: {
     default_popup: "src/popup/index.html",
     default_icon: {

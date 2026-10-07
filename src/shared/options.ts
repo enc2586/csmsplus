@@ -32,6 +32,11 @@ const optionsSchema = z.object({
     enable: flag(false),
     hoursBefore: z.catch(z.array(z.number().check(z.positive())), [24, 3]),
   }),
+  todoist: section({
+    enable: flag(false),
+    token: z.catch(z.string(), ""),
+    projectName: z.catch(z.string().check(z.minLength(1)), "CSMS+"),
+  }),
 });
 
 export type Options = z.infer<typeof optionsSchema>;

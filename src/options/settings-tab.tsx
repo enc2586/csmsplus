@@ -1,8 +1,10 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { isExclusionKey } from "../shared/assignment/exclusions.ts";
-import { isReminderKey } from "../shared/assignment/reminders.ts";
+import { isUserState } from "../shared/user-state.ts";
 import { loadOptions, type Options, parseOptions, saveOptions } from "../shared/options.ts";
 import { cn } from "../ui/cn.ts";
+import type { TodoistStatus } from "../shared/todoist/sync.ts";
+import { formatDistance } from "date-fns";
+import { ko } from "date-fns/locale";
 import { msToNaturalLanguage } from "./duration.ts";
 import { TrashIcon, WarningIcon } from "./icons.tsx";
 import { SaveBar } from "./save-bar.tsx";
@@ -59,10 +61,7 @@ function fromDraft({ options, numbers, reminderHours }: Draft): Options {
 async function clearCache() {
   if (!confirm("정말 모든 캐시 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")) return;
   const items = await chrome.storage.local.get(null);
-  // Reminder records stay so that clearing the cache never repeats a notification.
-  const keys = Object.keys(items).filter(
-    (key) => key !== "options" && !isExclusionKey(key) && !isReminderKey(key),
-  );
+  const keys = Object.keys(items).filter((key) => !isUserState(key));
   if (keys.length === 0) {
     alert("삭제할 캐시 데이터가 없습니다.");
     return;
@@ -115,6 +114,31 @@ const numberInput = cn(
 );
 const unit = cn("text-13 text-gray-aaa");
 
+function TodoistStatusLine() {
+  const [status, setStatus] = useState<TodoistStatus | null>(null);
+  // Read once on mount because render must stay pure.
+  const [now] = useState(() => Date.now());
+  useEffect(() => {
+    const load = () =>
+      void chrome.storage.local
+        .get("todoistStatus")
+        .then(({ todoistStatus }) => setStatus((todoistStatus as TodoistStatus) ?? null));
+    const onChanged = (changes: Record<string, unknown>) => "todoistStatus" in changes && load();
+    load();
+    chrome.storage.onChanged.addListener(onChanged);
+    return () => chrome.storage.onChanged.removeListener(onChanged);
+  }, []);
+  if (!status) return null;
+  const when = formatDistance(status.at, Math.max(now, status.at), { addSuffix: true, locale: ko });
+  return (
+    <p className={cn("ml-20 text-12", status.state === "ok" ? "text-gray-aaa" : "text-danger")}>
+      {status.state === "ok"
+        ? `${when} Todoist와 동기화했습니다.`
+        : `${when} 동기화 실패: ${status.message}`}
+    </p>
+  );
+}
+
 export function SettingsTab() {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [dirty, setDirty] = useState(false);
@@ -148,6 +172,11 @@ export function SettingsTab() {
         options: { ...draft.options, [section]: { ...draft.options[section], [key]: checked } },
       }),
   });
+  const editTodoist = (patch: Partial<Options["todoist"]>) =>
+    edit({
+      ...draft,
+      options: { ...draft.options, todoist: { ...draft.options.todoist, ...patch } },
+    });
   const number = (field: NumberField) => ({
     value: draft.numbers[field],
     onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
@@ -295,6 +324,54 @@ export function SettingsTab() {
             <span className={unit}>시간 전</span>
           </div>
         </OptionItem>
+      </Section>
+
+      <Section title="Todoist 연동">
+        <OptionItem
+          label="Todoist에 과제 추가"
+          description="제출하지 않은 과제를 Todoist 태스크로 만들고, LMS 마감 전날을 deadline으로 넣습니다. 제출하면 완료 처리합니다. 켤 때 Todoist 접근 권한을 요청합니다."
+        >
+          <ToggleSwitch
+            id="todoist-enable"
+            checked={draft.options.todoist.enable}
+            onChange={(checked) => {
+              const set = (enable: boolean) => editTodoist({ enable });
+              if (!checked) return set(false);
+              // The prompt only opens from a click, so it is requested before anything awaits.
+              void chrome.permissions
+                .request({ origins: ["https://api.todoist.com/*"] })
+                .then((granted) => granted && set(true));
+            }}
+          />
+        </OptionItem>
+        <OptionItem
+          sub
+          label="API 토큰"
+          description="Todoist 설정 → 연동 → 개발자에서 복사합니다. 이 브라우저에만 저장됩니다."
+        >
+          <input
+            id="todoist-token"
+            type="password"
+            autoComplete="off"
+            className={cn(numberInput, "w-240 text-left")}
+            value={draft.options.todoist.token}
+            onChange={(event) => editTodoist({ token: event.target.value.trim() })}
+          />
+        </OptionItem>
+        <OptionItem
+          sub
+          label="프로젝트"
+          description="태스크를 넣을 프로젝트 이름입니다. 없으면 새로 만듭니다."
+        >
+          <input
+            id="todoist-projectName"
+            type="text"
+            className={cn(numberInput, "w-240 text-left")}
+            value={draft.options.todoist.projectName}
+            onChange={(event) => editTodoist({ projectName: event.target.value })}
+          />
+        </OptionItem>
+        <TodoistStatusLine />
       </Section>
 
       <Section title="고급 설정">
