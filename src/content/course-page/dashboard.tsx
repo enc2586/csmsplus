@@ -98,7 +98,7 @@ function TaskList({
               className="flex items-center justify-between rounded-[4px] border border-gray-eee bg-gray-fcfcfc px-3.5 py-2.5 transition-all duration-200 hover:border-gray-ccc hover:bg-white hover:shadow-[0_2px_5px_rgba(0,0,0,0.05)]"
             >
               <div className="flex items-center gap-2.5">
-                <StatusChip status={item.diff < 0 ? "overdue" : "urgent"} size="dense" />
+                <StatusChip status={item.diff < 0 ? "overdue" : "urgent"} className="min-w-12.5" />
                 <div className="flex flex-col gap-1">
                   <span
                     className="max-w-100 overflow-hidden text-[13px] font-normal text-ellipsis whitespace-nowrap text-gray-333"

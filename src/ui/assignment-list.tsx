@@ -1,3 +1,4 @@
+import { ChevronRight } from "lucide-react";
 import type { ReactNode } from "react";
 import type { AssignmentGroups, ListedAssignment } from "../shared/assignment/groups.ts";
 import {
@@ -8,9 +9,10 @@ import {
 } from "../shared/assignment/status.ts";
 import { cn } from "./cn.ts";
 import { ExcludeButton } from "./exclude-button.tsx";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./shadcn/collapsible.tsx";
 import { StatusChip } from "./status-chip.tsx";
 
-const heading = cn("mb-2 text-[12px] font-semibold tracking-[0.5px] text-gray-666");
+const heading = cn("mb-2 text-xs font-medium text-muted-foreground");
 
 function dueText(a: ListedAssignment, now: number): string {
   if (!a.deadline) return "마감일 정보 없음";
@@ -31,22 +33,18 @@ function Row({
   now: number;
 }) {
   return (
-    <li className="flex items-center justify-between gap-3 rounded-[4px] border border-gray-eee bg-gray-fcfcfc px-3.5 py-2.5">
-      <a href={assignment.url} className="group flex min-w-0 items-center gap-2.5">
-        <StatusChip status={status} size="dense">
-          {excluded ? "제외됨" : undefined}
-        </StatusChip>
-        <span className="flex min-w-0 flex-col gap-0.5">
-          <span className="truncate text-[11px] text-gray-888">{assignment.courseName}</span>
-          <span className="truncate text-[13px] text-gray-333 group-hover:underline">
-            {assignment.title}
-          </span>
+    <li className="flex items-center gap-3 rounded-md border bg-card px-3.5 py-2.5">
+      <StatusChip status={status} className="min-w-14">
+        {excluded ? "제외됨" : undefined}
+      </StatusChip>
+      <a href={assignment.url} className="group flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-xs text-muted-foreground">{assignment.courseName}</span>
+        <span className="truncate text-sm text-card-foreground group-hover:underline">
+          {assignment.title}
         </span>
+        <span className="truncate text-xs text-muted-foreground">{dueText(assignment, now)}</span>
       </a>
-      <span className="flex shrink-0 items-center gap-2.5">
-        <span className="text-[11px] text-gray-999">{dueText(assignment, now)}</span>
-        <ExcludeButton id={assignment.id} title={assignment.title} excluded={excluded} />
-      </span>
+      <ExcludeButton id={assignment.id} title={assignment.title} excluded={excluded} />
     </li>
   );
 }
@@ -94,21 +92,27 @@ function Section({
 function Folded({ title, count, children }: { title: string; count: number; children: ReactNode }) {
   if (count === 0) return null;
   return (
-    <details>
-      <summary className={cn(heading, "cursor-pointer")}>
+    <Collapsible>
+      <CollapsibleTrigger
+        className={cn(
+          heading,
+          "group mb-0 flex cursor-pointer items-center gap-1 data-[state=open]:mb-2",
+        )}
+      >
+        <ChevronRight className="size-3.5 transition-transform group-data-[state=open]:rotate-90" />
         {title} {count}
-      </summary>
-      {children}
-    </details>
+      </CollapsibleTrigger>
+      <CollapsibleContent>{children}</CollapsibleContent>
+    </Collapsible>
   );
 }
 
 export function AssignmentList({ groups, now }: { groups: AssignmentGroups; now: number }) {
   const total = Object.values(groups).reduce((sum, list) => sum + list.length, 0);
   if (total === 0)
-    return <p className="py-2.5 text-[13px] text-gray-888">표시할 과제가 없습니다.</p>;
+    return <p className="py-2.5 text-sm text-muted-foreground">표시할 과제가 없습니다.</p>;
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 font-sans">
       <Section title="마감 임박" count={groups.urgent.length}>
         <Rows items={groups.urgent} status="urgent" now={now} />
       </Section>

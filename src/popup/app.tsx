@@ -1,5 +1,6 @@
 import { formatDistance } from "date-fns";
 import { ko } from "date-fns/locale";
+import { RefreshCw, Settings, TriangleAlert } from "lucide-react";
 import { useEffect, useState } from "react";
 import { groupAssignments } from "../shared/assignment/groups.ts";
 import { loadTracked, type TrackedSnapshot } from "../shared/assignment/tracked.ts";
@@ -7,10 +8,8 @@ import type { SyncRequest } from "../shared/messages.ts";
 import { LMS } from "../shared/sync/pages.ts";
 import { AssignmentList } from "../ui/assignment-list.tsx";
 import { cn } from "../ui/cn.ts";
-
-const button = cn(
-  "cursor-pointer rounded-[4px] border border-gray-ccc bg-white px-2.5 py-1 text-[12px] text-gray-444 hover:bg-gray-eee disabled:cursor-wait disabled:opacity-50",
-);
+import { Alert, AlertDescription, AlertTitle } from "../ui/shadcn/alert.tsx";
+import { Button } from "../ui/shadcn/button.tsx";
 
 export function App() {
   const [snapshot, setSnapshot] = useState<TrackedSnapshot | null>(null);
@@ -45,29 +44,37 @@ export function App() {
 
   return (
     <div className="flex max-h-140 flex-col">
-      <header className="flex items-center justify-between border-b border-gray-e1e1e1 bg-white px-4 py-3">
+      <header className="flex items-center justify-between border-b px-4 py-3">
         <div className="flex items-baseline gap-2">
-          <h1 className="text-[16px] font-bold text-brand">CSMS+</h1>
-          {lastSync && <span className="text-[11px] text-gray-999">{lastSync} 동기화</span>}
+          <h1 className="text-base font-bold text-brand">CSMS+</h1>
+          {lastSync && <span className="text-xs text-muted-foreground">{lastSync} 동기화</span>}
         </div>
-        <button type="button" className={button} disabled={syncing} onClick={() => void refresh()}>
+        <Button variant="outline" size="sm" disabled={syncing} onClick={() => void refresh()}>
+          <RefreshCw className={cn(syncing && "animate-spin")} />
           {syncing ? "불러오는 중..." : "새로고침"}
-        </button>
+        </Button>
       </header>
 
       {syncStatus?.state === "signed-out" && (
-        <p className="border-b border-[rgba(211,47,47,0.3)] bg-[rgba(211,47,47,0.08)] px-4 py-2.5 text-[12px] text-status-overdue">
-          LMS 로그인이 만료되었습니다.{" "}
-          <a href={`${LMS}/login/index.php`} target="_blank" className="font-semibold underline">
-            로그인
-          </a>
-          한 뒤 새로고침해 주세요.
-        </p>
+        <div className="px-4 pt-3">
+          <Alert variant="destructive">
+            <TriangleAlert />
+            <AlertTitle>LMS 로그인이 만료되었습니다.</AlertTitle>
+            <AlertDescription>
+              <span>
+                <a href={`${LMS}/login/index.php`} target="_blank" className="underline">
+                  로그인
+                </a>
+                한 뒤 새로고침해 주세요.
+              </span>
+            </AlertDescription>
+          </Alert>
+        </div>
       )}
 
       <main className="overflow-y-auto p-4">
         {assignments.length === 0 ? (
-          <p className="py-2.5 text-[13px] text-gray-888">
+          <p className="py-2.5 text-sm text-muted-foreground">
             아직 불러온 과제가 없습니다. 새로고침을 눌러 주세요.
           </p>
         ) : (
@@ -83,14 +90,11 @@ export function App() {
         )}
       </main>
 
-      <footer className="border-t border-gray-e1e1e1 bg-white px-4 py-2 text-right">
-        <button
-          type="button"
-          className="cursor-pointer text-[12px] text-gray-666 hover:underline"
-          onClick={() => void chrome.runtime.openOptionsPage()}
-        >
+      <footer className="flex justify-end border-t px-2 py-1.5">
+        <Button variant="ghost" size="sm" onClick={() => void chrome.runtime.openOptionsPage()}>
+          <Settings />
           설정 열기
-        </button>
+        </Button>
       </footer>
     </div>
   );

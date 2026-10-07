@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { setExcluded } from "../shared/assignment/exclusions.ts";
+import { Button } from "./shadcn/button.tsx";
 
 export function ExcludeButton({
   id,
@@ -27,14 +28,15 @@ export function ExcludeButton({
   };
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="outline"
+      size="xs"
       aria-label={`${title}: ${text}`}
       disabled={saving}
       onClick={() => void toggle()}
-      className="inline-flex min-h-5.5 shrink-0 cursor-pointer items-center justify-center rounded-[4px] border border-gray-ccc bg-white px-1.5 py-0.5 text-[11px] leading-[1.2] whitespace-nowrap text-gray-444 disabled:cursor-wait disabled:opacity-50"
+      className="font-sans"
     >
       {text}
-    </button>
+    </Button>
   );
 }

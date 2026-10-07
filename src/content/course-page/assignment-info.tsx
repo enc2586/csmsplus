@@ -56,7 +56,7 @@ function Content({
           card && "mt-0",
         )}
       >
-        <StatusChip status={status} size="compact" />
+        <StatusChip status={status} />
         {remaining && <div className="text-center text-[10px] text-gray-999">{remaining} 남음</div>}
       </a>
     );
