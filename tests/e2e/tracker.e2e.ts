@@ -154,6 +154,7 @@ test("visiting an assignment page refreshes its cache", async ({ context, storag
     .poll(async () => (await storage.get()).assignment_3)
     .toMatchObject({
       id: "3",
+      courseId: "100",
       title: "과제 3",
       content: "세 번째 과제 설명",
       deadline: due("3"),

@@ -84,7 +84,8 @@ export function assignmentPage(id: string): string {
       ? ""
       : `<tr><td class="cell c0">종료 일시</td><td class="cell c1">${deadlineText(a.hoursFromNow)}</td></tr>`,
   ].join("");
-  return page(`<div id="region-main"><div><h2>${a.title}</h2>
+  return page(`<ol class="breadcrumb"><li><a href="https://lms.gist.ac.kr/course/view.php?id=${COURSE_ID}">자료구조</a></li></ol>
+<div id="region-main"><div><h2>${a.title}</h2>
 <div id="intro" class="box generalbox boxaligncenter"><p>${a.intro}</p></div>
 <h3>제출 상황</h3><table class="submissionsummarytable"><tbody>${rows}</tbody></table></div></div>`);
 }
