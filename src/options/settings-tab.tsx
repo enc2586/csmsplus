@@ -1,14 +1,26 @@
+import { formatDistance } from "date-fns";
+import { ko } from "date-fns/locale";
+import { Trash2, TriangleAlert } from "lucide-react";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { isUserState } from "../shared/user-state.ts";
 import { loadOptions, type Options, parseOptions, saveOptions } from "../shared/options.ts";
 import { cn } from "../ui/cn.ts";
 import type { TodoistStatus } from "../shared/todoist/sync.ts";
-import { formatDistance } from "date-fns";
-import { ko } from "date-fns/locale";
+import { Alert, AlertDescription, AlertTitle } from "../ui/shadcn/alert.tsx";
+import { Button } from "../ui/shadcn/button.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/shadcn/card.tsx";
+import { Input } from "../ui/shadcn/input.tsx";
+import { Label } from "../ui/shadcn/label.tsx";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/shadcn/select.tsx";
+import { Switch } from "../ui/shadcn/switch.tsx";
 import { msToNaturalLanguage } from "./duration.ts";
-import { TrashIcon, WarningIcon } from "./icons.tsx";
 import { SaveBar } from "./save-bar.tsx";
-import { ToggleSwitch } from "./toggle-switch.tsx";
 
 type NumberField =
   | "urgentThresholdHours"
@@ -72,19 +84,23 @@ async function clearCache() {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="mb-10">
-      <h2 className="mb-5 border-b border-gray-333 pb-2.5 text-[18px] font-semibold">{title}</h2>
-      {children}
-    </section>
+    <Card>
+      <CardHeader>
+        <CardTitle>{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col divide-y">{children}</CardContent>
+    </Card>
   );
 }
 
 function OptionItem({
+  id,
   label,
   description,
   sub,
   children,
 }: {
+  id?: string;
   label: string;
   description: string;
   sub?: boolean;
@@ -93,26 +109,29 @@ function OptionItem({
   return (
     <div
       className={cn(
-        "mb-3 flex items-center justify-between rounded-[8px] border border-transparent bg-dark-card p-4 transition-colors duration-200 hover:border-gray-444",
-        sub && "ml-5 border-l-3 border-l-gray-333 bg-dark-card/50 hover:border-l-gray-333",
+        "flex items-center justify-between gap-6 py-4 first:pt-0 last:pb-0",
+        sub && "pl-6",
       )}
     >
-      <div className="flex-1 pr-5">
-        <span className="mb-1 block text-[15px] font-medium">{label}</span>
-        <span className="block text-[13px] leading-[1.4] text-gray-aaa">{description}</span>
+      <div className="flex flex-col gap-1">
+        <Label htmlFor={id}>{label}</Label>
+        <p className="text-sm text-muted-foreground">{description}</p>
       </div>
       {children}
     </div>
   );
 }
 
-// The legacy page never set a font on form controls, so they used Chrome's default (Arial).
-const controlFont = cn("font-[Arial]");
-const numberInput = cn(
-  "w-30 rounded-[4px] border border-gray-333 bg-dark-input px-3 py-2 text-right text-[14px] text-gray-e0e0e0 focus:border-brand focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none",
-  controlFont,
-);
-const unit = cn("text-[13px] text-gray-aaa");
+function WithUnit({ unit, children }: { unit: string; children: ReactNode }) {
+  return (
+    <div className="flex shrink-0 items-center gap-2">
+      {children}
+      <span className="text-sm text-muted-foreground">{unit}</span>
+    </div>
+  );
+}
+
+const numberInput = cn("w-28 text-right");
 
 function TodoistStatusLine() {
   const [status, setStatus] = useState<TodoistStatus | null>(null);
@@ -131,7 +150,12 @@ function TodoistStatusLine() {
   if (!status) return null;
   const when = formatDistance(status.at, Math.max(now, status.at), { addSuffix: true, locale: ko });
   return (
-    <p className={cn("ml-5 text-[12px]", status.state === "ok" ? "text-gray-aaa" : "text-danger")}>
+    <p
+      className={cn(
+        "py-3 pl-6 text-sm",
+        status.state === "ok" ? "text-muted-foreground" : "text-destructive",
+      )}
+    >
       {status.state === "ok"
         ? `${when} Todoist와 동기화했습니다.`
         : `${when} 동기화 실패: ${status.message}`}
@@ -166,7 +190,7 @@ export function SettingsTab() {
     key: keyof Options[S],
   ) => ({
     checked: draft.options[section][key] as boolean,
-    onChange: (checked: boolean) =>
+    onCheckedChange: (checked: boolean) =>
       edit({
         ...draft,
         options: { ...draft.options, [section]: { ...draft.options[section], [key]: checked } },
@@ -178,12 +202,22 @@ export function SettingsTab() {
       options: { ...draft.options, todoist: { ...draft.options.todoist, ...patch } },
     });
   const number = (field: NumberField) => ({
+    id: field === "urgentThresholdHours" ? `tracker-${field}` : `advanced-${field}`,
+    type: "number",
+    className: numberInput,
     value: draft.numbers[field],
     onChange: (event: React.ChangeEvent<HTMLInputElement>) =>
       edit({ ...draft, numbers: { ...draft.numbers, [field]: event.target.value } }),
   });
   const preview = (field: NumberField) =>
     `≈ ${msToNaturalLanguage(Number.parseInt(draft.numbers[field], 10) || 0)}`;
+  // Optional permissions prompt only from a click, so they are requested before anything awaits.
+  const withPermission =
+    (permissions: chrome.permissions.Permissions, set: (enabled: boolean) => void) =>
+    (checked: boolean) => {
+      if (!checked) return set(false);
+      void chrome.permissions.request(permissions).then((granted) => granted && set(true));
+    };
 
   const save = async () => {
     if (!thresholdRef.current?.reportValidity()) return;
@@ -193,217 +227,194 @@ export function SettingsTab() {
   };
 
   return (
-    <>
+    <div className="flex flex-col gap-6">
       <Section title="PDF 다운로드">
         <OptionItem
+          id="pdfdl-enable"
           label="PDF 다운로드 기능 사용"
           description="강의 자료 페이지에 PDF 다운로드 버튼을 표시합니다."
         >
-          <ToggleSwitch id="pdfdl-enable" {...toggle("pdfdl", "enable")} />
+          <Switch id="pdfdl-enable" {...toggle("pdfdl", "enable")} />
         </OptionItem>
       </Section>
 
       <Section title="과제 트래커">
-        <OptionItem
-          label="메인 페이지 과제 요약"
-          description="LMS 메인 페이지의 강좌 카드에 과제 현황(완료/마감 임박/마감 지남/남음)을 표시합니다."
-        >
-          <ToggleSwitch
-            id="tracker-enableSummaryAtDashboard"
-            {...toggle("tracker", "enableSummaryAtDashboard")}
-          />
-        </OptionItem>
-        <OptionItem
-          label="메인 페이지 전체 과제 목록"
-          description="LMS 메인 페이지 강좌 목록 아래에 모든 강좌의 과제를 마감 순서대로 모아 보여줍니다."
-        >
-          <ToggleSwitch
-            id="tracker-enableAllAssignmentsAtDashboard"
-            {...toggle("tracker", "enableAllAssignmentsAtDashboard")}
-          />
-        </OptionItem>
-        <OptionItem
-          label="툴바 아이콘 배지"
-          description="확장 프로그램 아이콘에 마감 임박 과제 수를 표시하고, 로그인이 만료되면 !를 표시합니다."
-        >
-          <ToggleSwitch id="tracker-showBadge" {...toggle("tracker", "showBadge")} />
-        </OptionItem>
-        <OptionItem
-          label="새 활동 표시"
-          description="강좌 페이지에서 마지막 방문 이후 새로 올라온 활동에 NEW를 붙이고, 메인 페이지 카드에 개수를 표시합니다."
-        >
-          <ToggleSwitch
-            id="tracker-markNewActivities"
-            {...toggle("tracker", "markNewActivities")}
-          />
-        </OptionItem>
-        <OptionItem
-          label="강좌 페이지 과제 대시보드"
-          description="강좌 페이지 상단에 전체 과제 현황 대시보드를 표시합니다."
-        >
-          <ToggleSwitch
-            id="tracker-enableSummaryAtLecture"
-            {...toggle("tracker", "enableSummaryAtLecture")}
-          />
-        </OptionItem>
-        <OptionItem
-          label="강좌 페이지 과제별 정보"
-          description="각 과제 링크 아래에 상태 칩과 마감 정보를 표시합니다."
-        >
-          <ToggleSwitch
-            id="tracker-enableAssignmentDetail"
-            {...toggle("tracker", "enableAssignmentDetail")}
-          />
-        </OptionItem>
+        {(
+          [
+            [
+              "enableSummaryAtDashboard",
+              "메인 페이지 과제 요약",
+              "LMS 메인 페이지의 강좌 카드에 과제 현황(완료/마감 임박/마감 지남/남음)을 표시합니다.",
+            ],
+            [
+              "enableAllAssignmentsAtDashboard",
+              "메인 페이지 전체 과제 목록",
+              "LMS 메인 페이지 강좌 목록 아래에 모든 강좌의 과제를 마감 순서대로 모아 보여줍니다.",
+            ],
+            [
+              "showBadge",
+              "툴바 아이콘 배지",
+              "확장 프로그램 아이콘에 마감 임박 과제 수를 표시하고, 로그인이 만료되면 !를 표시합니다.",
+            ],
+            [
+              "markNewActivities",
+              "새 활동 표시",
+              "강좌 페이지에서 마지막 방문 이후 새로 올라온 활동에 NEW를 붙이고, 메인 페이지 카드에 개수를 표시합니다.",
+            ],
+            [
+              "enableSummaryAtLecture",
+              "강좌 페이지 과제 대시보드",
+              "강좌 페이지 상단에 전체 과제 현황 대시보드를 표시합니다.",
+            ],
+            [
+              "enableAssignmentDetail",
+              "강좌 페이지 과제별 정보",
+              "각 과제 링크 아래에 상태 칩과 마감 정보를 표시합니다.",
+            ],
+          ] as const
+        ).map(([key, label, description]) => (
+          <OptionItem key={key} id={`tracker-${key}`} label={label} description={description}>
+            <Switch id={`tracker-${key}`} {...toggle("tracker", key)} />
+          </OptionItem>
+        ))}
         <OptionItem
           sub
+          id="tracker-showBody"
           label="과제 본문 미리보기 표시"
           description="과제 정보에 본문 내용을 짧게 미리 보여줍니다."
         >
-          <ToggleSwitch id="tracker-showBody" {...toggle("tracker", "showBody")} />
+          <Switch id="tracker-showBody" {...toggle("tracker", "showBody")} />
         </OptionItem>
         <OptionItem
           sub
+          id="tracker-showRemainingTime"
           label="마감까지 남은 시간 표시"
           description="마감일 옆에 남은 시간을 텍스트로 표시합니다."
         >
-          <ToggleSwitch
-            id="tracker-showRemainingTime"
-            {...toggle("tracker", "showRemainingTime")}
-          />
+          <Switch id="tracker-showRemainingTime" {...toggle("tracker", "showRemainingTime")} />
         </OptionItem>
         <OptionItem
-          label="마감 임박 기준 (시간)"
+          id="tracker-urgentThresholdHours"
+          label="마감 임박 기준"
           description="'임박'으로 표시할 마감 전 시간을 설정합니다. (기본값: 72시간)"
         >
-          <div className="flex items-center gap-2">
-            <input
+          <WithUnit unit="시간">
+            <Input
               ref={thresholdRef}
-              id="tracker-urgentThresholdHours"
-              type="number"
               min={1}
               max={168}
               required
-              className={numberInput}
               {...number("urgentThresholdHours")}
             />
-            <span className={unit}>시간</span>
-          </div>
+          </WithUnit>
         </OptionItem>
       </Section>
 
       <Section title="화면">
         <OptionItem
+          id="appearance-darkMode"
           label="LMS 다크 모드"
           description="LMS 페이지를 어둡게 표시합니다. Dark Reader 확장 프로그램을 이미 쓰고 있다면 둘 중 하나만 켜세요."
         >
-          <select
-            id="appearance-darkMode"
-            className={cn(numberInput, "w-40 text-left")}
+          <Select
             value={draft.options.appearance.darkMode}
-            onChange={(event) =>
+            onValueChange={(darkMode) =>
               edit({
                 ...draft,
                 options: {
                   ...draft.options,
-                  appearance: {
-                    darkMode: event.target.value as Options["appearance"]["darkMode"],
-                  },
+                  appearance: { darkMode: darkMode as Options["appearance"]["darkMode"] },
                 },
               })
             }
           >
-            <option value="off">끔</option>
-            <option value="on">켬</option>
-            <option value="system">시스템 설정 따름</option>
-          </select>
+            <SelectTrigger id="appearance-darkMode" className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="off">끔</SelectItem>
+              <SelectItem value="on">켬</SelectItem>
+              <SelectItem value="system">시스템 설정 따름</SelectItem>
+            </SelectContent>
+          </Select>
         </OptionItem>
       </Section>
 
       <Section title="마감 알림">
         <OptionItem
+          id="notifications-enable"
           label="마감 알림 받기"
           description="제출하지 않은 과제의 마감이 다가오면 데스크톱 알림을 보냅니다. 켤 때 알림 권한을 요청합니다."
         >
-          <ToggleSwitch
+          <Switch
             id="notifications-enable"
             checked={draft.options.notifications.enable}
-            onChange={(checked) => {
-              const set = (enable: boolean) =>
-                edit({
-                  ...draft,
-                  options: {
-                    ...draft.options,
-                    notifications: { ...draft.options.notifications, enable },
-                  },
-                });
-              if (!checked) return set(false);
-              // The prompt only opens from a click, so it is requested before anything awaits.
-              void chrome.permissions
-                .request({ permissions: ["notifications"] })
-                .then((granted) => granted && set(true));
-            }}
+            onCheckedChange={withPermission({ permissions: ["notifications"] }, (enable) =>
+              edit({
+                ...draft,
+                options: {
+                  ...draft.options,
+                  notifications: { ...draft.options.notifications, enable },
+                },
+              }),
+            )}
           />
         </OptionItem>
         <OptionItem
           sub
+          id="notifications-hoursBefore"
           label="알림 시점"
           description="마감 몇 시간 전에 알릴지 쉼표로 구분해 적습니다. (기본값: 24, 3)"
         >
-          <div className="flex items-center gap-2">
-            <input
+          <WithUnit unit="시간 전">
+            <Input
               id="notifications-hoursBefore"
-              type="text"
               className={numberInput}
               value={draft.reminderHours}
               onChange={(event) => edit({ ...draft, reminderHours: event.target.value })}
             />
-            <span className={unit}>시간 전</span>
-          </div>
+          </WithUnit>
         </OptionItem>
       </Section>
 
       <Section title="Todoist 연동">
         <OptionItem
+          id="todoist-enable"
           label="Todoist에 과제 추가"
           description="제출하지 않은 과제를 Todoist 태스크로 만들고, LMS 마감 전날을 deadline으로 넣습니다. 제출하면 완료 처리합니다. 켤 때 Todoist 접근 권한을 요청합니다."
         >
-          <ToggleSwitch
+          <Switch
             id="todoist-enable"
             checked={draft.options.todoist.enable}
-            onChange={(checked) => {
-              const set = (enable: boolean) => editTodoist({ enable });
-              if (!checked) return set(false);
-              // The prompt only opens from a click, so it is requested before anything awaits.
-              void chrome.permissions
-                .request({ origins: ["https://api.todoist.com/*"] })
-                .then((granted) => granted && set(true));
-            }}
+            onCheckedChange={withPermission({ origins: ["https://api.todoist.com/*"] }, (enable) =>
+              editTodoist({ enable }),
+            )}
           />
         </OptionItem>
         <OptionItem
           sub
+          id="todoist-token"
           label="API 토큰"
           description="Todoist 설정 → 연동 → 개발자에서 복사합니다. 이 브라우저에만 저장됩니다."
         >
-          <input
+          <Input
             id="todoist-token"
             type="password"
             autoComplete="off"
-            className={cn(numberInput, "w-60 text-left")}
+            className="w-60"
             value={draft.options.todoist.token}
             onChange={(event) => editTodoist({ token: event.target.value.trim() })}
           />
         </OptionItem>
         <OptionItem
           sub
+          id="todoist-projectName"
           label="프로젝트"
           description="태스크를 넣을 프로젝트 이름입니다. 없으면 새로 만듭니다."
         >
-          <input
+          <Input
             id="todoist-projectName"
-            type="text"
-            className={cn(numberInput, "w-60 text-left")}
+            className="w-60"
             value={draft.options.todoist.projectName}
             onChange={(event) => editTodoist({ projectName: event.target.value })}
           />
@@ -412,113 +423,70 @@ export function SettingsTab() {
       </Section>
 
       <Section title="고급 설정">
-        <div className="mb-6 flex flex-col items-start rounded-[8px] border border-[rgba(255,165,0,0.3)] bg-[rgba(255,165,0,0.1)] p-5 text-left text-warning">
-          <div className="mb-2 flex items-center gap-2">
-            <span className="flex items-center justify-center text-warning">
-              <WarningIcon />
-            </span>
-            <strong className="text-[15px] font-bold text-warning">주의</strong>
-          </div>
-          <p className="m-0 text-[14px] leading-normal text-gray-aaa">
-            이 설정들은 확장 프로그램의 성능에 큰 영향을 미칠 수 있습니다.
-            <br />
-            무엇을 하는지 정확히 알고 있는 경우에만 변경하세요.
-          </p>
+        <div className="pb-4">
+          <Alert>
+            <TriangleAlert />
+            <AlertTitle>주의</AlertTitle>
+            <AlertDescription>
+              이 설정들은 확장 프로그램의 성능에 큰 영향을 미칠 수 있습니다. 무엇을 하는지 정확히
+              알고 있는 경우에만 변경하세요.
+            </AlertDescription>
+          </Alert>
         </div>
-
         <OptionItem
-          label="데이터 요청 간격 (Fetch Interval)"
+          id="advanced-fetchInterval"
+          label="데이터 요청 간격"
           description="서버 부하 방지를 위한 요청 사이의 대기 시간입니다. (최소 10ms)"
         >
-          <div className="flex items-center gap-2">
-            <input
-              id="advanced-fetchInterval"
-              type="number"
-              min={10}
-              step={10}
-              className={numberInput}
-              {...number("fetchInterval")}
-            />
-            <span className={unit}>ms</span>
-          </div>
+          <WithUnit unit="ms">
+            <Input min={10} step={10} {...number("fetchInterval")} />
+          </WithUnit>
         </OptionItem>
-
         <OptionItem
+          id="advanced-syncIntervalMinutes"
           label="백그라운드 동기화 간격"
           description="LMS 페이지를 열지 않아도 이 간격마다 과제 정보를 새로 받아옵니다. (최소 5분)"
         >
-          <div className="flex items-center gap-2">
-            <input
-              id="advanced-syncIntervalMinutes"
-              type="number"
-              min={5}
-              step={5}
-              className={numberInput}
-              {...number("syncIntervalMinutes")}
-            />
-            <span className={unit}>분</span>
-          </div>
+          <WithUnit unit="분">
+            <Input min={5} step={5} {...number("syncIntervalMinutes")} />
+          </WithUnit>
         </OptionItem>
-
         {(
           [
             [
               "cacheTtl",
-              "기본 캐시 유효 시간 (TTL)",
+              "기본 캐시 유효 시간",
               "완료되지 않은 과제 데이터의 캐시 유효 기간입니다.",
             ],
             [
               "cacheTtlSubmitted",
-              "제출된 과제 캐시 유효 시간 (Submitted TTL)",
+              "제출된 과제 캐시 유효 시간",
               "이미 제출한 과제 데이터의 캐시 유효 기간입니다.",
             ],
           ] as const
         ).map(([field, label, description]) => (
-          <OptionItem key={field} label={label} description={description}>
+          <OptionItem key={field} id={`advanced-${field}`} label={label} description={description}>
             <div className="flex flex-col items-end gap-1">
-              <div className="flex items-center gap-2">
-                <input
-                  id={`advanced-${field}`}
-                  type="number"
-                  min={1000}
-                  step={1000}
-                  className={numberInput}
-                  {...number(field)}
-                />
-                <span className={unit}>ms</span>
-              </div>
-              <span className="ml-0 text-[11px] font-normal text-gray-aaa opacity-80">
-                {preview(field)}
-              </span>
+              <WithUnit unit="ms">
+                <Input min={1000} step={1000} {...number(field)} />
+              </WithUnit>
+              <span className="text-xs text-muted-foreground">{preview(field)}</span>
             </div>
           </OptionItem>
         ))}
-
-        <h3 className="mt-8 mb-4 border-l-3 border-brand pl-2 text-[16px] leading-[1.2] font-semibold text-gray-e0e0e0">
-          데이터 관리
-        </h3>
         <OptionItem
+          id="clear-cache-btn"
           label="캐시 데이터 삭제"
           description="저장된 모든 과제 데이터 및 임시 파일을 삭제합니다. 설정은 유지됩니다."
         >
-          <button
-            id="clear-cache-btn"
-            type="button"
-            className={cn(
-              controlFont,
-              "inline-flex cursor-pointer items-center gap-2 rounded-[4px] border border-[rgba(211,47,47,0.3)] bg-[rgba(211,47,47,0.1)] px-4 py-2 text-[13px] font-semibold text-danger transition-all duration-200 hover:border-danger hover:bg-[rgba(211,47,47,0.2)]",
-            )}
-            onClick={() => void clearCache()}
-          >
-            <span>
-              <TrashIcon />
-            </span>
+          <Button id="clear-cache-btn" variant="destructive" onClick={() => void clearCache()}>
+            <Trash2 />
             캐시 삭제
-          </button>
+          </Button>
         </OptionItem>
       </Section>
 
       <SaveBar visible={dirty} instant={instantHide} onSave={() => void save()} />
-    </>
+    </div>
   );
 }
