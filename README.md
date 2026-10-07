@@ -26,17 +26,18 @@ GIST LMS(Coursemos)의 사용자 경험을 향상시키는 Chrome/Edge 확장 �
 ## 설치 및 개발 방법
 
 ### 개발 환경 설정
-[Vite+](https://viteplus.dev)(`vp`)와 pnpm으로 빌드합니다. Node.js 24 이상이 필요합니다.
+[Vite+](https://viteplus.dev)(`vp`)로 빌드하고 패키지는 [Bun](https://bun.sh)으로 설치합니다. Node.js와 Bun 버전은 [mise](https://mise.jdx.dev)가 `mise.toml`에 맞춰 관리하므로 따로 전역 설치할 필요가 없습니다. `vp`도 프로젝트 의존성에 들어 있습니다.
 
 ```bash
 git clone https://github.com/enc2586/csmsplus
 cd csmsplus
-pnpm install
+mise install
+bun install
 ```
 
 ### 개발 버전 로드
 
-1. `pnpm build`로 `dist/`를 만듭니다. 코드를 고치는 동안에는 `pnpm dev`를 띄워 두면 바뀔 때마다 `dist/`가 다시 만들어집니다.
+1. `bun run build`로 `dist/`를 만듭니다. 코드를 고치는 동안에는 `bun run dev`를 띄워 두면 바뀔 때마다 `dist/`가 다시 만들어집니다.
 2. Chrome에서 `chrome://extensions`를 엽니다. Edge에서는 `edge://extensions`를 사용합니다.
 3. 기존 설치 버전이 있으면 비활성화하고 **개발자 모드**를 켭니다.
 4. **압축해제된 확장 프로그램을 로드합니다**를 눌러 `dist/` 폴더를 선택합니다.
@@ -45,19 +46,19 @@ pnpm install
 ### 검사
 
 ```bash
-pnpm check   # 포맷, 린트, 타입 검사
-pnpm test    # 단위 테스트 (Vitest)
-pnpm e2e     # 빌드한 확장을 Chromium에 올려 가짜 LMS 페이지에서 기능을 검사
+bun run check   # 포맷, 린트, 타입 검사
+bun run test    # 단위 테스트 (Vitest)
+bun run e2e     # 빌드한 확장을 Chromium에 올려 가짜 LMS 페이지에서 기능을 검사
 ```
 
-`pnpm e2e`는 LMS 요청을 `tests/e2e/lms-fixtures.ts`의 가짜 페이지로 바꿔 응답하므로 로그인이 필요 없습니다. 처음 실행하기 전에 `pnpm exec playwright install chromium`으로 브라우저를 받습니다.
+`bun run e2e`는 LMS 요청을 `tests/e2e/lms-fixtures.ts`의 가짜 페이지로 바꿔 응답하므로 로그인이 필요 없습니다. 처음 실행하기 전에 `bunx playwright install chromium`으로 브라우저를 받습니다.
 
-화면 비교 기준 이미지는 `tests/e2e/snapshots/`에 있습니다. 화면을 의도적으로 바꿨다면 `pnpm build && pnpm exec playwright test --update-snapshots`로 기준 이미지를 다시 만들고, 바뀐 이미지를 직접 확인한 뒤 커밋합니다.
+화면 비교 기준 이미지는 `tests/e2e/snapshots/`에 있습니다. 화면을 의도적으로 바꿨다면 `bun run build && bunx playwright test --update-snapshots`로 기준 이미지를 다시 만들고, 바뀐 이미지를 직접 확인한 뒤 커밋합니다.
 
 ### 배포용 ZIP 생성
 
 ```bash
-pnpm release
+bun run release
 ```
 
 `release/csmsplus-v<버전>.zip`이 생성됩니다.
@@ -86,6 +87,7 @@ pnpm release
 ├── tests/e2e/                          # 빌드한 확장을 가짜 LMS 페이지에서 검사
 ├── scripts/zip-release.ts              # 배포용 ZIP 생성
 ├── manifest.config.ts                  # 권한 및 페이지별 스크립트 등록
+├── mise.toml                           # Node.js, Bun 버전
 ├── vite.config.ts                      # Vite+ 빌드·포맷·린트·테스트 설정
 ├── README.md
 └── LICENSE
