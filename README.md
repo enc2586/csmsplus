@@ -2,7 +2,7 @@
 
 GIST LMS(Coursemos)의 사용자 경험을 향상시키는 Chrome/Edge 확장 프로그램입니다.
 
-현재 개발 버전은 **2.1.3**입니다. 업데이트 내역은 확장 프로그램 설정의 패치 노트 탭 또는 [업데이트 로그](src/options/patch_notes.json)에서 확인할 수 있습니다.
+현재 개발 버전은 **2.2.0**입니다. 업데이트 내역은 확장 프로그램 설정의 패치 노트 탭 또는 [업데이트 로그](src/options/patch-notes.json)에서 확인할 수 있습니다.
 
 ## 설치
 - [Chrome Web Store](https://chromewebstore.google.com/detail/oekalaanipfieieiibilhfjcoebfaabc)에서 다운로드
