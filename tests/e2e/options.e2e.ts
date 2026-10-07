@@ -39,5 +39,6 @@ test("options page saves settings and clears only cached assignments", async ({
     .toEqual(["excludedAssignment_6", "notified_1_24", "options"]);
 
   await page.locator("nav").getByText("Patch Notes").click();
-  await expect(page.getByText("과제 상태 구분 및 추적 제외 기능 추가")).toBeVisible();
+  // A released version, so the text does not change with upcoming notes.
+  await expect(page.getByText("대시보드 로딩 속도 및 진행률 표시줄 개선")).toBeVisible();
 });
