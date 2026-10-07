@@ -26,27 +26,27 @@ GIST LMS(Coursemos)의 사용자 경험을 향상시키는 Chrome/Edge 확장 �
 ## 설치 및 개발 방법
 
 ### 개발 환경 설정
-이 프로젝트는 기능별로 모듈화된 구조를 가지고 있습니다.
+[Vite+](https://viteplus.dev)(`vp`)와 pnpm으로 빌드합니다. Node.js 24 이상이 필요합니다.
 
 ```bash
 git clone https://github.com/enc2586/csmsplus
+cd csmsplus
+pnpm install
 ```
 
 ### 개발 버전 로드
 
-1. Chrome에서 `chrome://extensions`를 엽니다. Edge에서는 `edge://extensions`를 사용합니다.
-2. 기존 설치 버전이 있으면 비활성화하고 **개발자 모드**를 켭니다.
-3. **압축해제된 확장 프로그램을 로드합니다**를 눌러 `manifest.json`이 있는 프로젝트 루트 폴더를 선택합니다. 별도 빌드는 필요 없습니다.
-4. LMS 페이지를 새로고침합니다.
-
-코드를 수정한 뒤에는 확장 프로그램 관리 화면에서 개발 버전의 새로고침 버튼을 누르고 LMS 페이지도 새로고침합니다.
+1. `pnpm build`로 `dist/`를 만듭니다. 코드를 고치는 동안에는 `pnpm dev`를 띄워 두면 바뀔 때마다 `dist/`가 다시 만들어집니다.
+2. Chrome에서 `chrome://extensions`를 엽니다. Edge에서는 `edge://extensions`를 사용합니다.
+3. 기존 설치 버전이 있으면 비활성화하고 **개발자 모드**를 켭니다.
+4. **압축해제된 확장 프로그램을 로드합니다**를 눌러 `dist/` 폴더를 선택합니다.
+5. LMS 페이지를 새로고침합니다.
 
 ### 검사
 
-Node.js가 설치된 환경에서 기능 회귀 검사를 실행합니다.
-
 ```bash
-node tests/tracker-check.cjs
+pnpm check   # 포맷, 린트, 타입 검사
+node tests/tracker-check.cjs   # 기존 기능 회귀 검사
 ```
 
 브라우저에서 [레이아웃 검사 페이지](tests/tracker-layout.html)를 열면 실제 표시 스크립트로 좁은 개요 카드의 줄바꿈·가운데 정렬과 주차 버튼 위치를 검사합니다. 버튼을 눌러 추적 상태를 바꾼 뒤에도 `PASS`가 유지되는지 확인합니다.
@@ -54,10 +54,10 @@ node tests/tracker-check.cjs
 ### 배포용 ZIP 생성
 
 ```bash
-./build.sh
+pnpm release
 ```
 
-`dist/csmsplus-v2.1.3.zip`이 생성됩니다.
+`release/csmsplus-v<버전>.zip`이 생성됩니다.
 
 ## 프로젝트 구조
 
@@ -83,6 +83,7 @@ node tests/tracker-check.cjs
 │   │   │       └── course-stats-styles.css
 │   │   └── pdf-downloader/
 │   │       ├── content.js                       # PDF 다운로드 UI 및 변환
+│   │       ├── pdf-lib-global.js                # PDF 라이브러리를 전역으로 노출
 │   │       ├── pdf-lib.min.js                   # 번들된 PDF 라이브러리
 │   │       └── styles.css
 │   ├── background/
@@ -95,8 +96,9 @@ node tests/tracker-check.cjs
 ├── tests/
 │   ├── tracker-check.cjs                        # 기능 회귀 검사
 │   └── tracker-layout.html                      # 브라우저 레이아웃 검사
-├── build.sh                                    # 배포용 ZIP 생성
-├── manifest.json                               # 권한 및 페이지별 스크립트 등록
+├── scripts/zip-release.ts                      # 배포용 ZIP 생성
+├── manifest.config.ts                          # 권한 및 페이지별 스크립트 등록
+├── vite.config.ts                              # Vite+ 빌드·포맷·린트 설정
 ├── README.md
 └── LICENSE
 ```
