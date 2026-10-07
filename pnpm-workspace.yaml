@@ -8,3 +8,10 @@ peerDependencyRules:
     - vite
   allowedVersions:
     vite: "*"
+# jsPDF's HTML rendering (html2canvas, canvg, dompurify, core-js) is unused here, and
+# core-js runs an install script.
+ignoredOptionalDependencies:
+  - canvg
+  - core-js
+  - dompurify
+  - html2canvas

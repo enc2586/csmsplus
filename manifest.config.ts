@@ -20,11 +20,7 @@ const manifest = {
   content_scripts: [
     {
       matches: ["https://lms.gist.ac.kr/local/ubdoc/*"],
-      js: [
-        "src/features/pdf-downloader/pdf-lib-global.js",
-        "src/features/pdf-downloader/content.js",
-      ],
-      css: ["src/features/pdf-downloader/styles.css"],
+      js: ["src/content/pdf-viewer/index.tsx"],
     },
     {
       matches: ["https://lms.gist.ac.kr/course/view.php*"],
@@ -45,9 +41,5 @@ const manifest = {
     128: "assets/icons/icon128.png",
   },
 } satisfies Parameters<typeof defineManifest>[0];
-
-export const legacyContentScripts = manifest.content_scripts
-  .flatMap((script) => script.js)
-  .filter((file) => file.startsWith("src/features/"));
 
 export default defineManifest(manifest);

@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "cn": "0.4.0",
+    "jspdf": "^4.2.1",
     "p-queue": "^9.3.3",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
