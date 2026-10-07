@@ -11,7 +11,7 @@ import { cn } from "../../ui/cn.ts";
 import { StatusChip } from "../../ui/status-chip.tsx";
 import { type Assignment, courseStore } from "./store.ts";
 
-const heading = cn("mb-10 text-13 font-semibold tracking-[0.5px] text-gray-666 uppercase");
+const heading = cn("mb-2.5 text-[13px] font-semibold tracking-[0.5px] text-gray-666 uppercase");
 
 type DueItem = Assignment & { record: NonNullable<Assignment["record"]>; diff: number };
 
@@ -39,7 +39,7 @@ function ProgressBar({ loaded, total }: { loaded: number; total: number }) {
       aria-label="과제 정보 불러오는 중"
       aria-valuenow={percent}
       className={cn(
-        "absolute top-0 left-0 z-10 h-5 w-full bg-black/5 transition-[height,opacity] duration-500 ease-in-out",
+        "absolute top-0 left-0 z-10 h-1.25 w-full bg-black/5 transition-[height,opacity] duration-500 ease-in-out",
         phase === "collapsing" && "m-0 h-0 opacity-0",
       )}
     >
@@ -62,8 +62,10 @@ function Stat({
 }) {
   return (
     <div className="flex flex-col">
-      <div className={cn("text-20 leading-[1.2] font-bold text-gray-333", className)}>{value}</div>
-      <div className="mt-2 text-12 text-gray-777">{label}</div>
+      <div className={cn("text-[20px] leading-[1.2] font-bold text-gray-333", className)}>
+        {value}
+      </div>
+      <div className="mt-0.5 text-[12px] text-gray-777">{label}</div>
     </div>
   );
 }
@@ -83,7 +85,7 @@ function TaskList({
   return (
     <>
       <div className={heading}>{title}</div>
-      <div className="mb-16 flex flex-col gap-8">
+      <div className="mb-4 flex flex-col gap-2">
         {items.map((item) => {
           const { deadline, content } = item.record;
           const dueDate = parseDeadline(deadline);
@@ -93,25 +95,25 @@ function TaskList({
             <a
               key={item.id}
               href={item.url}
-              className="flex items-center justify-between rounded-4 border border-gray-eee bg-gray-fcfcfc px-14 py-10 transition-all duration-200 hover:border-gray-ccc hover:bg-white hover:shadow-[0_2px_5px_rgba(0,0,0,0.05)]"
+              className="flex items-center justify-between rounded-[4px] border border-gray-eee bg-gray-fcfcfc px-3.5 py-2.5 transition-all duration-200 hover:border-gray-ccc hover:bg-white hover:shadow-[0_2px_5px_rgba(0,0,0,0.05)]"
             >
-              <div className="flex items-center gap-10">
+              <div className="flex items-center gap-2.5">
                 <StatusChip status={item.diff < 0 ? "overdue" : "urgent"} size="dense" />
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
                   <span
-                    className="max-w-400 overflow-hidden text-13 font-normal text-ellipsis whitespace-nowrap text-gray-333"
+                    className="max-w-100 overflow-hidden text-[13px] font-normal text-ellipsis whitespace-nowrap text-gray-333"
                     title={title}
                   >
                     {title}
                   </span>
                   {showContent && content && (
-                    <div className="animate-fade-in-down text-11 leading-[1.3] text-gray-999">
+                    <div className="animate-fade-in-down text-[11px] leading-[1.3] text-gray-999">
                       {content}
                     </div>
                   )}
                 </div>
               </div>
-              <span className="text-11 text-gray-999">
+              <span className="text-[11px] text-gray-999">
                 {deadline ? `${formatDeadline(deadline)}까지` : ""}
                 {remaining && ` (${remaining} 남음)`}
               </span>
@@ -161,13 +163,13 @@ export function Dashboard() {
     <div className="font-sans">
       <ProgressBar loaded={loaded} total={all.length} />
       <div>
-        <div className="mb-15 h-1 bg-gray-e1e1e1" />
+        <div className="mb-3.75 h-0.25 bg-gray-e1e1e1" />
         <div className={cn(heading, "flex items-center justify-between")}>
           <span>과제 개요</span>
         </div>
         <div
           className={cn(
-            "mb-20 flex animate-fade-in flex-wrap gap-30 border-b border-gray-eee pb-20",
+            "mb-5 flex animate-fade-in flex-wrap gap-7.5 border-b border-gray-eee pb-5",
             skeleton && "opacity-50",
           )}
         >
@@ -194,7 +196,7 @@ export function Dashboard() {
         </div>
         {!skeleton &&
           (urgent.length + overdue.length === 0 ? (
-            <div className="py-10 text-left text-13 text-gray-888">
+            <div className="py-2.5 text-left text-[13px] text-gray-888">
               지금은 마감이 임박하거나 지난 과제가 없습니다.
             </div>
           ) : (

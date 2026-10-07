@@ -72,8 +72,8 @@ async function clearCache() {
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="mb-40">
-      <h2 className="mb-20 border-b border-gray-333 pb-10 text-18 font-semibold">{title}</h2>
+    <section className="mb-10">
+      <h2 className="mb-5 border-b border-gray-333 pb-2.5 text-[18px] font-semibold">{title}</h2>
       {children}
     </section>
   );
@@ -93,13 +93,13 @@ function OptionItem({
   return (
     <div
       className={cn(
-        "mb-12 flex items-center justify-between rounded-8 border border-transparent bg-dark-card p-16 transition-colors duration-200 hover:border-gray-444",
-        sub && "ml-20 border-l-3 border-l-gray-333 bg-dark-card/50 hover:border-l-gray-333",
+        "mb-3 flex items-center justify-between rounded-[8px] border border-transparent bg-dark-card p-4 transition-colors duration-200 hover:border-gray-444",
+        sub && "ml-5 border-l-3 border-l-gray-333 bg-dark-card/50 hover:border-l-gray-333",
       )}
     >
-      <div className="flex-1 pr-20">
-        <span className="mb-4 block text-15 font-medium">{label}</span>
-        <span className="block text-13 leading-[1.4] text-gray-aaa">{description}</span>
+      <div className="flex-1 pr-5">
+        <span className="mb-1 block text-[15px] font-medium">{label}</span>
+        <span className="block text-[13px] leading-[1.4] text-gray-aaa">{description}</span>
       </div>
       {children}
     </div>
@@ -109,10 +109,10 @@ function OptionItem({
 // The legacy page never set a font on form controls, so they used Chrome's default (Arial).
 const controlFont = cn("font-[Arial]");
 const numberInput = cn(
-  "w-120 rounded-4 border border-gray-333 bg-dark-input px-12 py-8 text-right text-14 text-gray-e0e0e0 focus:border-accent focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none",
+  "w-30 rounded-[4px] border border-gray-333 bg-dark-input px-3 py-2 text-right text-[14px] text-gray-e0e0e0 focus:border-brand focus:outline-none [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none",
   controlFont,
 );
-const unit = cn("text-13 text-gray-aaa");
+const unit = cn("text-[13px] text-gray-aaa");
 
 function TodoistStatusLine() {
   const [status, setStatus] = useState<TodoistStatus | null>(null);
@@ -131,7 +131,7 @@ function TodoistStatusLine() {
   if (!status) return null;
   const when = formatDistance(status.at, Math.max(now, status.at), { addSuffix: true, locale: ko });
   return (
-    <p className={cn("ml-20 text-12", status.state === "ok" ? "text-gray-aaa" : "text-danger")}>
+    <p className={cn("ml-5 text-[12px]", status.state === "ok" ? "text-gray-aaa" : "text-danger")}>
       {status.state === "ok"
         ? `${when} Todoist와 동기화했습니다.`
         : `${when} 동기화 실패: ${status.message}`}
@@ -276,7 +276,7 @@ export function SettingsTab() {
           label="마감 임박 기준 (시간)"
           description="'임박'으로 표시할 마감 전 시간을 설정합니다. (기본값: 72시간)"
         >
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2">
             <input
               ref={thresholdRef}
               id="tracker-urgentThresholdHours"
@@ -299,7 +299,7 @@ export function SettingsTab() {
         >
           <select
             id="appearance-darkMode"
-            className={cn(numberInput, "w-160 text-left")}
+            className={cn(numberInput, "w-40 text-left")}
             value={draft.options.appearance.darkMode}
             onChange={(event) =>
               edit({
@@ -350,7 +350,7 @@ export function SettingsTab() {
           label="알림 시점"
           description="마감 몇 시간 전에 알릴지 쉼표로 구분해 적습니다. (기본값: 24, 3)"
         >
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2">
             <input
               id="notifications-hoursBefore"
               type="text"
@@ -390,7 +390,7 @@ export function SettingsTab() {
             id="todoist-token"
             type="password"
             autoComplete="off"
-            className={cn(numberInput, "w-240 text-left")}
+            className={cn(numberInput, "w-60 text-left")}
             value={draft.options.todoist.token}
             onChange={(event) => editTodoist({ token: event.target.value.trim() })}
           />
@@ -403,7 +403,7 @@ export function SettingsTab() {
           <input
             id="todoist-projectName"
             type="text"
-            className={cn(numberInput, "w-240 text-left")}
+            className={cn(numberInput, "w-60 text-left")}
             value={draft.options.todoist.projectName}
             onChange={(event) => editTodoist({ projectName: event.target.value })}
           />
@@ -412,14 +412,14 @@ export function SettingsTab() {
       </Section>
 
       <Section title="고급 설정">
-        <div className="mb-24 flex flex-col items-start rounded-8 border border-[rgba(255,165,0,0.3)] bg-[rgba(255,165,0,0.1)] p-20 text-left text-warning">
-          <div className="mb-8 flex items-center gap-8">
+        <div className="mb-6 flex flex-col items-start rounded-[8px] border border-[rgba(255,165,0,0.3)] bg-[rgba(255,165,0,0.1)] p-5 text-left text-warning">
+          <div className="mb-2 flex items-center gap-2">
             <span className="flex items-center justify-center text-warning">
               <WarningIcon />
             </span>
-            <strong className="text-15 font-bold text-warning">주의</strong>
+            <strong className="text-[15px] font-bold text-warning">주의</strong>
           </div>
-          <p className="m-0 text-14 leading-normal text-gray-aaa">
+          <p className="m-0 text-[14px] leading-normal text-gray-aaa">
             이 설정들은 확장 프로그램의 성능에 큰 영향을 미칠 수 있습니다.
             <br />
             무엇을 하는지 정확히 알고 있는 경우에만 변경하세요.
@@ -430,7 +430,7 @@ export function SettingsTab() {
           label="데이터 요청 간격 (Fetch Interval)"
           description="서버 부하 방지를 위한 요청 사이의 대기 시간입니다. (최소 10ms)"
         >
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2">
             <input
               id="advanced-fetchInterval"
               type="number"
@@ -447,7 +447,7 @@ export function SettingsTab() {
           label="백그라운드 동기화 간격"
           description="LMS 페이지를 열지 않아도 이 간격마다 과제 정보를 새로 받아옵니다. (최소 5분)"
         >
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-2">
             <input
               id="advanced-syncIntervalMinutes"
               type="number"
@@ -475,8 +475,8 @@ export function SettingsTab() {
           ] as const
         ).map(([field, label, description]) => (
           <OptionItem key={field} label={label} description={description}>
-            <div className="flex flex-col items-end gap-4">
-              <div className="flex items-center gap-8">
+            <div className="flex flex-col items-end gap-1">
+              <div className="flex items-center gap-2">
                 <input
                   id={`advanced-${field}`}
                   type="number"
@@ -487,14 +487,14 @@ export function SettingsTab() {
                 />
                 <span className={unit}>ms</span>
               </div>
-              <span className="ml-0 text-11 font-normal text-gray-aaa opacity-80">
+              <span className="ml-0 text-[11px] font-normal text-gray-aaa opacity-80">
                 {preview(field)}
               </span>
             </div>
           </OptionItem>
         ))}
 
-        <h3 className="mt-32 mb-16 border-l-3 border-accent pl-8 text-16 leading-[1.2] font-semibold text-gray-e0e0e0">
+        <h3 className="mt-8 mb-4 border-l-3 border-brand pl-2 text-[16px] leading-[1.2] font-semibold text-gray-e0e0e0">
           데이터 관리
         </h3>
         <OptionItem
@@ -506,7 +506,7 @@ export function SettingsTab() {
             type="button"
             className={cn(
               controlFont,
-              "inline-flex cursor-pointer items-center gap-8 rounded-4 border border-[rgba(211,47,47,0.3)] bg-[rgba(211,47,47,0.1)] px-16 py-8 text-13 font-semibold text-danger transition-all duration-200 hover:border-danger hover:bg-[rgba(211,47,47,0.2)]",
+              "inline-flex cursor-pointer items-center gap-2 rounded-[4px] border border-[rgba(211,47,47,0.3)] bg-[rgba(211,47,47,0.1)] px-4 py-2 text-[13px] font-semibold text-danger transition-all duration-200 hover:border-danger hover:bg-[rgba(211,47,47,0.2)]",
             )}
             onClick={() => void clearCache()}
           >

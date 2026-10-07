@@ -66,7 +66,7 @@ export function DownloadButton({ params }: { params: DocumentParams }) {
         aria-label="PDF로 다운로드"
         onClick={() => void download()}
         className={cn(
-          "fixed right-20 bottom-20 z-10000 flex h-56 w-56 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-black shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-110 hover:shadow-[0_6px_16px_rgba(0,0,0,0.4)] active:scale-95",
+          "fixed right-5 bottom-5 z-10000 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-black shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-110 hover:shadow-[0_6px_16px_rgba(0,0,0,0.4)] active:scale-95",
           busy && "cursor-not-allowed opacity-70 hover:scale-100",
         )}
       >
@@ -80,7 +80,7 @@ export function DownloadButton({ params }: { params: DocumentParams }) {
         />
         <svg
           viewBox="0 0 24 24"
-          className="h-28 w-28 fill-none stroke-white stroke-2 [stroke-linecap:round] [stroke-linejoin:round]"
+          className="h-7 w-7 fill-none stroke-white stroke-2 [stroke-linecap:round] [stroke-linejoin:round]"
         >
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
           <polyline points="7 10 12 15 17 10" />
@@ -88,7 +88,7 @@ export function DownloadButton({ params }: { params: DocumentParams }) {
         </svg>
       </button>
       {message && (
-        <div className="fixed right-85 bottom-28 z-10000 rounded-[20px] bg-black/85 px-16 py-8 font-sans text-13 font-medium whitespace-nowrap text-white shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+        <div className="fixed right-21.25 bottom-7 z-10000 rounded-[20px] bg-black/85 px-4 py-2 font-sans text-[13px] font-medium whitespace-nowrap text-white shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
           {message}
         </div>
       )}

@@ -17,8 +17,8 @@ export function App() {
 
   return (
     <div className="flex h-full">
-      <nav className="flex w-250 flex-col border-r border-gray-333 bg-dark-sidebar py-20">
-        <div className="mb-10 border-b border-gray-333 px-24 pb-20 text-24 font-bold text-accent">
+      <nav className="flex w-62.5 flex-col border-r border-gray-333 bg-dark-sidebar py-5">
+        <div className="mb-2.5 border-b border-gray-333 px-6 pb-5 text-[24px] font-bold text-brand">
           CSMS+
         </div>
         <ul>
@@ -27,14 +27,14 @@ export function App() {
               <button
                 type="button"
                 className={cn(
-                  "flex w-full cursor-pointer items-center px-24 py-12 text-left font-medium text-gray-aaa transition-[background-color,color] duration-200",
+                  "flex w-full cursor-pointer items-center px-6 py-3 text-left font-medium text-gray-aaa transition-[background-color,color] duration-200",
                   tab.id === active
-                    ? "border-l-3 border-accent bg-accent/10 text-accent"
+                    ? "border-l-3 border-brand bg-brand/10 text-brand"
                     : "hover:bg-white/5 hover:text-gray-e0e0e0",
                 )}
                 onClick={() => setActive(tab.id)}
               >
-                <span className="mr-12 text-16 [&_svg]:inline [&_svg]:align-baseline">
+                <span className="mr-3 text-[16px] [&_svg]:inline [&_svg]:align-baseline">
                   {tab.icon}
                 </span>{" "}
                 {tab.label}
@@ -43,9 +43,9 @@ export function App() {
           ))}
         </ul>
       </nav>
-      <main className="flex-1 overflow-y-auto p-40">
-        <div key={current.id} className="mx-auto block max-w-800 animate-fade-up">
-          <h1 className="mb-30 text-28 font-semibold">{current.label}</h1>
+      <main className="flex-1 overflow-y-auto p-10">
+        <div key={current.id} className="mx-auto block max-w-200 animate-fade-up">
+          <h1 className="mb-7.5 text-[28px] font-semibold">{current.label}</h1>
           {current.content}
         </div>
       </main>

@@ -27,11 +27,11 @@ export function AllAssignments() {
   );
 
   return (
-    <section className="mt-16 rounded-4 border border-gray-e1e1e1 bg-white p-20 font-sans">
-      <div className="mb-14 flex items-baseline justify-between">
-        <h2 className="text-14 font-semibold text-gray-333">전체 과제</h2>
+    <section className="mt-4 rounded-[4px] border border-gray-e1e1e1 bg-white p-5 font-sans">
+      <div className="mb-3.5 flex items-baseline justify-between">
+        <h2 className="text-[14px] font-semibold text-gray-333">전체 과제</h2>
         {loading > 0 && (
-          <span className="text-11 text-gray-999">
+          <span className="text-[11px] text-gray-999">
             강좌 {entries.length - loading}/{entries.length} 불러옴
           </span>
         )}

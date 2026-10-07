@@ -9,7 +9,7 @@ import { AssignmentList } from "../ui/assignment-list.tsx";
 import { cn } from "../ui/cn.ts";
 
 const button = cn(
-  "cursor-pointer rounded-4 border border-gray-ccc bg-white px-10 py-4 text-12 text-gray-444 hover:bg-gray-eee disabled:cursor-wait disabled:opacity-50",
+  "cursor-pointer rounded-[4px] border border-gray-ccc bg-white px-2.5 py-1 text-[12px] text-gray-444 hover:bg-gray-eee disabled:cursor-wait disabled:opacity-50",
 );
 
 export function App() {
@@ -44,11 +44,11 @@ export function App() {
     formatDistance(syncStatus.at, Math.max(now, syncStatus.at), { addSuffix: true, locale: ko });
 
   return (
-    <div className="flex max-h-560 flex-col">
-      <header className="flex items-center justify-between border-b border-gray-e1e1e1 bg-white px-16 py-12">
-        <div className="flex items-baseline gap-8">
-          <h1 className="text-16 font-bold text-accent">CSMS+</h1>
-          {lastSync && <span className="text-11 text-gray-999">{lastSync} 동기화</span>}
+    <div className="flex max-h-140 flex-col">
+      <header className="flex items-center justify-between border-b border-gray-e1e1e1 bg-white px-4 py-3">
+        <div className="flex items-baseline gap-2">
+          <h1 className="text-[16px] font-bold text-brand">CSMS+</h1>
+          {lastSync && <span className="text-[11px] text-gray-999">{lastSync} 동기화</span>}
         </div>
         <button type="button" className={button} disabled={syncing} onClick={() => void refresh()}>
           {syncing ? "불러오는 중..." : "새로고침"}
@@ -56,7 +56,7 @@ export function App() {
       </header>
 
       {syncStatus?.state === "signed-out" && (
-        <p className="border-b border-[rgba(211,47,47,0.3)] bg-[rgba(211,47,47,0.08)] px-16 py-10 text-12 text-status-overdue">
+        <p className="border-b border-[rgba(211,47,47,0.3)] bg-[rgba(211,47,47,0.08)] px-4 py-2.5 text-[12px] text-status-overdue">
           LMS 로그인이 만료되었습니다.{" "}
           <a href={`${LMS}/login/index.php`} target="_blank" className="font-semibold underline">
             로그인
@@ -65,9 +65,9 @@ export function App() {
         </p>
       )}
 
-      <main className="overflow-y-auto p-16">
+      <main className="overflow-y-auto p-4">
         {assignments.length === 0 ? (
-          <p className="py-10 text-13 text-gray-888">
+          <p className="py-2.5 text-[13px] text-gray-888">
             아직 불러온 과제가 없습니다. 새로고침을 눌러 주세요.
           </p>
         ) : (
@@ -83,10 +83,10 @@ export function App() {
         )}
       </main>
 
-      <footer className="border-t border-gray-e1e1e1 bg-white px-16 py-8 text-right">
+      <footer className="border-t border-gray-e1e1e1 bg-white px-4 py-2 text-right">
         <button
           type="button"
-          className="cursor-pointer text-12 text-gray-666 hover:underline"
+          className="cursor-pointer text-[12px] text-gray-666 hover:underline"
           onClick={() => void chrome.runtime.openOptionsPage()}
         >
           설정 열기

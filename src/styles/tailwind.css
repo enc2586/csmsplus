@@ -1,32 +1,25 @@
 @import "tailwindcss";
 
-/* Content UI lives inside LMS pages whose root font-size is not ours, so every scale is
-   in px instead of rem. Spacing, font sizes and radii are named by their pixel value:
-   p-8 is 8px, text-13 is 13px, rounded-4 is 4px. */
+/* Content UI lives inside LMS pages whose root font-size is not ours, so Tailwind's scales
+   keep their usual names (p-2, text-sm, rounded-md) but are defined in px instead of rem. */
 @theme {
-  --spacing: 1px;
+  --spacing: 4px;
 
   --text-*: initial;
-  --text-8: 8px;
-  --text-10: 10px;
-  --text-11: 11px;
-  --text-12: 12px;
-  --text-13: 13px;
-  --text-14: 14px;
-  --text-15: 15px;
-  --text-16: 16px;
-  --text-18: 18px;
-  --text-20: 20px;
-  --text-24: 24px;
-  --text-28: 28px;
-
-  --radius-*: initial;
-  --radius-3: 3px;
-  --radius-4: 4px;
-  --radius-6: 6px;
-  --radius-8: 8px;
-  --radius-12: 12px;
-  --radius-24: 24px;
+  --text-xs: 12px;
+  --text-xs--line-height: 16px;
+  --text-sm: 14px;
+  --text-sm--line-height: 20px;
+  --text-base: 16px;
+  --text-base--line-height: 24px;
+  --text-lg: 18px;
+  --text-lg--line-height: 28px;
+  --text-xl: 20px;
+  --text-xl--line-height: 28px;
+  --text-2xl: 24px;
+  --text-2xl--line-height: 32px;
+  --text-3xl: 30px;
+  --text-3xl--line-height: 36px;
 
   --font-sans:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
@@ -64,8 +57,8 @@
   --color-stat-overdue: #c62828;
 
   --color-new: #e91e63;
-  --color-accent: #4a90e2;
-  --color-accent-hover: #357abd;
+  --color-brand: #4a90e2;
+  --color-brand-hover: #357abd;
   --color-progress: #1a73e8;
   --color-success: #4caf50;
   --color-warning: #ffb74d;

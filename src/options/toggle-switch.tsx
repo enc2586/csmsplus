@@ -8,7 +8,7 @@ export function ToggleSwitch({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="relative inline-block h-24 w-48 shrink-0">
+    <label className="relative inline-block h-6 w-12 shrink-0">
       <input
         id={id}
         type="checkbox"
@@ -16,7 +16,7 @@ export function ToggleSwitch({
         checked={checked}
         onChange={(event) => onChange(event.target.checked)}
       />
-      <span className="absolute inset-0 cursor-pointer rounded-24 bg-gray-555 transition duration-300 peer-checked:bg-accent before:absolute before:bottom-3 before:left-3 before:h-18 before:w-18 before:rounded-full before:bg-white before:transition before:duration-300 before:content-[''] peer-checked:before:translate-x-24" />
+      <span className="absolute inset-0 cursor-pointer rounded-[24px] bg-gray-555 transition duration-300 peer-checked:bg-brand before:absolute before:bottom-0.75 before:left-0.75 before:h-4.5 before:w-4.5 before:rounded-full before:bg-white before:transition before:duration-300 before:content-[''] peer-checked:before:translate-x-6" />
     </label>
   );
 }

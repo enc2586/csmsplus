@@ -17,9 +17,9 @@ const tone: Record<AssignmentStatus, string> = {
 };
 
 const size = {
-  normal: cn("px-8 py-2 text-11"),
-  compact: cn("px-8 py-3 text-11"),
-  dense: cn("min-w-50 px-5 py-1 text-10"),
+  normal: cn("px-2 py-0.5 text-[11px]"),
+  compact: cn("px-2 py-0.75 text-[11px]"),
+  dense: cn("min-w-12.5 px-1.25 py-0.25 text-[10px]"),
 };
 
 export function StatusChip({
@@ -34,7 +34,7 @@ export function StatusChip({
   return (
     <span
       className={cn(
-        "inline-flex min-h-22 shrink-0 items-center justify-center rounded-4 leading-[1.2] font-medium whitespace-nowrap",
+        "inline-flex min-h-5.5 shrink-0 items-center justify-center rounded-[4px] leading-[1.2] font-medium whitespace-nowrap",
         size[variant],
         tone[status],
       )}

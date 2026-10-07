@@ -8,15 +8,15 @@ const year = getYear(Date.now());
 
 export function AboutTab() {
   return (
-    <div className="mx-auto max-w-600 rounded-12 bg-dark-card p-40 text-center">
+    <div className="mx-auto max-w-150 rounded-[12px] bg-dark-card p-10 text-center">
       <div>
-        <img src={iconUrl} alt="CSMS+ Logo" className="mb-20 inline h-80 w-80 align-baseline" />
-        <h2 className="mb-8 pb-10 text-24 font-semibold">CSMS+</h2>
-        <p className="mb-20 inline-block rounded-4 bg-white/5 px-8 py-4 font-mono text-14 text-gray-aaa">
+        <img src={iconUrl} alt="CSMS+ Logo" className="mb-5 inline h-20 w-20 align-baseline" />
+        <h2 className="mb-2 pb-2.5 text-[24px] font-semibold">CSMS+</h2>
+        <p className="mb-5 inline-block rounded-[4px] bg-white/5 px-2 py-1 font-mono text-[14px] text-gray-aaa">
           v<span>{chrome.runtime.getManifest().version}</span>
         </p>
       </div>
-      <p className="mb-30 text-16 leading-[1.6] text-gray-e0e0e0">
+      <p className="mb-7.5 text-[16px] leading-[1.6] text-gray-e0e0e0">
         GIST LMS를 더 편리하게 만들어드립니다.
       </p>
 
@@ -24,19 +24,19 @@ export function AboutTab() {
         <a
           href="https://github.com/enc2586/csmsplus"
           target="_blank"
-          className="inline-flex items-center rounded-6 bg-dark-input px-20 py-10 text-gray-e0e0e0 transition-colors duration-200 hover:bg-gray-444"
+          className="inline-flex items-center rounded-[6px] bg-dark-input px-5 py-2.5 text-gray-e0e0e0 transition-colors duration-200 hover:bg-gray-444"
         >
           <GitHubIcon />
           GitHub 저장소
         </a>
       </div>
 
-      <div className="mt-32 w-full rounded-12 border border-gray-333 bg-white/3 p-24 text-left">
-        <h3 className="mb-12 text-[1.1rem] font-bold text-gray-e0e0e0">버그 제보 및 기능 제안</h3>
-        <p className="mb-16 text-[0.95rem] text-gray-aaa">
+      <div className="mt-8 w-full rounded-[12px] border border-gray-333 bg-white/3 p-6 text-left">
+        <h3 className="mb-3 text-[1.1rem] font-bold text-gray-e0e0e0">버그 제보 및 기능 제안</h3>
+        <p className="mb-4 text-[0.95rem] text-gray-aaa">
           문제가 발생했거나 새로운 기능이 필요하다면 언제든 알려주세요!
         </p>
-        <ul className="[&_a]:text-accent [&_a:hover]:underline [&_li]:mb-8">
+        <ul className="[&_a]:text-brand [&_a:hover]:underline [&_li]:mb-2">
           <li>
             <a href="https://forms.gle/i81z4jLKyXF1oXKBA" target="_blank">
               Google Forms로 제보하기
@@ -53,8 +53,8 @@ export function AboutTab() {
         </ul>
       </div>
 
-      <div className="mt-40 border-t border-gray-333 pt-20 text-13 text-gray-aaa">
-        <h3 className="mb-8 text-14 font-bold text-gray-e0e0e0">License</h3>
+      <div className="mt-10 border-t border-gray-333 pt-5 text-[13px] text-gray-aaa">
+        <h3 className="mb-2 text-[14px] font-bold text-gray-e0e0e0">License</h3>
         <p>
           Licensed under{" "}
           <a

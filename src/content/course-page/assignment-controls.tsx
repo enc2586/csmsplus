@@ -16,8 +16,8 @@ export function AssignmentControls({
   return (
     <span
       className={cn(
-        "ml-8 inline-flex items-center gap-4 align-middle text-11 text-gray-666",
-        card && "m-0 mt-4 flex flex-col",
+        "ml-2 inline-flex items-center gap-1 align-middle text-[11px] text-gray-666",
+        card && "m-0 mt-1 flex flex-col",
       )}
     >
       <ExcludeButton id={id} title={title} excluded={excluded} />

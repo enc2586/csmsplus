@@ -5,9 +5,9 @@ import { cn } from "../../ui/cn.ts";
 import { ProgressRing } from "../../ui/progress-ring.tsx";
 import { homeStore } from "./store.ts";
 
-const label = cn("text-12 font-medium whitespace-nowrap text-gray-666");
-const badge = cn("rounded-3 px-6 py-2 font-bold text-white");
-const value = cn("min-w-16 text-right text-12 leading-none font-bold");
+const label = cn("text-[12px] font-medium whitespace-nowrap text-gray-666");
+const badge = cn("rounded-[3px] px-1.5 py-0.5 font-bold text-white");
+const value = cn("min-w-4 text-right text-[12px] leading-none font-bold");
 
 function Stat({
   name,
@@ -21,7 +21,7 @@ function Stat({
   valueClassName: string;
 }) {
   return (
-    <div className="flex animate-slide-in flex-row items-center justify-end gap-6">
+    <div className="flex animate-slide-in flex-row items-center justify-end gap-1.5">
       <div className={cn(label, labelClassName)}>{name}</div>
       <div className={cn(value, valueClassName)}>{count}</div>
     </div>
@@ -40,7 +40,7 @@ export function CourseStats({ courseId }: { courseId: string }) {
   return (
     <a
       href={`https://lms.gist.ac.kr/course/view.php?id=${courseId}`}
-      className="absolute top-1/2 right-10 z-10 flex -translate-y-1/2 animate-slide-in-centered flex-col items-end gap-4 transition-opacity duration-200"
+      className="absolute top-1/2 right-2.5 z-10 flex -translate-y-1/2 animate-slide-in-centered flex-col items-end gap-1 transition-opacity duration-200"
     >
       {course.records ? (
         (() => {
@@ -68,16 +68,16 @@ export function CourseStats({ courseId }: { courseId: string }) {
           );
         })()
       ) : (
-        <div className="relative flex h-32 w-32 items-center justify-center">
+        <div className="relative flex h-8 w-8 items-center justify-center">
           <ProgressRing
             progress={course.progress}
             size={32}
             radius={12}
             strokeWidth={4}
-            barClassName={cn("stroke-accent [stroke-linecap:round]")}
+            barClassName={cn("stroke-brand [stroke-linecap:round]")}
             trackClassName={cn("stroke-black/10")}
           />
-          <div className="absolute text-center text-8 font-bold text-gray-666">
+          <div className="absolute text-center text-[8px] font-bold text-gray-666">
             {Math.round(course.progress * 100)}%
           </div>
         </div>

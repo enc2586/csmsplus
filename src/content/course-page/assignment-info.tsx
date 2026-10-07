@@ -11,7 +11,7 @@ import { StatusChip } from "../../ui/status-chip.tsx";
 import { courseStore } from "./store.ts";
 
 const spinner = cn(
-  "mr-4 inline-block h-10 w-10 animate-spin rounded-full border-2 border-gray-f3f3f3 border-t-gray-555",
+  "mr-1 inline-block h-2.5 w-2.5 animate-spin rounded-full border-2 border-gray-f3f3f3 border-t-gray-555",
 );
 
 function Content({
@@ -34,7 +34,7 @@ function Content({
   if (assignment.state === "failed") return null;
   if (assignment.state === "loading" || !assignment.record) {
     return (
-      <span className="text-11 text-gray-666 italic">
+      <span className="text-[11px] text-gray-666 italic">
         <span className={spinner} />
         {!compact && "불러오는 중..."}
       </span>
@@ -52,27 +52,27 @@ function Content({
       <a
         href={url}
         className={cn(
-          "mt-2 flex flex-col items-center gap-4 transition-opacity duration-200 hover:opacity-80",
+          "mt-0.5 flex flex-col items-center gap-1 transition-opacity duration-200 hover:opacity-80",
           card && "mt-0",
         )}
       >
         <StatusChip status={status} size="compact" />
-        {remaining && <div className="text-center text-10 text-gray-999">{remaining} 남음</div>}
+        {remaining && <div className="text-center text-[10px] text-gray-999">{remaining} 남음</div>}
       </a>
     );
   }
 
   return (
-    <a href={url} className="group flex flex-col gap-4">
-      <div className="flex animate-fade-in flex-row items-center gap-8">
+    <a href={url} className="group flex flex-col gap-1">
+      <div className="flex animate-fade-in flex-row items-center gap-2">
         <StatusChip status={status} />
-        <div className="text-12 text-gray-444 group-hover:underline">
+        <div className="text-[12px] text-gray-444 group-hover:underline">
           {deadline ? `${formatDeadline(deadline)}까지` : "마감일 정보 없음"}
           {remaining && ` (${remaining} 남음)`}
         </div>
       </div>
       {tracker.showBody && content && (
-        <div className="mt-2 animate-fade-in-down overflow-hidden text-11 leading-[1.3] text-ellipsis whitespace-nowrap text-gray-999">
+        <div className="mt-0.5 animate-fade-in-down overflow-hidden text-[11px] leading-[1.3] text-ellipsis whitespace-nowrap text-gray-999">
           {content}
         </div>
       )}
@@ -98,8 +98,8 @@ export function AssignmentInfo({
   return (
     <div
       className={cn(
-        "mt-2 ml-35 flex flex-col items-start gap-4 font-sans text-13 text-gray-555",
-        card && "mt-6 ml-0 items-center",
+        "mt-0.5 ml-8.75 flex flex-col items-start gap-1 font-sans text-[13px] text-gray-555",
+        card && "mt-1.5 ml-0 items-center",
       )}
     >
       {excluded ? (
