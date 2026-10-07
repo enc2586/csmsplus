@@ -16,7 +16,7 @@ export function AssignmentControls({
   return (
     <span
       className={cn(
-        "ml-2 inline-flex items-center gap-1 align-middle text-[11px] text-gray-666",
+        "ml-2 inline-flex items-center gap-1 align-middle text-[11px] text-muted-foreground",
         card && "m-0 mt-1 flex flex-col",
       )}
     >
