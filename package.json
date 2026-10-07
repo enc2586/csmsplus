@@ -16,7 +16,8 @@
     "p-queue": "^9.3.3",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "zod": "^4.6.5"
+    "zod": "^4.6.5",
+    "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "3.0.0",

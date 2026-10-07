@@ -42,11 +42,7 @@ const manifest = {
     },
     {
       matches: ["https://lms.gist.ac.kr/", "https://lms.gist.ac.kr/index.php*"],
-      js: [
-        `${tracker}/content-scripts/tracker-utils.js`,
-        `${tracker}/content-scripts/course-list-parser.js`,
-      ],
-      css: [`${tracker}/styles/course-stats-styles.css`],
+      js: ["src/content/home/index.tsx"],
     },
     {
       matches: ["https://lms.gist.ac.kr/mod/assign/view.php*"],
@@ -60,6 +56,8 @@ const manifest = {
   },
 } satisfies Parameters<typeof defineManifest>[0];
 
-export const contentScriptFiles = manifest.content_scripts.flatMap((script) => script.js);
+export const legacyContentScripts = manifest.content_scripts
+  .flatMap((script) => script.js)
+  .filter((file) => file.startsWith("src/features/"));
 
 export default defineManifest(manifest);

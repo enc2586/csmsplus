@@ -114,18 +114,6 @@ function assertCounts(html, values) {
     assert.equal(controls[0].children[0].textContent, '추적 제외');
     assert.equal(controls[5].children[0].textContent, '다시 추적');
 
-    const courseDiv = new Element();
-    const card = { querySelector: selector => selector === 'a.course_link' ? { href: 'https://lms.gist.ac.kr/course/view.php?id=100' } : courseDiv };
-    const home = browser({ readyState: 'complete', createElement: () => new Element(),
-        querySelector: () => null, querySelectorAll: () => [card] }, '/');
-    home.fetch = async () => ({ text: async () => '' });
-    home.DOMParser = class { parseFromString() { return { querySelectorAll: () => links }; } };
-    run(home, scripts + 'tracker-utils.js');
-    run(home, scripts + 'course-list-parser.js');
-    await settle();
-    const homeStats = courseDiv.children[0];
-    assertCounts(homeStats.innerHTML, [1, 1, 1, 2]);
-
     await controls[0].children[0].events.click();
     await settle();
     assert.equal(stored.excludedAssignment_1, true);
@@ -134,18 +122,15 @@ function assertCounts(html, values) {
     assert.equal(details[0].children[0].textContent, '추적 제외됨');
     assert.equal(details[0].hidden, false);
     assertCounts(wrapper.innerHTML, [1, 0, 1, 2]);
-    assertCounts(homeStats.innerHTML, [1, 0, 1, 2]);
     await controls[6].children[0].events.click();
     await settle();
     assert(!('excludedAssignment_1' in stored));
     assertCounts(wrapper.innerHTML, [1, 1, 1, 2]);
-    assertCounts(homeStats.innerHTML, [1, 1, 1, 2]);
     assert.deepEqual(fetched, ['6'], 'restoring does not add a new fetch');
 
     await local.set({ options: { tracker: { urgentThresholdHours: 8, enableAssignmentDetail: true } } });
     await settle();
     assertCounts(wrapper.innerHTML, [1, 0, 1, 3]);
-    assertCounts(homeStats.innerHTML, [1, 0, 1, 3]);
     assert(details[0].innerHTML.includes('미제출'));
     assert.equal(details[0].hidden, false);
     assert.equal(details[5].hidden, false);

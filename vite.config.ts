@@ -2,7 +2,7 @@ import { crx } from "@crxjs/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite-plus";
-import manifest, { contentScriptFiles } from "./manifest.config.ts";
+import manifest, { legacyContentScripts } from "./manifest.config.ts";
 
 // Shrinks as each legacy file is replaced by its rewrite.
 const legacyFiles = ["src/features/**", "tests/tracker-check.cjs", "tests/tracker-layout.html"];
@@ -24,7 +24,7 @@ export default defineConfig({
     // The legacy scripts share globals through window.GistAssignmentTracker and depend
     // on manifest order. CRXJS's default loader imports each file asynchronously, which
     // can reorder them, so they are built as self-contained IIFEs instead.
-    crx({ manifest, contentScripts: { standaloneFiles: contentScriptFiles } }),
+    crx({ manifest, contentScripts: { standaloneFiles: legacyContentScripts } }),
   ],
   test: {
     include: ["src/**/*.test.{ts,tsx}"],
