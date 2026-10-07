@@ -62,7 +62,17 @@ coverage/
 # Optional: Extension store credentials (if using web-ext)
 web-ext-artifacts/
 
-# Vite+ / Playwright
+# Build outputs: Vite+ and scripts/zip-release.ts
 release/
+*.timestamp-*.mjs
+*.tsbuildinfo
+
+# Test outputs: Playwright and Vitest
 test-results/
 playwright-report/
+blob-report/
+playwright/.cache/
+
+# Personal tool overrides
+mise.local.toml
+.mise.local.toml

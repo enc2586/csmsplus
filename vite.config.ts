@@ -7,15 +7,16 @@ import manifest from "./manifest.config.ts";
 
 const unsupported = fileURLToPath(new URL("src/shared/unsupported-module.ts", import.meta.url));
 
-const generated = ["dist/**", "release/**", "test-results/**", "playwright-report/**", "**/*.md"];
+// Generated files are skipped through .gitignore, which fmt and lint both honour.
+const ignored = ["**/*.md"];
 
 export default defineConfig({
   fmt: {
     printWidth: 100,
-    ignorePatterns: generated,
+    ignorePatterns: ignored,
   },
   lint: {
-    ignorePatterns: generated,
+    ignorePatterns: ignored,
     plugins: ["typescript", "oxc", "react"],
     options: { typeAware: true, typeCheck: true },
   },
