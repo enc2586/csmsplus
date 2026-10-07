@@ -16,10 +16,6 @@ export default defineConfig({
   },
   lint: {
     ignorePatterns: generated,
-    resolve: {
-      // jsPDF lazily imports these for HTML/SVG rendering, which is never used here.
-      alias: { html2canvas: unsupported, canvg: unsupported, dompurify: unsupported },
-    },
     plugins: ["typescript", "oxc", "react"],
     options: { typeAware: true, typeCheck: true },
   },
