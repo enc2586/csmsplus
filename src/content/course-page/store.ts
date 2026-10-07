@@ -5,9 +5,9 @@ import {
   readCachedAssignments,
   writeCachedAssignment,
 } from "../../shared/assignment/cache.ts";
-import { fetchAssignment } from "../../shared/assignment/fetch.ts";
 import { createFetchQueue } from "../../shared/assignment/queue.ts";
 import { DEFAULT_OPTIONS, type Options } from "../../shared/options.ts";
+import { domPageLoader } from "../../shared/sync/pages.ts";
 
 export type Assignment = {
   id: string;
@@ -56,11 +56,12 @@ export async function loadAssignments(courseId: string | null) {
         setAssignment(id, { state: "loaded", record: hit });
         return;
       }
-      const record = await queue.add(() => fetchAssignment(assignments[id].url, id, courseId));
-      if (!record) {
+      const page = await queue.add(() => domPageLoader("assignment", assignments[id].url));
+      if (!page?.assignment) {
         setAssignment(id, { state: "failed" });
         return;
       }
+      const record = { id, courseId, ...page.assignment, timestamp: Date.now() };
       setAssignment(id, { state: "loaded", record });
       await writeCachedAssignment(record);
     }),
