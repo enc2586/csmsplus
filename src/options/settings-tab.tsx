@@ -167,6 +167,15 @@ export function SettingsTab() {
           />
         </OptionItem>
         <OptionItem
+          label="메인 페이지 전체 과제 목록"
+          description="LMS 메인 페이지 강좌 목록 아래에 모든 강좌의 과제를 마감 순서대로 모아 보여줍니다."
+        >
+          <ToggleSwitch
+            id="tracker-enableAllAssignmentsAtDashboard"
+            {...toggle("tracker", "enableAllAssignmentsAtDashboard")}
+          />
+        </OptionItem>
+        <OptionItem
           label="강좌 페이지 과제 대시보드"
           description="강좌 페이지 상단에 전체 과제 현황 대시보드를 표시합니다."
         >

@@ -9,6 +9,7 @@ import {
 } from "../../shared/sync/pages.ts";
 import { SignedOutError, type SyncContext, syncCourse } from "../../shared/sync/sync-all.ts";
 import { mount } from "../mount.tsx";
+import { AllAssignments } from "./all-assignments.tsx";
 import { CourseStats } from "./course-stats.tsx";
 import { GlobalProgressBar } from "./global-progress-bar.tsx";
 import { homeStore, updateCourse } from "./store.ts";
@@ -38,7 +39,8 @@ async function loadCourse(courseId: string, context: SyncContext) {
 
 async function main() {
   const options = await loadOptions();
-  if (!options.tracker.enableSummaryAtDashboard) return;
+  const { enableSummaryAtDashboard, enableAllAssignmentsAtDashboard } = options.tracker;
+  if (!enableSummaryAtDashboard && !enableAllAssignmentsAtDashboard) return;
 
   homeStore.setState({
     excluded: await loadExcludedIds(),
@@ -55,14 +57,18 @@ async function main() {
 
   // The home page already lists every course by name, so the list is saved for screens that
   // show assignments outside their course page.
+  const summaries = findCourses(document);
   void chrome.storage.local.set({
-    courses: Object.fromEntries(findCourses(document).map((course) => [course.id, course])),
+    courses: Object.fromEntries(summaries.map((course) => [course.id, course])),
+  });
+  homeStore.setState({
+    courseNames: Object.fromEntries(summaries.map((course) => [course.id, course.name])),
   });
   const courses = findCards();
   for (const { id } of courses) updateCourse(id, { progress: 0, records: null });
 
   const list = document.querySelector(".progress_courses .course_lists");
-  if (list) {
+  if (list && enableSummaryAtDashboard) {
     const host = document.createElement("div");
     const ul = list.querySelector("ul");
     if (ul) list.insertBefore(host, ul);
@@ -70,12 +76,20 @@ async function main() {
     mount(host, <GlobalProgressBar />);
   }
 
-  for (const { id, card } of courses) {
-    // The stats are absolutely positioned against the course card.
-    card.style.setProperty("position", "relative", "important");
+  if (enableSummaryAtDashboard) {
+    for (const { id, card } of courses) {
+      // The stats are absolutely positioned against the course card.
+      card.style.setProperty("position", "relative", "important");
+      const host = document.createElement("div");
+      card.append(host);
+      mount(host, <CourseStats courseId={id} />);
+    }
+  }
+
+  if (list && enableAllAssignmentsAtDashboard) {
     const host = document.createElement("div");
-    card.append(host);
-    mount(host, <CourseStats courseId={id} />);
+    list.after(host);
+    mount(host, <AllAssignments />);
   }
 
   const context: SyncContext = {

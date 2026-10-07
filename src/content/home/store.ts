@@ -9,12 +9,14 @@ export type CourseProgress = {
 
 export type HomeState = {
   courses: Record<string, CourseProgress>;
+  courseNames: Record<string, string>;
   excluded: ReadonlySet<string>;
   urgentThresholdHours: number;
 };
 
 export const homeStore = createStore<HomeState>()(() => ({
   courses: {},
+  courseNames: {},
   excluded: new Set(),
   urgentThresholdHours: 72,
 }));

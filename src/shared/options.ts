@@ -13,6 +13,7 @@ const optionsSchema = z.object({
   pdfdl: section({ enable: flag(true) }),
   tracker: section({
     enableSummaryAtDashboard: flag(true),
+    enableAllAssignmentsAtDashboard: flag(true),
     enableSummaryAtLecture: flag(true),
     enableAssignmentDetail: flag(true),
     showBody: flag(true),
