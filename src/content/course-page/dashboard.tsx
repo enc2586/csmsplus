@@ -31,8 +31,12 @@ function ProgressBar({ loaded, total }: { loaded: number; total: number }) {
   }, [phase, done]);
 
   if (phase === "gone") return null;
+  const percent = total ? Math.min(100, Math.round((loaded / total) * 100)) : 0;
   return (
     <div
+      role="progressbar"
+      aria-label="과제 정보 불러오는 중"
+      aria-valuenow={percent}
       className={cn(
         "absolute top-0 left-0 z-10 h-5 w-full bg-black/5 transition-[height,opacity] duration-500 ease-in-out",
         phase === "collapsing" && "m-0 h-0 opacity-0",
@@ -40,7 +44,7 @@ function ProgressBar({ loaded, total }: { loaded: number; total: number }) {
     >
       <div
         className="h-full rounded-r-[2px] bg-progress transition-[width] duration-300 ease-out"
-        style={{ width: `${total ? Math.min(100, Math.round((loaded / total) * 100)) : 0}%` }}
+        style={{ width: `${percent}%` }}
       />
     </div>
   );

@@ -25,6 +25,9 @@ export function GlobalProgressBar() {
   if (phase === "gone") return null;
   return (
     <div
+      role="progressbar"
+      aria-label="강좌별 과제 불러오는 중"
+      aria-valuenow={Math.round(progress * 100)}
       className={cn(
         "relative -mt-5 mb-0 h-3 w-full overflow-hidden bg-black/5 transition-[height,opacity,margin] duration-500 ease-in-out",
         phase === "collapsing" && "m-0 h-0 opacity-0",
