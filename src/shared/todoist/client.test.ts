@@ -9,7 +9,8 @@ function fakeFetch(respond: (call: Call) => { status?: number; body: unknown }) 
     const call = {
       method: init?.method ?? "GET",
       path: new URL(url).pathname + new URL(url).search,
-      body: init?.body ? JSON.parse(String(init.body)) : undefined,
+      // The SDK sends JSON text bodies.
+      body: typeof init?.body === "string" ? JSON.parse(init.body) : undefined,
     };
     calls.push(call);
     const { status = 200, body } = respond(call);
