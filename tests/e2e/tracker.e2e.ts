@@ -44,6 +44,8 @@ test("course page shows dashboard and per-assignment status", async ({ context, 
   );
   expect(await renderedText(page, week(6))).toBe("과제 6 과제 다시 추적 추적 제외됨");
 
+  // The loading bar collapses 800ms after the last assignment loads and is removed 500ms later.
+  await page.waitForTimeout(1500);
   const mask = [page.getByText(dates)];
   await expect(page.locator("#assignment-dashboard-root")).toHaveScreenshot(
     "course-dashboard.png",
@@ -60,6 +62,39 @@ test("course page shows dashboard and per-assignment status", async ({ context, 
     isSubmitted: false,
   });
   expect(cached.assignment_3).toMatchObject({ isSubmitted: true });
+});
+
+test("course page reuses fresh caches and still loads excluded assignments", async ({
+  context,
+  storage,
+}) => {
+  const cached = Object.fromEntries(
+    assignments.slice(0, 5).map((a) => [
+      `assignment_${a.id}`,
+      {
+        id: a.id,
+        courseId: "100",
+        title: a.title,
+        content: a.intro,
+        deadline: a.hoursFromNow === null ? null : deadlineText(a.hoursFromNow),
+        isSubmitted: a.submitted,
+        timestamp: Date.now(),
+      },
+    ]),
+  );
+  await storage.set(cached);
+  const fetched: string[] = [];
+  context.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.pathname === "/mod/assign/view.php") fetched.push(url.searchParams.get("id")!);
+  });
+
+  const page = await context.newPage();
+  await page.goto(COURSE_URL);
+  await expect
+    .poll(() => renderedText(page, "#assignment-dashboard-root"))
+    .toContain("1 완료 1 마감 임박 1 마감 지남 2 남음");
+  expect(fetched).toEqual(["6"]);
 });
 
 test("excluding an assignment syncs duplicate links and recounts", async ({ context, storage }) => {

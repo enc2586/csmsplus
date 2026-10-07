@@ -5,7 +5,7 @@ import { defineConfig } from "vite-plus";
 import manifest, { legacyContentScripts } from "./manifest.config.ts";
 
 // Shrinks as each legacy file is replaced by its rewrite.
-const legacyFiles = ["src/features/**", "tests/tracker-check.cjs", "tests/tracker-layout.html"];
+const legacyFiles = ["src/features/**"];
 const generated = ["dist/**", "release/**", "test-results/**", "playwright-report/**", "**/*.md"];
 
 export default defineConfig({
@@ -21,9 +21,9 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    // The legacy scripts share globals through window.GistAssignmentTracker and depend
-    // on manifest order. CRXJS's default loader imports each file asynchronously, which
-    // can reorder them, so they are built as self-contained IIFEs instead.
+    // The legacy PDF scripts share a global (window.PDFLib) and depend on manifest order.
+    // CRXJS's default loader imports each file asynchronously, which can reorder them, so
+    // they are built as self-contained IIFEs instead.
     crx({ manifest, contentScripts: { standaloneFiles: legacyContentScripts } }),
   ],
   test: {

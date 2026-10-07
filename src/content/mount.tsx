@@ -19,9 +19,11 @@ function sharedSheet(): CSSStyleSheet {
 
 // The host takes no box of its own (display: contents), so the shadow content lays out
 // as if it were a direct child of wherever the host is inserted.
-export function mount(host: HTMLElement, children: ReactNode): void {
+export function mount(host: HTMLElement, children: ReactNode): () => void {
   host.style.display = "contents";
   const shadow = host.attachShadow({ mode: "open" });
   shadow.adoptedStyleSheets = [sharedSheet()];
-  createRoot(shadow).render(<StrictMode>{children}</StrictMode>);
+  const root = createRoot(shadow);
+  root.render(<StrictMode>{children}</StrictMode>);
+  return () => root.unmount();
 }

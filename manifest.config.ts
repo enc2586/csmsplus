@@ -1,8 +1,6 @@
 import { defineManifest } from "@crxjs/vite-plugin";
 import pkg from "./package.json" with { type: "json" };
 
-const tracker = "src/features/assignment-tracker";
-
 const manifest = {
   manifest_version: 3,
   name: "CSMS+",
@@ -30,15 +28,7 @@ const manifest = {
     },
     {
       matches: ["https://lms.gist.ac.kr/course/view.php*"],
-      js: [
-        `${tracker}/content-scripts/tracker-config.js`,
-        `${tracker}/content-scripts/tracker-utils.js`,
-        `${tracker}/content-scripts/tracker-api.js`,
-        `${tracker}/content-scripts/tracker-ui.js`,
-        `${tracker}/content-scripts/tracker-dashboard.js`,
-        `${tracker}/content-scripts/tracker-main.js`,
-      ],
-      css: [`${tracker}/styles/assignment-styles.css`],
+      js: ["src/content/course-page/index.tsx"],
     },
     {
       matches: ["https://lms.gist.ac.kr/", "https://lms.gist.ac.kr/index.php*"],
