@@ -11,14 +11,6 @@ import { courseStore, loadAssignments, registerAssignment } from "./store.ts";
 
 const DASHBOARD_ID = "assignment-dashboard-root";
 
-// The dashboard <li> joins the LMS section list. Its box styles must stay weaker than the
-// LMS's own section rules, as they were in the original stylesheet, so they are a plain
-// class rule on the page rather than inline styles.
-const DASHBOARD_BOX = `.assignment-dashboard-container {
-  position: relative; list-style: none; background: #fff; border: 1px solid #e1e1e1;
-  border-radius: 4px; padding: 20px; margin: 0 0 20px 0; box-shadow: none;
-}`;
-
 function linkTitle(link: HTMLAnchorElement): string {
   const clone = link.cloneNode(true) as HTMLAnchorElement;
   clone.querySelector(".accesshide")?.remove();
@@ -64,7 +56,9 @@ function showDashboard(enabled: boolean) {
   if (!topics) return;
   const item = document.createElement("li");
   item.id = DASHBOARD_ID;
-  item.className = "section main assignment-dashboard-container";
+  // The card inside draws the box; the item only takes its place in the section list.
+  item.style.listStyle = "none";
+  item.style.marginBottom = "20px";
   const section0 = topics.querySelector("#section-0");
   topics.insertBefore(item, section0 ? section0.nextSibling : topics.firstChild);
 
@@ -88,9 +82,6 @@ async function markNewActivities(courseId: string) {
 }
 
 async function main() {
-  const style = document.createElement("style");
-  style.textContent = DASHBOARD_BOX;
-  document.head.append(style);
   courseStore.setState({ options: await loadOptions(), excluded: await loadExcludedIds() });
   watchOptions((options) => {
     courseStore.setState({ options });

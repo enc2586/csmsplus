@@ -1,3 +1,4 @@
+import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { useStore } from "zustand";
 import {
@@ -9,10 +10,6 @@ import {
 import { cn } from "../../ui/cn.ts";
 import { StatusChip } from "../../ui/status-chip.tsx";
 import { courseStore } from "./store.ts";
-
-const spinner = cn(
-  "mr-1 inline-block h-2.5 w-2.5 animate-spin rounded-full border-2 border-gray-f3f3f3 border-t-gray-555",
-);
 
 function Content({
   id,
@@ -34,8 +31,8 @@ function Content({
   if (assignment.state === "failed") return null;
   if (assignment.state === "loading" || !assignment.record) {
     return (
-      <span className="text-[11px] text-gray-666 italic">
-        <span className={spinner} />
+      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+        <LoaderCircle className="size-3 animate-spin" />
         {!compact && "불러오는 중..."}
       </span>
     );
@@ -57,7 +54,9 @@ function Content({
         )}
       >
         <StatusChip status={status} />
-        {remaining && <div className="text-center text-[10px] text-gray-999">{remaining} 남음</div>}
+        {remaining && (
+          <div className="text-center text-[10px] text-muted-foreground">{remaining} 남음</div>
+        )}
       </a>
     );
   }
@@ -66,13 +65,13 @@ function Content({
     <a href={url} className="group flex flex-col gap-1">
       <div className="flex animate-fade-in flex-row items-center gap-2">
         <StatusChip status={status} />
-        <div className="text-[12px] text-gray-444 group-hover:underline">
+        <div className="text-xs text-foreground group-hover:underline">
           {deadline ? `${formatDeadline(deadline)}까지` : "마감일 정보 없음"}
           {remaining && ` (${remaining} 남음)`}
         </div>
       </div>
       {tracker.showBody && content && (
-        <div className="mt-0.5 animate-fade-in-down overflow-hidden text-[11px] leading-[1.3] text-ellipsis whitespace-nowrap text-gray-999">
+        <div className="mt-0.5 animate-fade-in-down overflow-hidden text-xs text-ellipsis whitespace-nowrap text-muted-foreground">
           {content}
         </div>
       )}
@@ -98,7 +97,7 @@ export function AssignmentInfo({
   return (
     <div
       className={cn(
-        "mt-0.5 ml-8.75 flex flex-col items-start gap-1 font-sans text-[13px] text-gray-555",
+        "mt-0.5 ml-8.75 flex flex-col items-start gap-1 font-sans text-sm text-muted-foreground",
         card && "mt-1.5 ml-0 items-center",
       )}
     >
