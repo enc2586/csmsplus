@@ -50,7 +50,7 @@ const manifest = {
     },
     {
       matches: ["https://lms.gist.ac.kr/mod/assign/view.php*"],
-      js: [`${tracker}/content-scripts/assignment-cache-updater.js`],
+      js: ["src/content/assignment-page/index.ts"],
     },
   ],
   icons: {
