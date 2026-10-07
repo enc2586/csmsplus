@@ -9,7 +9,6 @@ import {
 } from "../../shared/assignment/status.ts";
 import { cn } from "../../ui/cn.ts";
 import { StatusChip } from "../../ui/status-chip.tsx";
-import { useNow } from "../../ui/use-now.ts";
 import { type Assignment, courseStore } from "./store.ts";
 
 const heading = "mb-10 text-13 font-semibold tracking-[0.5px] text-gray-666 uppercase";
@@ -128,7 +127,9 @@ export function Dashboard() {
   const assignments = useStore(courseStore, (state) => state.assignments);
   const excluded = useStore(courseStore, (state) => state.excluded);
   const tracker = useStore(courseStore, (state) => state.options.tracker);
-  const now = useNow();
+  // Read once on mount because render must stay pure; statuses are judged as of page load,
+  // as they always were.
+  const [now] = useState(() => Date.now());
 
   const all = Object.values(assignments);
   const loaded = all.filter((a) => a.state !== "loading").length;

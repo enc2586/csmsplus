@@ -1,8 +1,8 @@
+import { useState } from "react";
 import { useStore } from "zustand";
 import { countStatuses } from "../../shared/assignment/stats.ts";
 import { cn } from "../../ui/cn.ts";
 import { ProgressRing } from "../../ui/progress-ring.tsx";
-import { useNow } from "../../ui/use-now.ts";
 import { homeStore } from "./store.ts";
 
 const label = "text-12 font-medium whitespace-nowrap text-gray-666";
@@ -32,7 +32,9 @@ export function CourseStats({ courseId }: { courseId: string }) {
   const course = useStore(homeStore, (state) => state.courses[courseId]);
   const excluded = useStore(homeStore, (state) => state.excluded);
   const threshold = useStore(homeStore, (state) => state.urgentThresholdHours);
-  const now = useNow();
+  // Read once on mount because render must stay pure; statuses are judged as of page load,
+  // as they always were.
+  const [now] = useState(() => Date.now());
   if (!course) return null;
 
   return (

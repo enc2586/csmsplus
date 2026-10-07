@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useStore } from "zustand";
 import {
   formatDeadline,
@@ -7,7 +8,6 @@ import {
 } from "../../shared/assignment/status.ts";
 import { cn } from "../../ui/cn.ts";
 import { StatusChip } from "../../ui/status-chip.tsx";
-import { useNow } from "../../ui/use-now.ts";
 import { courseStore } from "./store.ts";
 
 const spinner =
@@ -26,7 +26,9 @@ function Content({
 }) {
   const assignment = useStore(courseStore, (state) => state.assignments[id]);
   const tracker = useStore(courseStore, (state) => state.options.tracker);
-  const now = useNow();
+  // Read once on mount because render must stay pure; statuses are judged as of page load,
+  // as they always were.
+  const [now] = useState(() => Date.now());
 
   if (assignment.state === "failed") return null;
   if (assignment.state === "loading" || !assignment.record) {
