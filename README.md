@@ -46,8 +46,11 @@ pnpm install
 
 ```bash
 pnpm check   # 포맷, 린트, 타입 검사
+pnpm e2e     # 빌드한 확장을 Chromium에 올려 가짜 LMS 페이지에서 기능을 검사
 node tests/tracker-check.cjs   # 기존 기능 회귀 검사
 ```
+
+`pnpm e2e`는 LMS 요청을 `tests/e2e/lms-fixtures.ts`의 가짜 페이지로 바꿔 응답하므로 로그인이 필요 없습니다. 처음 실행하기 전에 `pnpm exec playwright install chromium`으로 브라우저를 받습니다. 화면 비교 기준 이미지는 `tests/e2e/snapshots/`에 있습니다.
 
 브라우저에서 [레이아웃 검사 페이지](tests/tracker-layout.html)를 열면 실제 표시 스크립트로 좁은 개요 카드의 줄바꿈·가운데 정렬과 주차 버튼 위치를 검사합니다. 버튼을 눌러 추적 상태를 바꾼 뒤에도 `PASS`가 유지되는지 확인합니다.
 
@@ -94,6 +97,7 @@ pnpm release
 │       ├── options.js                           # 설정 읽기·검증·저장
 │       └── patch_notes.json                     # 업데이트 로그
 ├── tests/
+│   ├── e2e/                                     # 빌드한 확장을 가짜 LMS 페이지에서 검사
 │   ├── tracker-check.cjs                        # 기능 회귀 검사
 │   └── tracker-layout.html                      # 브라우저 레이아웃 검사
 ├── scripts/zip-release.ts                      # 배포용 ZIP 생성

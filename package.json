@@ -8,10 +8,12 @@
     "build": "vp build",
     "check": "vp check",
     "test": "vp test",
+    "e2e": "vp build && playwright test",
     "release": "vp build && node scripts/zip-release.ts"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "3.0.0",
+    "@playwright/test": "1.63.0",
     "@types/chrome": "^0.3.4",
     "@types/node": "^24.19.1",
     "typescript": "~6.0.3",

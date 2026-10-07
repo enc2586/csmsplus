@@ -60,5 +60,7 @@ coverage/
 # Optional: Extension store credentials (if using web-ext)
 web-ext-artifacts/
 
-# Vite+
+# Vite+ / Playwright
 release/
+test-results/
+playwright-report/
