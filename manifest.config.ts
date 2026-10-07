@@ -8,6 +8,7 @@ const manifest = {
   description: "Enhance your LMS experience",
   permissions: ["storage", "alarms", "offscreen"],
   action: {
+    default_popup: "src/popup/index.html",
     default_icon: {
       16: "assets/icons/icon16.png",
       48: "assets/icons/icon48.png",

@@ -1,4 +1,5 @@
 import { watchOptions } from "../shared/options.ts";
+import { BADGE_ALARM, updateBadge } from "./badge.ts";
 import { runSync, SYNC_ALARM, scheduleSync } from "./sync.ts";
 
 // Document viewer images are on doc.coursemos.co.kr, which the content script cannot
@@ -30,17 +31,24 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === SYNC_ALARM) void runSync();
+  if (alarm.name === BADGE_ALARM) void updateBadge();
 });
 
 // Alarms survive browser restarts but not every update, so they are re-registered here.
+function scheduleAll() {
+  void chrome.alarms.create(BADGE_ALARM, { periodInMinutes: 5 });
+  void updateBadge();
+  return scheduleSync();
+}
 chrome.runtime.onInstalled.addListener(() => {
-  void scheduleSync().then(runSync);
+  void scheduleAll().then(runSync);
 });
 chrome.runtime.onStartup.addListener(() => {
-  void scheduleSync();
+  void scheduleAll();
 });
 watchOptions(() => void scheduleSync());
 
-chrome.action.onClicked.addListener(() => {
-  void chrome.runtime.openOptionsPage();
+// Sync results, exclusions and options all live in storage, so any change can move the count.
+chrome.storage.onChanged.addListener((_changes, area) => {
+  if (area === "local") void updateBadge();
 });

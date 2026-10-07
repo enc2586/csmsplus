@@ -14,6 +14,7 @@ const optionsSchema = z.object({
   tracker: section({
     enableSummaryAtDashboard: flag(true),
     enableAllAssignmentsAtDashboard: flag(true),
+    showBadge: flag(true),
     enableSummaryAtLecture: flag(true),
     enableAssignmentDetail: flag(true),
     showBody: flag(true),

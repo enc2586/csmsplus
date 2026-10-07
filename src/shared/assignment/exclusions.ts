@@ -6,13 +6,16 @@ export function isExclusionKey(key: string): boolean {
   return key.startsWith(PREFIX);
 }
 
-export async function loadExcludedIds(): Promise<Set<string>> {
-  const stored = await chrome.storage.local.get(null);
+export function excludedIdsIn(stored: Record<string, unknown>): Set<string> {
   return new Set(
     Object.keys(stored)
       .filter((key) => isExclusionKey(key) && stored[key] === true)
       .map((key) => key.slice(PREFIX.length)),
   );
+}
+
+export async function loadExcludedIds(): Promise<Set<string>> {
+  return excludedIdsIn(await chrome.storage.local.get(null));
 }
 
 /** Returns a new set when any exclusion changed, or null when none did. */

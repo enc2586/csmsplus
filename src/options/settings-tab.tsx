@@ -176,6 +176,12 @@ export function SettingsTab() {
           />
         </OptionItem>
         <OptionItem
+          label="툴바 아이콘 배지"
+          description="확장 프로그램 아이콘에 마감 임박 과제 수를 표시하고, 로그인이 만료되면 !를 표시합니다."
+        >
+          <ToggleSwitch id="tracker-showBadge" {...toggle("tracker", "showBadge")} />
+        </OptionItem>
+        <OptionItem
           label="강좌 페이지 과제 대시보드"
           description="강좌 페이지 상단에 전체 과제 현황 대시보드를 표시합니다."
         >
