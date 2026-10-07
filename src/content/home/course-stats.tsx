@@ -5,9 +5,9 @@ import { cn } from "../../ui/cn.ts";
 import { ProgressRing } from "../../ui/progress-ring.tsx";
 import { homeStore } from "./store.ts";
 
-const label = cn("text-[12px] font-medium whitespace-nowrap text-gray-666");
-const badge = cn("rounded-[3px] px-1.5 py-0.5 font-bold text-white");
-const value = cn("min-w-4 text-right text-[12px] leading-none font-bold");
+const label = cn("text-xs whitespace-nowrap text-muted-foreground");
+const highlighted = cn("rounded-md px-1.5 py-0.5 font-semibold text-white");
+const value = cn("min-w-4 text-right text-xs leading-none font-semibold");
 
 function Stat({
   name,
@@ -21,7 +21,7 @@ function Stat({
   valueClassName: string;
 }) {
   return (
-    <div className="flex animate-slide-in flex-row items-center justify-end gap-1.5">
+    <div className="flex animate-slide-in flex-row items-center justify-end gap-1.5 font-sans">
       <div className={cn(label, labelClassName)}>{name}</div>
       <div className={cn(value, valueClassName)}>{count}</div>
     </div>
@@ -54,16 +54,22 @@ export function CourseStats({ courseId }: { courseId: string }) {
               <Stat
                 name="마감 임박"
                 count={counts.urgent}
-                labelClassName={counts.urgent > 0 && cn(badge, "animate-blink bg-status-urgent")}
+                labelClassName={
+                  counts.urgent > 0 && cn(highlighted, "animate-blink bg-status-urgent")
+                }
                 valueClassName={cn("text-status-urgent", counts.urgent > 0 && "animate-blink")}
               />
               <Stat
                 name="마감 지남"
                 count={counts.overdue}
-                labelClassName={counts.overdue > 0 && cn(badge, "bg-status-overdue")}
+                labelClassName={counts.overdue > 0 && cn(highlighted, "bg-status-overdue")}
                 valueClassName={cn("text-status-overdue")}
               />
-              <Stat name="남음" count={counts.remaining} valueClassName={cn("text-gray-9e9e9e")} />
+              <Stat
+                name="남음"
+                count={counts.remaining}
+                valueClassName={cn("text-muted-foreground")}
+              />
             </>
           );
         })()
@@ -75,9 +81,9 @@ export function CourseStats({ courseId }: { courseId: string }) {
             radius={12}
             strokeWidth={4}
             barClassName={cn("stroke-brand [stroke-linecap:round]")}
-            trackClassName={cn("stroke-black/10")}
+            trackClassName={cn("stroke-muted")}
           />
-          <div className="absolute text-center text-[8px] font-bold text-gray-666">
+          <div className="absolute text-center font-sans text-[8px] font-semibold text-muted-foreground">
             {Math.round(course.progress * 100)}%
           </div>
         </div>

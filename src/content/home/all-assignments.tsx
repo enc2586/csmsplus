@@ -3,6 +3,7 @@ import { useStore } from "zustand";
 import { groupAssignments, type ListedAssignment } from "../../shared/assignment/groups.ts";
 import { LMS } from "../../shared/sync/pages.ts";
 import { AssignmentList } from "../../ui/assignment-list.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "../../ui/shadcn/card.tsx";
 import { homeStore } from "./store.ts";
 
 export function AllAssignments() {
@@ -27,16 +28,23 @@ export function AllAssignments() {
   );
 
   return (
-    <section className="mt-4 rounded-[4px] border border-gray-e1e1e1 bg-white p-5 font-sans">
-      <div className="mb-3.5 flex items-baseline justify-between">
-        <h2 className="text-[14px] font-semibold text-gray-333">전체 과제</h2>
+    <Card role="region" aria-label="전체 과제" className="mt-4 gap-4 font-sans">
+      <CardHeader className="flex items-baseline justify-between">
+        <CardTitle>
+          <h2>전체 과제</h2>
+        </CardTitle>
         {loading > 0 && (
-          <span className="text-[11px] text-gray-999">
+          <span className="text-xs text-muted-foreground">
             강좌 {entries.length - loading}/{entries.length} 불러옴
           </span>
         )}
-      </div>
-      <AssignmentList groups={groupAssignments(assignments, excluded, threshold, now)} now={now} />
-    </section>
+      </CardHeader>
+      <CardContent>
+        <AssignmentList
+          groups={groupAssignments(assignments, excluded, threshold, now)}
+          now={now}
+        />
+      </CardContent>
+    </Card>
   );
 }

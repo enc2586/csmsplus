@@ -13,7 +13,7 @@ test("home page lists every assignment by status", async ({ context }) => {
   await expect(page.getByRole("heading", { name: "전체 과제" })).toBeVisible();
   await expect(page.getByText(/강좌 \d+\/\d+ 불러옴/)).toHaveCount(0, { timeout: 10_000 });
 
-  const list = () => renderedText(page, "section:has(> div > h2)");
+  const list = () => renderedText(page, "[role=region][aria-label='전체 과제']");
   const open =
     `마감 임박 1 마감 임박 자료구조 과제 1 ${due("1")}까지 (10시간 남음) 추적 제외 ` +
     `마감 지남 1 마감 지남 자료구조 과제 2 ${due("2")}까지 추적 제외 ` +

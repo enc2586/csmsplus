@@ -34,7 +34,7 @@ function Row({
 }) {
   return (
     <li className="flex items-center gap-3 rounded-md border bg-card px-3.5 py-2.5">
-      <StatusChip status={status} className="min-w-14">
+      <StatusChip status={status} className="w-16">
         {excluded ? "제외됨" : undefined}
       </StatusChip>
       <a href={assignment.url} className="group flex min-w-0 flex-1 flex-col">

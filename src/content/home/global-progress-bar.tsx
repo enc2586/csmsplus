@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 import { cn } from "../../ui/cn.ts";
+import { Progress } from "../../ui/shadcn/progress.tsx";
 import { homeStore } from "./store.ts";
 
 export function GlobalProgressBar() {
@@ -24,19 +25,13 @@ export function GlobalProgressBar() {
 
   if (phase === "gone") return null;
   return (
-    <div
-      role="progressbar"
+    <Progress
       aria-label="강좌별 과제 불러오는 중"
-      aria-valuenow={Math.round(progress * 100)}
+      value={Math.min(100, progress * 100)}
       className={cn(
-        "relative -mt-1.25 mb-0 h-0.75 w-full overflow-hidden bg-black/5 transition-[height,opacity,margin] duration-500 ease-in-out",
+        "mb-2 h-1 rounded-full transition-[height,opacity,margin] duration-500 ease-in-out [&>[data-slot=progress-indicator]]:bg-brand",
         phase === "collapsing" && "m-0 h-0 opacity-0",
       )}
-    >
-      <div
-        className="absolute top-0 left-0 h-full bg-brand transition-[width] duration-300 ease-out"
-        style={{ width: `${Math.min(100, progress * 100)}%` }}
-      />
-    </div>
+    />
   );
 }
