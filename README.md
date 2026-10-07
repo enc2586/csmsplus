@@ -46,13 +46,13 @@ pnpm install
 
 ```bash
 pnpm check   # 포맷, 린트, 타입 검사
+pnpm test    # 단위 테스트 (Vitest)
 pnpm e2e     # 빌드한 확장을 Chromium에 올려 가짜 LMS 페이지에서 기능을 검사
-node tests/tracker-check.cjs   # 기존 기능 회귀 검사
 ```
 
-`pnpm e2e`는 LMS 요청을 `tests/e2e/lms-fixtures.ts`의 가짜 페이지로 바꿔 응답하므로 로그인이 필요 없습니다. 처음 실행하기 전에 `pnpm exec playwright install chromium`으로 브라우저를 받습니다. 화면 비교 기준 이미지는 `tests/e2e/snapshots/`에 있습니다.
+`pnpm e2e`는 LMS 요청을 `tests/e2e/lms-fixtures.ts`의 가짜 페이지로 바꿔 응답하므로 로그인이 필요 없습니다. 처음 실행하기 전에 `pnpm exec playwright install chromium`으로 브라우저를 받습니다.
 
-브라우저에서 [레이아웃 검사 페이지](tests/tracker-layout.html)를 열면 실제 표시 스크립트로 좁은 개요 카드의 줄바꿈·가운데 정렬과 주차 버튼 위치를 검사합니다. 버튼을 눌러 추적 상태를 바꾼 뒤에도 `PASS`가 유지되는지 확인합니다.
+화면 비교 기준 이미지는 `tests/e2e/snapshots/`에 있습니다. 화면을 의도적으로 바꿨다면 `pnpm build && pnpm exec playwright test --update-snapshots`로 기준 이미지를 다시 만들고, 바뀐 이미지를 직접 확인한 뒤 커밋합니다.
 
 ### 배포용 ZIP 생성
 
@@ -66,43 +66,27 @@ pnpm release
 
 ```
 /
-├── assets/
-│   └── icons/                          # 확장 프로그램 아이콘
+├── assets/icons/                       # 확장 프로그램 아이콘
 ├── demo/                               # 기능 예시 이미지
 ├── src/
-│   ├── features/
-│   │   ├── assignment-tracker/
-│   │   │   ├── content-scripts/
-│   │   │   │   ├── tracker-main.js              # 강의 페이지 초기화 및 추적 버튼
-│   │   │   │   ├── tracker-config.js            # 조회·캐시 기본 설정
-│   │   │   │   ├── tracker-utils.js             # 상태 판정·추적 제외·조회 큐
-│   │   │   │   ├── tracker-api.js               # 과제 상세 정보 조회
-│   │   │   │   ├── tracker-ui.js                # 개별 과제 상태 표시
-│   │   │   │   ├── tracker-dashboard.js         # 강의 상단 과제 요약
-│   │   │   │   ├── course-list-parser.js        # LMS 메인 강좌 카드 집계
-│   │   │   │   └── assignment-cache-updater.js  # 과제 방문 시 캐시 갱신
-│   │   │   └── styles/
-│   │   │       ├── assignment-styles.css
-│   │   │       └── course-stats-styles.css
-│   │   └── pdf-downloader/
-│   │       ├── content.js                       # PDF 다운로드 UI 및 변환
-│   │       ├── pdf-lib-global.js                # PDF 라이브러리를 전역으로 노출
-│   │       ├── pdf-lib.min.js                   # 번들된 PDF 라이브러리
-│   │       └── styles.css
-│   ├── background/
-│   │   └── background.js                       # 다운로드 처리 및 설정 화면 열기
-│   └── options/
-│       ├── options.html
-│       ├── options.css
-│       ├── options.js                           # 설정 읽기·검증·저장
-│       └── patch_notes.json                     # 업데이트 로그
-├── tests/
-│   ├── e2e/                                     # 빌드한 확장을 가짜 LMS 페이지에서 검사
-│   ├── tracker-check.cjs                        # 기능 회귀 검사
-│   └── tracker-layout.html                      # 브라우저 레이아웃 검사
-├── scripts/zip-release.ts                      # 배포용 ZIP 생성
-├── manifest.config.ts                          # 권한 및 페이지별 스크립트 등록
-├── vite.config.ts                              # Vite+ 빌드·포맷·린트 설정
+│   ├── background/index.ts             # 문서 이미지 다운로드 중계, 아이콘 클릭 시 설정 열기
+│   ├── content/                        # LMS 페이지에 붙는 content script
+│   │   ├── mount.tsx                   # Shadow DOM에 React 화면을 붙이는 공통 함수
+│   │   ├── home/                       # LMS 메인: 강좌 카드별 과제 집계
+│   │   ├── course-page/                # 강좌 페이지: 과제별 상태, 추적 제외, 과제 개요
+│   │   ├── assignment-page/            # 과제 페이지: 방문 시 캐시 갱신
+│   │   └── pdf-viewer/                 # 문서 뷰어: PDF 다운로드 버튼
+│   ├── options/                        # 설정 페이지 (React)
+│   │   └── patch-notes.json            # 업데이트 로그
+│   ├── shared/                         # 화면과 무관한 공통 로직
+│   │   ├── options.ts                  # 설정 기본값과 검증
+│   │   └── assignment/                 # 상태 판정, 과제 페이지 파싱, 캐시, 추적 제외, 조회 큐
+│   ├── ui/                             # 여러 화면이 함께 쓰는 컴포넌트와 cn()
+│   └── styles/tailwind.css             # Tailwind 테마 (크기는 모두 px 기준)
+├── tests/e2e/                          # 빌드한 확장을 가짜 LMS 페이지에서 검사
+├── scripts/zip-release.ts              # 배포용 ZIP 생성
+├── manifest.config.ts                  # 권한 및 페이지별 스크립트 등록
+├── vite.config.ts                      # Vite+ 빌드·포맷·린트·테스트 설정
 ├── README.md
 └── LICENSE
 ```
