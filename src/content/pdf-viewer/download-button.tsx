@@ -1,6 +1,8 @@
+import { Download, LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../../ui/cn.ts";
 import { ProgressRing } from "../../ui/progress-ring.tsx";
+import { Button } from "../../ui/shadcn/button.tsx";
 import { type DocumentParams, downloadPages, makePdf } from "./make-pdf.ts";
 
 function save(blob: Blob, name: string) {
@@ -60,35 +62,25 @@ export function DownloadButton({ params }: { params: DocumentParams }) {
 
   return (
     <>
-      <button
-        type="button"
+      <Button
         title="Download as PDF"
         aria-label="PDF로 다운로드"
+        disabled={busy}
         onClick={() => void download()}
-        className={cn(
-          "fixed right-5 bottom-5 z-10000 flex h-14 w-14 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-black shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-110 hover:shadow-[0_6px_16px_rgba(0,0,0,0.4)] active:scale-95",
-          busy && "cursor-not-allowed opacity-70 hover:scale-100",
-        )}
+        className="fixed right-5 bottom-5 z-10000 size-14 rounded-full shadow-lg transition-transform hover:scale-105 active:scale-95 disabled:opacity-80 [&_svg:not([class*='size-'])]:size-6"
       >
         <ProgressRing
           progress={progress}
           size={62}
           radius={28}
           strokeWidth={3}
-          className="absolute top-1/2 left-1/2 -translate-1/2"
+          className="pointer-events-none absolute top-1/2 left-1/2 -translate-1/2"
           barClassName={cn("stroke-success")}
         />
-        <svg
-          viewBox="0 0 24 24"
-          className="h-7 w-7 fill-none stroke-white stroke-2 [stroke-linecap:round] [stroke-linejoin:round]"
-        >
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-          <polyline points="7 10 12 15 17 10" />
-          <line x1="12" y1="15" x2="12" y2="3" />
-        </svg>
-      </button>
+        {busy ? <LoaderCircle className="animate-spin" /> : <Download />}
+      </Button>
       {message && (
-        <div className="fixed right-21.25 bottom-7 z-10000 rounded-[20px] bg-black/85 px-4 py-2 font-sans text-[13px] font-medium whitespace-nowrap text-white shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+        <div className="fixed right-21.25 bottom-8 z-10000 rounded-md border bg-popover px-3 py-1.5 font-sans text-sm whitespace-nowrap text-popover-foreground shadow-md">
           {message}
         </div>
       )}
