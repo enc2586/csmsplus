@@ -18,7 +18,7 @@ export function PatchNotesTab() {
               {note.changes.map((change) => (
                 <li
                   key={change}
-                  className="relative mb-6 pl-18 leading-[1.5] text-gray-aaa before:absolute before:left-0 before:content-['-']"
+                  className="relative mb-6 pl-18 leading-normal text-gray-aaa before:absolute before:left-0 before:content-['-']"
                 >
                   {change}
                 </li>

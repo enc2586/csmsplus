@@ -3,7 +3,7 @@ import iconUrl from "../../assets/icons/icon128.png";
 import { cn } from "../ui/cn.ts";
 import { GitHubIcon } from "./icons.tsx";
 
-const link = cn("text-[color:LinkText] underline");
+const link = cn("text-[LinkText] underline");
 const year = getYear(Date.now());
 
 export function AboutTab() {
@@ -31,7 +31,7 @@ export function AboutTab() {
         </a>
       </div>
 
-      <div className="mt-32 w-full rounded-12 border border-gray-333 bg-white/[0.03] p-24 text-left">
+      <div className="mt-32 w-full rounded-12 border border-gray-333 bg-white/3 p-24 text-left">
         <h3 className="mb-12 text-[1.1rem] font-bold text-gray-e0e0e0">버그 제보 및 기능 제안</h3>
         <p className="mb-16 text-[0.95rem] text-gray-aaa">
           문제가 발생했거나 새로운 기능이 필요하다면 언제든 알려주세요!

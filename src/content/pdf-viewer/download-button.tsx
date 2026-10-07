@@ -66,7 +66,7 @@ export function DownloadButton({ params }: { params: DocumentParams }) {
         aria-label="PDF로 다운로드"
         onClick={() => void download()}
         className={cn(
-          "fixed right-20 bottom-20 z-[10000] flex h-56 w-56 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-black shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-110 hover:shadow-[0_6px_16px_rgba(0,0,0,0.4)] active:scale-95",
+          "fixed right-20 bottom-20 z-10000 flex h-56 w-56 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-black shadow-[0_4px_12px_rgba(0,0,0,0.3)] transition-all duration-300 hover:scale-110 hover:shadow-[0_6px_16px_rgba(0,0,0,0.4)] active:scale-95",
           busy && "cursor-not-allowed opacity-70 hover:scale-100",
         )}
       >
@@ -88,7 +88,7 @@ export function DownloadButton({ params }: { params: DocumentParams }) {
         </svg>
       </button>
       {message && (
-        <div className="fixed right-85 bottom-28 z-[10000] rounded-[20px] bg-black/85 px-16 py-8 font-sans text-13 font-medium whitespace-nowrap text-white shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+        <div className="fixed right-85 bottom-28 z-10000 rounded-[20px] bg-black/85 px-16 py-8 font-sans text-13 font-medium whitespace-nowrap text-white shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
           {message}
         </div>
       )}

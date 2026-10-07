@@ -235,7 +235,7 @@ export function SettingsTab() {
             </span>
             <strong className="text-15 font-bold text-warning">주의</strong>
           </div>
-          <p className="m-0 text-14 leading-[1.5] text-gray-aaa">
+          <p className="m-0 text-14 leading-normal text-gray-aaa">
             이 설정들은 확장 프로그램의 성능에 큰 영향을 미칠 수 있습니다.
             <br />
             무엇을 하는지 정확히 알고 있는 경우에만 변경하세요.
