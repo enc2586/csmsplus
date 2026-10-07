@@ -41,6 +41,7 @@ describe("formatDeadline", () => {
 describe("timeRemaining", () => {
   it("lists only the non-zero units", () => {
     expect(timeRemaining(at("2026-10-02 15:05:00"), now)).toBe("2일 3시간 5분");
+    expect(timeRemaining(at("2026-11-04 12:00:00"), now)).toBe("35일");
     expect(timeRemaining(at("2026-09-30 22:00:00"), now)).toBe("10시간");
     expect(timeRemaining(at("2026-09-30 12:00:30"), now)).toBe("");
     expect(timeRemaining(at("2026-09-30 11:00:00"), now)).toBe("");

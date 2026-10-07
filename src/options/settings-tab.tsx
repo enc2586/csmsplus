@@ -2,6 +2,7 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { isExclusionKey } from "../shared/assignment/exclusions.ts";
 import { loadOptions, type Options, parseOptions, saveOptions } from "../shared/options.ts";
 import { cn } from "../ui/cn.ts";
+import { msToNaturalLanguage } from "./duration.ts";
 import { TrashIcon, WarningIcon } from "./icons.tsx";
 import { SaveBar } from "./save-bar.tsx";
 import { ToggleSwitch } from "./toggle-switch.tsx";
@@ -34,20 +35,6 @@ function fromDraft({ options, numbers }: Draft): Options {
       cacheTtlSubmitted: int(numbers.cacheTtlSubmitted),
     },
   });
-}
-
-function msToNaturalLanguage(ms: number): string {
-  if (ms < 1000) return `${ms}ms`;
-  const seconds = Math.floor(ms / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-  const weeks = Math.floor(days / 7);
-  if (weeks > 0) return `${weeks}주 (${days}일)`;
-  if (days > 0) return `${days}일`;
-  if (hours > 0) return `${hours}시간`;
-  if (minutes > 0) return `${minutes}분`;
-  return `${seconds}초`;
 }
 
 async function clearCache() {

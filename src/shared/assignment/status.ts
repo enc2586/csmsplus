@@ -1,4 +1,15 @@
-import { addHours, differenceInMinutes, format, isAfter, isBefore, isValid, parse } from "date-fns";
+import {
+  addHours,
+  differenceInMinutes,
+  format,
+  formatDuration,
+  isAfter,
+  isBefore,
+  isValid,
+  parse,
+} from "date-fns";
+import { minutesInDay, minutesInHour } from "date-fns/constants";
+import { ko } from "date-fns/locale";
 
 export type AssignmentStatus = "submitted" | "overdue" | "urgent" | "remaining";
 
@@ -36,13 +47,13 @@ export function formatDeadline(text: string): string {
 export function timeRemaining(dueDate: Date, now: Date | number): string {
   const minutes = differenceInMinutes(dueDate, now);
   if (minutes <= 0) return "";
-  const parts = [
-    [Math.floor(minutes / (24 * 60)), "일"],
-    [Math.floor(minutes / 60) % 24, "시간"],
-    [minutes % 60, "분"],
-  ] as const;
-  return parts
-    .filter(([value]) => value > 0)
-    .map(([value, unit]) => `${value}${unit}`)
-    .join(" ");
+  // Days are not rolled up into months, so a deadline five weeks out reads "35일".
+  return formatDuration(
+    {
+      days: Math.floor(minutes / minutesInDay),
+      hours: Math.floor((minutes % minutesInDay) / minutesInHour),
+      minutes: minutes % minutesInHour,
+    },
+    { locale: ko },
+  );
 }
