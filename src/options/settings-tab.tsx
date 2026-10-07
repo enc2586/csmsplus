@@ -7,7 +7,12 @@ import { TrashIcon, WarningIcon } from "./icons.tsx";
 import { SaveBar } from "./save-bar.tsx";
 import { ToggleSwitch } from "./toggle-switch.tsx";
 
-type NumberField = "urgentThresholdHours" | "fetchInterval" | "cacheTtl" | "cacheTtlSubmitted";
+type NumberField =
+  | "urgentThresholdHours"
+  | "fetchInterval"
+  | "syncIntervalMinutes"
+  | "cacheTtl"
+  | "cacheTtlSubmitted";
 
 // Number inputs stay as raw text while editing so a half-typed value is not coerced.
 type Draft = { options: Options; numbers: Record<NumberField, string> };
@@ -18,6 +23,7 @@ function toDraft(options: Options): Draft {
     numbers: {
       urgentThresholdHours: String(options.tracker.urgentThresholdHours),
       fetchInterval: String(options.advanced.fetchInterval),
+      syncIntervalMinutes: String(options.advanced.syncIntervalMinutes),
       cacheTtl: String(options.advanced.cacheTtl),
       cacheTtlSubmitted: String(options.advanced.cacheTtlSubmitted),
     },
@@ -31,6 +37,7 @@ function fromDraft({ options, numbers }: Draft): Options {
     tracker: { ...options.tracker, urgentThresholdHours: int(numbers.urgentThresholdHours) },
     advanced: {
       fetchInterval: Math.max(10, int(numbers.fetchInterval) || 100),
+      syncIntervalMinutes: int(numbers.syncIntervalMinutes),
       cacheTtl: int(numbers.cacheTtl),
       cacheTtlSubmitted: int(numbers.cacheTtlSubmitted),
     },
@@ -243,6 +250,23 @@ export function SettingsTab() {
               {...number("fetchInterval")}
             />
             <span className={unit}>ms</span>
+          </div>
+        </OptionItem>
+
+        <OptionItem
+          label="백그라운드 동기화 간격"
+          description="LMS 페이지를 열지 않아도 이 간격마다 과제 정보를 새로 받아옵니다. (최소 5분)"
+        >
+          <div className="flex items-center gap-8">
+            <input
+              id="advanced-syncIntervalMinutes"
+              type="number"
+              min={5}
+              step={5}
+              className={numberInput}
+              {...number("syncIntervalMinutes")}
+            />
+            <span className={unit}>분</span>
           </div>
         </OptionItem>
 

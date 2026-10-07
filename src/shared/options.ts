@@ -23,6 +23,8 @@ const optionsSchema = z.object({
     fetchInterval: z.catch(z.number().check(z.minimum(10)), 100),
     cacheTtl: positive(60 * 1000),
     cacheTtlSubmitted: positive(7 * 24 * 60 * 60 * 1000),
+    // Background sync visits every course, so the LMS should not see it more often than this.
+    syncIntervalMinutes: z.catch(z.number().check(z.minimum(5)), 30),
   }),
 });
 

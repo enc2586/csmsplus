@@ -6,7 +6,7 @@ const manifest = {
   name: "CSMS+",
   version: pkg.version,
   description: "Enhance your LMS experience",
-  permissions: ["storage"],
+  permissions: ["storage", "alarms", "offscreen"],
   action: {
     default_icon: {
       16: "assets/icons/icon16.png",

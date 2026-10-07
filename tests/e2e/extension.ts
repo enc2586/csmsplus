@@ -3,6 +3,7 @@ import path from "node:path";
 import {
   test as base,
   chromium,
+  expect,
   type BrowserContext,
   type Page,
   type Worker,
@@ -71,6 +72,14 @@ export const test = base.extend<Fixtures>({
   },
   worker: async ({ context }, use) => {
     const worker = context.serviceWorkers()[0] ?? (await context.waitForEvent("serviceworker"));
+    // Installing starts a background sync that fills the cache. Waiting for it and clearing
+    // storage gives every test the same empty starting point.
+    await expect
+      .poll(() => worker.evaluate(() => chrome.storage.local.get("syncStatus")), {
+        timeout: 15_000,
+      })
+      .toHaveProperty("syncStatus");
+    await worker.evaluate(() => chrome.storage.local.clear());
     await use(worker);
   },
   extensionId: async ({ worker }, use) => {

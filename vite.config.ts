@@ -26,6 +26,10 @@ export default defineConfig({
     // jsPDF lazily imports these for HTML/SVG rendering, which is never used here.
     alias: { html2canvas: unsupported, canvg: unsupported, dompurify: unsupported },
   },
+  build: {
+    // Not referenced from the manifest, so CRXJS would not build it on its own.
+    rollupOptions: { input: { offscreen: "src/offscreen/index.html" } },
+  },
   plugins: [react(), tailwindcss(), crx({ manifest })],
   test: {
     include: ["src/**/*.test.{ts,tsx}"],
