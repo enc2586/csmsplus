@@ -229,6 +229,15 @@ export function SettingsTab() {
           <ToggleSwitch id="tracker-showBadge" {...toggle("tracker", "showBadge")} />
         </OptionItem>
         <OptionItem
+          label="새 활동 표시"
+          description="강좌 페이지에서 마지막 방문 이후 새로 올라온 활동에 NEW를 붙이고, 메인 페이지 카드에 개수를 표시합니다."
+        >
+          <ToggleSwitch
+            id="tracker-markNewActivities"
+            {...toggle("tracker", "markNewActivities")}
+          />
+        </OptionItem>
+        <OptionItem
           label="강좌 페이지 과제 대시보드"
           description="강좌 페이지 상단에 전체 과제 현황 대시보드를 표시합니다."
         >

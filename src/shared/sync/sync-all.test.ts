@@ -29,6 +29,7 @@ const list: PageOf<"courseList"> = {
 const course: PageOf<"coursePage"> = {
   kind: "coursePage",
   signedIn: true,
+  modules: [],
   links: [
     { id: "1", url: "https://lms.gist.ac.kr/mod/assign/view.php?id=1" },
     { id: "2", url: "https://lms.gist.ac.kr/mod/assign/view.php?id=2" },

@@ -5,6 +5,8 @@ export type CourseProgress = {
   progress: number;
   // Null until every assignment of the course has been read from cache or fetched.
   records: AssignmentRecord[] | null;
+  // Activities added since the course page was last opened.
+  newCount?: number;
 };
 
 export type HomeState = {

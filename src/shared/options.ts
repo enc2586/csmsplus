@@ -15,6 +15,7 @@ const optionsSchema = z.object({
     enableSummaryAtDashboard: flag(true),
     enableAllAssignmentsAtDashboard: flag(true),
     showBadge: flag(true),
+    markNewActivities: flag(true),
     enableSummaryAtLecture: flag(true),
     enableAssignmentDetail: flag(true),
     showBody: flag(true),

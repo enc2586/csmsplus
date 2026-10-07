@@ -47,6 +47,9 @@ export function CourseStats({ courseId }: { courseId: string }) {
           const counts = countStatuses(course.records, excluded, threshold, now);
           return (
             <>
+              {course.newCount ? (
+                <Stat name="새 항목" count={course.newCount} valueClassName={cn("text-new")} />
+              ) : null}
               <Stat name="완료" count={counts.submitted} valueClassName={cn("text-stat-done")} />
               <Stat
                 name="마감 임박"

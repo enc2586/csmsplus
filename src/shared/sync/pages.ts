@@ -11,7 +11,7 @@ export type AssignmentLink = { id: string; url: string };
 
 export type ParsedPage =
   | { kind: "courseList"; signedIn: boolean; courses: CourseSummary[] }
-  | { kind: "coursePage"; signedIn: boolean; links: AssignmentLink[] }
+  | { kind: "coursePage"; signedIn: boolean; links: AssignmentLink[]; modules: string[] }
   | { kind: "assignment"; signedIn: boolean; assignment: ScrapedAssignment | null };
 
 export type PageKind = ParsedPage["kind"];
@@ -32,6 +32,13 @@ export function findAssignmentLinks(root: ParentNode): AssignmentLink[] {
     if (id && !links.has(id)) links.set(id, url.href);
   }
   return [...links].map(([id, url]) => ({ id, url }));
+}
+
+// Every activity on a course page (assignment, file, board, ...) is an <li id="module-N">.
+export function findModules(root: ParentNode): string[] {
+  return [...root.querySelectorAll('li.activity[id^="module-"]')].map((li) =>
+    li.id.slice("module-".length),
+  );
 }
 
 export const COURSE_CARDS = ".progress_courses .course_lists ul > li";
@@ -66,7 +73,7 @@ export function parsePage<K extends PageKind>(kind: K, doc: Document, url: strin
     kind === "courseList"
       ? { kind, signedIn, courses: findCourses(doc) }
       : kind === "coursePage"
-        ? { kind, signedIn, links: findAssignmentLinks(doc) }
+        ? { kind, signedIn, links: findAssignmentLinks(doc), modules: findModules(doc) }
         : {
             kind: "assignment",
             signedIn,

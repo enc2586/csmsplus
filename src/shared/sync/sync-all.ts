@@ -24,13 +24,14 @@ export async function syncCourse(
   courseId: string,
   { load, queue, options }: SyncContext,
   onProgress?: (progress: number) => void,
-): Promise<AssignmentRecord[]> {
+): Promise<{ records: AssignmentRecord[]; modules: string[] }> {
   const page = await queue.add(() => load("coursePage", `${LMS}/course/view.php?id=${courseId}`));
   if (page && !page.signedIn) throw new SignedOutError();
   const links = page?.links ?? [];
+  const modules = page?.modules ?? [];
   if (links.length === 0) {
     onProgress?.(1);
-    return [];
+    return { records: [], modules };
   }
 
   const cached = await readCachedAssignments(links.map((link) => link.id));
@@ -55,7 +56,7 @@ export async function syncCourse(
     processed++;
     onProgress?.(processed / links.length);
   }
-  return records;
+  return { records, modules };
 }
 
 export async function loadCourses(): Promise<Record<string, CourseSummary>> {

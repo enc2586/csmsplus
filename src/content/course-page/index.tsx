@@ -1,5 +1,8 @@
 import { applyExclusionChanges, loadExcludedIds } from "../../shared/assignment/exclusions.ts";
 import { loadOptions, watchOptions } from "../../shared/options.ts";
+import { loadSeen, markSeen, newModules } from "../../shared/assignment/seen-modules.ts";
+import { findModules } from "../../shared/sync/pages.ts";
+import { NewChip } from "../../ui/new-chip.tsx";
 import { mount } from "../mount.tsx";
 import { AssignmentControls } from "./assignment-controls.tsx";
 import { AssignmentInfo } from "./assignment-info.tsx";
@@ -70,6 +73,20 @@ function showDashboard(enabled: boolean) {
   unmountDashboard = mount(host, <Dashboard />);
 }
 
+// Opening the course page is what marks its activities as seen, so the markers show once.
+async function markNewActivities(courseId: string) {
+  const modules = findModules(document);
+  for (const id of newModules(modules, await loadSeen(courseId))) {
+    const item = document.getElementById(`module-${id}`);
+    const title = item?.querySelector(".activityinstance a, a");
+    if (!title) continue;
+    const host = document.createElement("span");
+    title.after(host);
+    mount(host, <NewChip />);
+  }
+  await markSeen(courseId, modules);
+}
+
 async function main() {
   const style = document.createElement("style");
   style.textContent = DASHBOARD_BOX;
@@ -87,7 +104,11 @@ async function main() {
 
   attachToLinks();
   showDashboard(courseStore.getState().options.tracker.enableSummaryAtLecture);
-  await loadAssignments(new URLSearchParams(location.search).get("id"));
+  const courseId = new URLSearchParams(location.search).get("id");
+  if (courseId && courseStore.getState().options.tracker.markNewActivities) {
+    void markNewActivities(courseId);
+  }
+  await loadAssignments(courseId);
 }
 
 void main();

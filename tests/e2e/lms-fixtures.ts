@@ -29,8 +29,16 @@ export const assignments: FixtureAssignment[] = [
 // fixing the base per test keeps served pages and assertions on the same deadline.
 let baseTime: Date | number = 0;
 
+// Activities a test adds to the course page after its first visit, to look new.
+let extraActivities: string[] = [];
+
+export function addActivities(ids: string[]) {
+  extraActivities = ids;
+}
+
 export function resetFixtureTime() {
   baseTime = addMinutes(startOfMinute(Date.now()), 2);
+  extraActivities = [];
 }
 
 export function deadlineText(hoursFromNow: number): string {
@@ -64,7 +72,13 @@ export function coursePage(): string {
   const week = assignments
     .map(
       (a) =>
-        `<li class="activity assign modtype_assign"><div class="activityinstance">${link(a)}</div></li>`,
+        `<li id="module-${a.id}" class="activity assign modtype_assign"><div class="activityinstance">${link(a)}</div></li>`,
+    )
+    .join("");
+  const extra = extraActivities
+    .map(
+      (id) =>
+        `<li id="module-${id}" class="activity resource modtype_resource"><div class="activityinstance"><a href="https://lms.gist.ac.kr/mod/resource/view.php?id=${id}"><span class="instancename">강의자료 ${id}</span></a></div></li>`,
     )
     .join("");
   return page(`<div class="course-content"><ul class="topics">
@@ -72,7 +86,7 @@ export function coursePage(): string {
 <li class="activity assign modtype_assign"><div class="course_box0"><div class="activityinstance">
 <a href="https://lms.gist.ac.kr/mod/assign/view.php?id=${first.id}"><span class="icon"></span><span class="instancename">${first.title}<span class="accesshide"> 과제</span></span></a>
 </div></div></li></ul></div></li>
-<li id="section-1" class="section main"><div class="content"><h3>1주차</h3><ul class="section">${week}</ul></div></li>
+<li id="section-1" class="section main"><div class="content"><h3>1주차</h3><ul class="section">${week}${extra}</ul></div></li>
 </ul></div>`);
 }
 
