@@ -24,6 +24,7 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      "@": fileURLToPath(new URL("src", import.meta.url)),
       // jsPDF lazily imports these for HTML/SVG rendering, which is never used here.
       html2canvas: unsupported,
       canvg: unsupported,
