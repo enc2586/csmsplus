@@ -8,6 +8,7 @@ test("options page saves settings and clears only cached assignments", async ({
   await storage.set({
     assignment_1: { id: "1", timestamp: Date.now() },
     excludedAssignment_6: true,
+    notified_1_24: true,
   });
   const page = await context.newPage();
   page.on("dialog", (dialog) => dialog.accept());
@@ -23,15 +24,19 @@ test("options page saves settings and clears only cached assignments", async ({
   expect(await storage.get()).not.toHaveProperty("options");
 
   await threshold.fill("24");
+  await page.locator("#notifications-hoursBefore").fill("3, 48 3, 0");
   await page.locator("#save-btn").click();
   await expect
     .poll(async () => (await storage.get()).options)
-    .toMatchObject({ tracker: { urgentThresholdHours: 24 } });
+    .toMatchObject({
+      tracker: { urgentThresholdHours: 24 },
+      notifications: { enable: false, hoursBefore: [48, 3] },
+    });
 
   await page.locator("#clear-cache-btn").click();
   await expect
     .poll(async () => Object.keys(await storage.get()).sort())
-    .toEqual(["excludedAssignment_6", "options"]);
+    .toEqual(["excludedAssignment_6", "notified_1_24", "options"]);
 
   await page.locator("nav").getByText("Patch Notes").click();
   await expect(page.getByText("과제 상태 구분 및 추적 제외 기능 추가")).toBeVisible();

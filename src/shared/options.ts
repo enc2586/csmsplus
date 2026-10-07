@@ -28,6 +28,10 @@ const optionsSchema = z.object({
     // Background sync visits every course, so the LMS should not see it more often than this.
     syncIntervalMinutes: z.catch(z.number().check(z.minimum(5)), 30),
   }),
+  notifications: section({
+    enable: flag(false),
+    hoursBefore: z.catch(z.array(z.number().check(z.positive())), [24, 3]),
+  }),
 });
 
 export type Options = z.infer<typeof optionsSchema>;

@@ -1,5 +1,6 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { isExclusionKey } from "../shared/assignment/exclusions.ts";
+import { isReminderKey } from "../shared/assignment/reminders.ts";
 import { loadOptions, type Options, parseOptions, saveOptions } from "../shared/options.ts";
 import { cn } from "../ui/cn.ts";
 import { msToNaturalLanguage } from "./duration.ts";
@@ -15,7 +16,7 @@ type NumberField =
   | "cacheTtlSubmitted";
 
 // Number inputs stay as raw text while editing so a half-typed value is not coerced.
-type Draft = { options: Options; numbers: Record<NumberField, string> };
+type Draft = { options: Options; numbers: Record<NumberField, string>; reminderHours: string };
 
 function toDraft(options: Options): Draft {
   return {
@@ -27,10 +28,20 @@ function toDraft(options: Options): Draft {
       cacheTtl: String(options.advanced.cacheTtl),
       cacheTtlSubmitted: String(options.advanced.cacheTtlSubmitted),
     },
+    reminderHours: options.notifications.hoursBefore.join(", "),
   };
 }
 
-function fromDraft({ options, numbers }: Draft): Options {
+// "24, 3" -> [24, 3]; duplicates and non-positive entries are dropped.
+function parseHours(text: string): number[] {
+  const hours = text
+    .split(/[,\s]+/)
+    .map(Number)
+    .filter((h) => Number.isFinite(h) && h > 0);
+  return [...new Set(hours)].sort((a, b) => b - a);
+}
+
+function fromDraft({ options, numbers, reminderHours }: Draft): Options {
   const int = (value: string) => Number.parseInt(value, 10);
   return parseOptions({
     ...options,
@@ -41,13 +52,17 @@ function fromDraft({ options, numbers }: Draft): Options {
       cacheTtl: int(numbers.cacheTtl),
       cacheTtlSubmitted: int(numbers.cacheTtlSubmitted),
     },
+    notifications: { ...options.notifications, hoursBefore: parseHours(reminderHours) },
   });
 }
 
 async function clearCache() {
   if (!confirm("정말 모든 캐시 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.")) return;
   const items = await chrome.storage.local.get(null);
-  const keys = Object.keys(items).filter((key) => key !== "options" && !isExclusionKey(key));
+  // Reminder records stay so that clearing the cache never repeats a notification.
+  const keys = Object.keys(items).filter(
+    (key) => key !== "options" && !isExclusionKey(key) && !isReminderKey(key),
+  );
   if (keys.length === 0) {
     alert("삭제할 캐시 데이터가 없습니다.");
     return;
@@ -122,7 +137,10 @@ export function SettingsTab() {
     setDraft(next);
     setDirty(true);
   };
-  const toggle = <S extends "pdfdl" | "tracker">(section: S, key: keyof Options[S]) => ({
+  const toggle = <S extends "pdfdl" | "tracker" | "notifications">(
+    section: S,
+    key: keyof Options[S],
+  ) => ({
     checked: draft.options[section][key] as boolean,
     onChange: (checked: boolean) =>
       edit({
@@ -232,6 +250,49 @@ export function SettingsTab() {
               {...number("urgentThresholdHours")}
             />
             <span className={unit}>시간</span>
+          </div>
+        </OptionItem>
+      </Section>
+
+      <Section title="마감 알림">
+        <OptionItem
+          label="마감 알림 받기"
+          description="제출하지 않은 과제의 마감이 다가오면 데스크톱 알림을 보냅니다. 켤 때 알림 권한을 요청합니다."
+        >
+          <ToggleSwitch
+            id="notifications-enable"
+            checked={draft.options.notifications.enable}
+            onChange={(checked) => {
+              const set = (enable: boolean) =>
+                edit({
+                  ...draft,
+                  options: {
+                    ...draft.options,
+                    notifications: { ...draft.options.notifications, enable },
+                  },
+                });
+              if (!checked) return set(false);
+              // The prompt only opens from a click, so it is requested before anything awaits.
+              void chrome.permissions
+                .request({ permissions: ["notifications"] })
+                .then((granted) => granted && set(true));
+            }}
+          />
+        </OptionItem>
+        <OptionItem
+          sub
+          label="알림 시점"
+          description="마감 몇 시간 전에 알릴지 쉼표로 구분해 적습니다. (기본값: 24, 3)"
+        >
+          <div className="flex items-center gap-8">
+            <input
+              id="notifications-hoursBefore"
+              type="text"
+              className={numberInput}
+              value={draft.reminderHours}
+              onChange={(event) => edit({ ...draft, reminderHours: event.target.value })}
+            />
+            <span className={unit}>시간 전</span>
           </div>
         </OptionItem>
       </Section>

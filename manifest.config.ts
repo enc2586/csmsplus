@@ -7,6 +7,8 @@ const manifest = {
   version: pkg.version,
   description: "Enhance your LMS experience",
   permissions: ["storage", "alarms", "offscreen"],
+  // Requested from the options page when reminders are turned on, so updating never prompts.
+  optional_permissions: ["notifications"],
   action: {
     default_popup: "src/popup/index.html",
     default_icon: {
