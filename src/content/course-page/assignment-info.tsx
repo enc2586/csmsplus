@@ -7,6 +7,7 @@ import {
 } from "../../shared/assignment/status.ts";
 import { cn } from "../../ui/cn.ts";
 import { StatusChip } from "../../ui/status-chip.tsx";
+import { useNow } from "../../ui/use-now.ts";
 import { courseStore } from "./store.ts";
 
 const spinner =
@@ -25,6 +26,7 @@ function Content({
 }) {
   const assignment = useStore(courseStore, (state) => state.assignments[id]);
   const tracker = useStore(courseStore, (state) => state.options.tracker);
+  const now = useNow();
 
   if (assignment.state === "failed") return null;
   if (assignment.state === "loading" || !assignment.record) {
@@ -37,10 +39,10 @@ function Content({
   }
 
   const { deadline, isSubmitted, content } = assignment.record;
-  const status = getAssignmentStatus(deadline, isSubmitted, tracker.urgentThresholdHours);
+  const status = getAssignmentStatus(deadline, isSubmitted, tracker.urgentThresholdHours, now);
   const dueDate = parseDeadline(deadline);
   const remaining =
-    tracker.showRemainingTime && !isSubmitted && dueDate ? timeRemaining(dueDate) : "";
+    tracker.showRemainingTime && !isSubmitted && dueDate ? timeRemaining(dueDate, now) : "";
 
   if (compact) {
     return (

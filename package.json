@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "cn": "0.4.0",
+    "date-fns": "^4.4.0",
     "jspdf": "^4.2.1",
     "p-queue": "^9.3.3",
     "react": "^19.3.0",
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "3.0.0",
+    "@date-fns/tz": "^1.5.0",
     "@playwright/test": "1.63.0",
     "@tailwindcss/vite": "^4.3.3",
     "@testing-library/react": "^16.3.3",

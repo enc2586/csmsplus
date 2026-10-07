@@ -1,3 +1,6 @@
+import { tz } from "@date-fns/tz";
+import { addHours, addMinutes, format, startOfMinute } from "date-fns";
+
 // Synthetic LMS pages shaped after the selectors the extension reads. Deadlines are
 // relative to the current time because the extension's isolated world keeps the real
 // clock even when the page clock is mocked.
@@ -21,27 +24,17 @@ export const assignments: FixtureAssignment[] = [
   { id: "6", title: "과제 6", hoursFromNow: 1, submitted: false, intro: "여섯 번째 과제 설명" },
 ];
 
-// Deadlines have minute precision. Rounding up and adding a minute keeps the shown
-// remaining time ("10시간 1분 남음") stable for the minute after a test starts, and fixing
-// the base per test keeps served pages and assertions on the same deadline.
-let baseTime = 0;
+// Deadlines have minute precision. Counting from a minute boundary over a minute ahead keeps
+// the shown remaining time ("10시간 1분 남음") stable for the minute after a test starts, and
+// fixing the base per test keeps served pages and assertions on the same deadline.
+let baseTime: Date | number = 0;
 
 export function resetFixtureTime() {
-  baseTime = Math.ceil(Date.now() / 60_000) * 60_000 + 60_000;
+  baseTime = addMinutes(startOfMinute(Date.now()), 2);
 }
 
 export function deadlineText(hoursFromNow: number): string {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Seoul",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hourCycle: "h23",
-  }).formatToParts(new Date(baseTime + hoursFromNow * 3_600_000));
-  const get = (type: string) => parts.find((part) => part.type === type)!.value;
-  return `${get("year")}-${get("month")}-${get("day")} ${get("hour")}:${get("minute")}`;
+  return format(addHours(baseTime, hoursFromNow), "yyyy-MM-dd HH:mm", { in: tz("Asia/Seoul") });
 }
 
 const page = (body: string) =>

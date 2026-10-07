@@ -1,3 +1,4 @@
+import { isAfter } from "date-fns";
 import { parseDeadline } from "./status.ts";
 
 export type ScrapedAssignment = {
@@ -48,14 +49,17 @@ export function hasSubmissionSummary(doc: Document): boolean {
   return valueByHeader(doc, "제출 여부") !== null || valueByHeader(doc, "종료 일시") !== null;
 }
 
-export function parseAssignmentDocument(doc: Document, now = new Date()): ScrapedAssignment {
+export function parseAssignmentDocument(
+  doc: Document,
+  now: Date | number = Date.now(),
+): ScrapedAssignment {
   const status = valueByHeader(doc, "제출 여부") ?? "";
   const deadline = valueByHeader(doc, "종료 일시");
   // Assignments without online submission never show "제출함"; the LMS treats them as
   // done once the deadline passes, so the tracker does too.
   const dueDate = parseDeadline(deadline);
   const isSubmitted = status.includes("온라인 제출물을 요구하지 않습니다")
-    ? dueDate !== null && now > dueDate
+    ? dueDate !== null && isAfter(now, dueDate)
     : status.includes("제출함") || status.includes("제출 완료");
   return {
     title: doc.querySelector("#region-main > div > h2")?.textContent?.trim() ?? "",

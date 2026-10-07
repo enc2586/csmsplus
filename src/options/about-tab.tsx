@@ -1,7 +1,9 @@
+import { getYear } from "date-fns";
 import iconUrl from "../../assets/icons/icon128.png";
 import { GitHubIcon } from "./icons.tsx";
 
 const link = "text-[color:LinkText] underline";
+const year = getYear(Date.now());
 
 export function AboutTab() {
   return (
@@ -62,7 +64,7 @@ export function AboutTab() {
             CC BY-NC-SA 4.0
           </a>
         </p>
-        <p>Copyright © {new Date().getFullYear()} 최홍제</p>
+        <p>Copyright © {year} 최홍제</p>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { parse } from "date-fns";
 import { describe, expect, it } from "vite-plus/test";
 import { hasSubmissionSummary, parseAssignmentDocument } from "./scrape.ts";
 
@@ -8,7 +9,7 @@ const page = (rows: string, intro = "<p>설명</p>") =>
   <table class="submissionsummarytable">${rows}</table></div></div>`);
 const row = (header: string, value: string) =>
   `<tr><td class="cell c0">${header}</td><td class="cell c1">${value}</td></tr>`;
-const now = new Date(2026, 8, 30, 12, 0);
+const now = parse("2026-09-30 12:00", "yyyy-MM-dd HH:mm", 0);
 
 describe("parseAssignmentDocument", () => {
   it("reads title, deadline and submission from c0/c1 rows", () => {

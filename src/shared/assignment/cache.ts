@@ -1,3 +1,4 @@
+import { differenceInMilliseconds } from "date-fns";
 import * as z from "zod/mini";
 import type { Options } from "../options.ts";
 import type { ScrapedAssignment } from "./scrape.ts";
@@ -23,7 +24,7 @@ export const cacheKey = (id: string) => `assignment_${id}`;
 
 export function isFresh(record: AssignmentRecord, advanced: Options["advanced"], now = Date.now()) {
   const ttl = record.isSubmitted ? advanced.cacheTtlSubmitted : advanced.cacheTtl;
-  return now - record.timestamp < ttl;
+  return differenceInMilliseconds(now, record.timestamp) < ttl;
 }
 
 export async function readCachedAssignments(ids: string[]): Promise<Map<string, AssignmentRecord>> {

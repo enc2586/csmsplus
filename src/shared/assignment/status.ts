@@ -1,42 +1,40 @@
+import { addHours, differenceInMinutes, format, isAfter, isBefore, isValid, parse } from "date-fns";
+
 export type AssignmentStatus = "submitted" | "overdue" | "urgent" | "remaining";
 
-const HOUR = 60 * 60 * 1000;
+const NUMERIC = /(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})/;
+const KOREAN = /(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일.*?(\d{1,2}):(\d{2})/;
 
 // LMS deadlines carry no time zone; like the LMS itself they are read as local time.
+// The text around the date varies (weekday, seconds), so the fields are cut out first.
 export function parseDeadline(text: string | null | undefined): Date | null {
-  if (!text) return null;
-  const match =
-    text.match(/(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})/) ??
-    text.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일.*?(\d{1,2}):(\d{2})/);
+  const match = text?.match(NUMERIC) ?? text?.match(KOREAN);
   if (!match) return null;
-  const [year, month, day, hour, minute] = match.slice(1).map(Number);
-  return new Date(year, month - 1, day, hour, minute);
+  const [year, month, day, hour, minute] = match.slice(1);
+  const date = parse(`${year}-${month}-${day} ${hour}:${minute}`, "yyyy-M-d H:m", 0);
+  return isValid(date) ? date : null;
 }
 
 export function getAssignmentStatus(
   deadline: string | null,
   isSubmitted: boolean,
   urgentThresholdHours: number,
-  now = new Date(),
+  now: Date | number,
 ): AssignmentStatus {
   if (isSubmitted) return "submitted";
   const dueDate = parseDeadline(deadline);
   if (!dueDate) return "remaining";
-  const diff = dueDate.getTime() - now.getTime();
-  if (diff < 0) return "overdue";
-  return diff <= urgentThresholdHours * HOUR ? "urgent" : "remaining";
+  if (isBefore(dueDate, now)) return "overdue";
+  return isAfter(dueDate, addHours(now, urgentThresholdHours)) ? "remaining" : "urgent";
 }
 
 export function formatDeadline(text: string): string {
-  const match = text.match(/(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})/);
-  if (!match) return text;
-  const [year, ...rest] = match.slice(1);
-  const [month, day, hour, minute] = rest.map((part) => part.padStart(2, "0"));
-  return `${year}-${month}-${day} ${hour}:${minute}`;
+  const date = NUMERIC.test(text) ? parseDeadline(text) : null;
+  return date ? format(date, "yyyy-MM-dd HH:mm") : text;
 }
 
-export function timeRemaining(dueDate: Date, now = new Date()): string {
-  const minutes = Math.floor((dueDate.getTime() - now.getTime()) / 60_000);
+export function timeRemaining(dueDate: Date, now: Date | number): string {
+  const minutes = differenceInMinutes(dueDate, now);
   if (minutes <= 0) return "";
   const parts = [
     [Math.floor(minutes / (24 * 60)), "일"],

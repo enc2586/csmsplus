@@ -8,7 +8,7 @@ export function countStatuses(
   assignments: Iterable<Countable>,
   excluded: ReadonlySet<string>,
   urgentThresholdHours: number,
-  now = new Date(),
+  now: Date | number,
 ): StatusCounts {
   const counts: StatusCounts = { submitted: 0, urgent: 0, overdue: 0, remaining: 0 };
   for (const a of assignments) {

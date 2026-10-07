@@ -1,7 +1,8 @@
+import { parse } from "date-fns";
 import { describe, expect, it } from "vite-plus/test";
 import { countStatuses } from "./stats.ts";
 
-const now = new Date(2026, 8, 30, 12, 0);
+const now = parse("2026-09-30 12:00", "yyyy-MM-dd HH:mm", 0);
 const assignments = [
   { id: "1", deadline: "2026-09-30 22:00", isSubmitted: false },
   { id: "2", deadline: "2026-09-29 12:00", isSubmitted: false },

@@ -1,7 +1,9 @@
+import { parse } from "date-fns";
 import { describe, expect, it } from "vite-plus/test";
 import { formatDeadline, getAssignmentStatus, parseDeadline, timeRemaining } from "./status.ts";
 
-const now = new Date(2026, 8, 30, 12, 0);
+const at = (text: string) => parse(text, "yyyy-MM-dd HH:mm:ss", 0);
+const now = at("2026-09-30 12:00:00");
 
 describe("getAssignmentStatus", () => {
   it("uses the urgent threshold in hours", () => {
@@ -22,8 +24,8 @@ describe("getAssignmentStatus", () => {
 
 describe("parseDeadline", () => {
   it("reads both LMS date formats as local time", () => {
-    expect(parseDeadline("2025-12-10 9:05")).toEqual(new Date(2025, 11, 10, 9, 5));
-    expect(parseDeadline("2025년 12월 10일 (수) 23:59")).toEqual(new Date(2025, 11, 10, 23, 59));
+    expect(parseDeadline("2025-12-10 9:05")).toEqual(at("2025-12-10 09:05:00"));
+    expect(parseDeadline("2025년 12월 10일 (수) 23:59")).toEqual(at("2025-12-10 23:59:00"));
     expect(parseDeadline("마감 없음")).toBeNull();
     expect(parseDeadline(null)).toBeNull();
   });
@@ -38,9 +40,9 @@ describe("formatDeadline", () => {
 
 describe("timeRemaining", () => {
   it("lists only the non-zero units", () => {
-    expect(timeRemaining(new Date(2026, 9, 2, 15, 5), now)).toBe("2일 3시간 5분");
-    expect(timeRemaining(new Date(2026, 8, 30, 22, 0), now)).toBe("10시간");
-    expect(timeRemaining(new Date(2026, 8, 30, 12, 0, 30), now)).toBe("");
-    expect(timeRemaining(new Date(2026, 8, 30, 11, 0), now)).toBe("");
+    expect(timeRemaining(at("2026-10-02 15:05:00"), now)).toBe("2일 3시간 5분");
+    expect(timeRemaining(at("2026-09-30 22:00:00"), now)).toBe("10시간");
+    expect(timeRemaining(at("2026-09-30 12:00:30"), now)).toBe("");
+    expect(timeRemaining(at("2026-09-30 11:00:00"), now)).toBe("");
   });
 });

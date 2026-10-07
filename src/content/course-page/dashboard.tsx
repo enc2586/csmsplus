@@ -1,3 +1,4 @@
+import { differenceInMilliseconds } from "date-fns";
 import { useEffect, useState } from "react";
 import { useStore } from "zustand";
 import {
@@ -8,6 +9,7 @@ import {
 } from "../../shared/assignment/status.ts";
 import { cn } from "../../ui/cn.ts";
 import { StatusChip } from "../../ui/status-chip.tsx";
+import { useNow } from "../../ui/use-now.ts";
 import { type Assignment, courseStore } from "./store.ts";
 
 const heading = "mb-10 text-13 font-semibold tracking-[0.5px] text-gray-666 uppercase";
@@ -71,10 +73,12 @@ function TaskList({
   title,
   items,
   showContent,
+  now,
 }: {
   title: string;
   items: DueItem[];
   showContent: boolean;
+  now: number;
 }) {
   if (items.length === 0) return null;
   return (
@@ -84,7 +88,7 @@ function TaskList({
         {items.map((item) => {
           const { deadline, content } = item.record;
           const dueDate = parseDeadline(deadline);
-          const remaining = dueDate && item.diff > 0 ? timeRemaining(dueDate) : "";
+          const remaining = dueDate && item.diff > 0 ? timeRemaining(dueDate, now) : "";
           const title = item.record.title || item.linkTitle;
           return (
             <a
@@ -124,12 +128,12 @@ export function Dashboard() {
   const assignments = useStore(courseStore, (state) => state.assignments);
   const excluded = useStore(courseStore, (state) => state.excluded);
   const tracker = useStore(courseStore, (state) => state.options.tracker);
+  const now = useNow();
 
   const all = Object.values(assignments);
   const loaded = all.filter((a) => a.state !== "loading").length;
   const tracked = all.filter((a) => !excluded.has(a.id));
 
-  const now = new Date();
   let completed = 0;
   const urgent: DueItem[] = [];
   const overdue: DueItem[] = [];
@@ -141,7 +145,8 @@ export function Dashboard() {
       tracker.urgentThresholdHours,
       now,
     );
-    const diff = (parseDeadline(a.record.deadline)?.getTime() ?? 0) - now.getTime();
+    const dueDate = parseDeadline(a.record.deadline);
+    const diff = dueDate ? differenceInMilliseconds(dueDate, now) : 0;
     if (status === "submitted") completed++;
     else if (status === "urgent") urgent.push({ ...a, record: a.record, diff });
     else if (status === "overdue") overdue.push({ ...a, record: a.record, diff });
@@ -193,8 +198,18 @@ export function Dashboard() {
             </div>
           ) : (
             <>
-              <TaskList title="마감 임박 과제" items={urgent} showContent={tracker.showBody} />
-              <TaskList title="마감 지남 과제" items={overdue} showContent={tracker.showBody} />
+              <TaskList
+                title="마감 임박 과제"
+                items={urgent}
+                showContent={tracker.showBody}
+                now={now}
+              />
+              <TaskList
+                title="마감 지남 과제"
+                items={overdue}
+                showContent={tracker.showBody}
+                now={now}
+              />
             </>
           ))}
       </div>
