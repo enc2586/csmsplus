@@ -29,6 +29,10 @@ test("course page shows dashboard and per-assignment status", async ({ context, 
         `마감 임박 과제 마감 임박 과제 1 첫 번째 과제 설명 ${due("1")}까지 (10시간 1분 남음) ` +
         `마감 지남 과제 마감 지남 과제 2 두 번째 과제 설명 ${due("2")}까지`,
     );
+  // Counts can settle before every row has loaded: assignment 5 has no deadline and is
+  // "remaining" either way, and excluded ones are not counted. The loading bar leaves
+  // only after all of them finish.
+  await expect(page.getByRole("progressbar")).toHaveCount(0);
   const week = (n: number) => `#section-1 li:nth-child(${n}) .activityinstance`;
   expect(await renderedText(page, "#section-0 .activityinstance")).toBe(
     "과제 1 과제 추적 제외 마감 임박 10시간 1분 남음",
@@ -44,8 +48,6 @@ test("course page shows dashboard and per-assignment status", async ({ context, 
   );
   expect(await renderedText(page, week(6))).toBe("과제 6 과제 다시 추적 추적 제외됨");
 
-  // The loading bar collapses 800ms after the last assignment loads and is removed 500ms later.
-  await page.waitForTimeout(1500);
   const mask = [page.getByText(dates)];
   await expect(page.locator("#assignment-dashboard-root")).toHaveScreenshot(
     "course-dashboard.png",
