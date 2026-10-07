@@ -16,9 +16,9 @@ const manifest = {
       128: "assets/icons/icon128.png",
     },
   },
-  background: { service_worker: "src/background/background.js", type: "module" },
+  background: { service_worker: "src/background/index.ts", type: "module" },
   host_permissions: ["https://lms.gist.ac.kr/*", "https://doc.coursemos.co.kr/*"],
-  options_ui: { page: "src/options/options.html", open_in_tab: true },
+  options_ui: { page: "src/options/index.html", open_in_tab: true },
   content_scripts: [
     {
       matches: ["https://lms.gist.ac.kr/local/ubdoc/*"],

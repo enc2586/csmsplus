@@ -156,33 +156,6 @@ function assertCounts(html, values) {
     assert.equal(controls[0].children[0].disabled, false);
     assert(!('excludedAssignment_1' in stored));
 
-    const optionElements = new Map();
-    const options = browser({ addEventListener() {}, getElementById(id) {
-        if (!optionElements.has(id)) optionElements.set(id, new Element());
-        return optionElements.get(id);
-    } });
-    run(options, 'src/options/options.js');
-    const thresholdInput = optionElements.get('tracker-urgentThresholdHours');
-    const saveButton = optionElements.get('save-btn');
-    saveButton.disabled = false;
-    thresholdInput.reportValidity = () => false;
-    options.optionReads = 0;
-    vm.runInContext('getSettingsFromUI = () => { optionReads++; return { tracker: { urgentThresholdHours: 24 } }; };', options);
-    const previousOptions = stored.options;
-    vm.runInContext('saveSettings()', options);
-    assert.equal(options.optionReads, 0, 'invalid input must not be read');
-    assert.equal(stored.options, previousOptions, 'invalid input must not be saved');
-    assert.equal(saveButton.disabled, false, 'invalid input must leave saving available');
-    thresholdInput.reportValidity = () => true;
-    options.showSaveStatus = () => {};
-    vm.runInContext('saveSettings()', options);
-    assert.equal(options.optionReads, 1);
-    assert.equal(stored.options.tracker.urgentThresholdHours, 24);
-    vm.runInContext('clearCache()', options);
-    await settle();
-    assert.equal(stored.excludedAssignment_6, true);
-    assert(stored.options);
-    assert(!Object.keys(stored).some(key => key.startsWith('assignment_')));
     const reload = browser({});
     run(reload, scripts + 'tracker-utils.js');
     await reload.window.GistAssignmentTracker.Utils.loadExcludedAssignments();

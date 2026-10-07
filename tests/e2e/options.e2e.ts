@@ -11,7 +11,7 @@ test("options page saves settings and clears only cached assignments", async ({
   });
   const page = await context.newPage();
   page.on("dialog", (dialog) => dialog.accept());
-  await page.goto(`chrome-extension://${extensionId}/src/options/options.html`);
+  await page.goto(`chrome-extension://${extensionId}/src/options/index.html`);
 
   await expect(page.locator("#tracker-urgentThresholdHours")).toHaveValue("72");
   await expect(page.locator("#pdfdl-enable")).toBeChecked();
