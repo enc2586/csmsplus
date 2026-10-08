@@ -2,7 +2,7 @@
 
 GIST LMS(Coursemos)의 사용자 경험을 향상시키는 Chrome/Edge 확장 프로그램입니다.
 
-현재 개발 버전은 **2.1.3**입니다. 업데이트 내역은 확장 프로그램 설정의 패치 노트 탭 또는 [업데이트 로그](src/options/patch_notes.json)에서 확인할 수 있습니다.
+현재 개발 버전은 **2.2.0**입니다. 업데이트 내역은 확장 프로그램 설정의 패치 노트 탭 또는 [업데이트 로그](src/options/patch-notes.json)에서 확인할 수 있습니다.
 
 ## 설치
 - [Chrome Web Store](https://chromewebstore.google.com/detail/oekalaanipfieieiibilhfjcoebfaabc)에서 다운로드
@@ -17,7 +17,19 @@ GIST LMS(Coursemos)의 사용자 경험을 향상시키는 Chrome/Edge 확장 �
 - **선택 유지**: 제외 선택은 해당 브라우저 프로필에 저장되며 새로고침, 브라우저 재시작, 캐시 삭제 후에도 유지됩니다. 다른 기기에 동기화되지 않으며, 제외한 과제의 정보 조회는 계속됩니다.
 - **과제 상태 표시**: 개별 과제와 요약 화면 모두 설정한 마감 임박 기준을 사용합니다. 온라인 제출이 필요 없는 과제는 기한이 지나면 기존처럼 완료로 처리합니다.
 
-### 2. PDF 다운로드 (PDF Downloader)
+- **전체 과제 목록**: LMS 메인 페이지 강좌 목록 아래에 모든 강좌의 과제를 마감 순서대로 모아 보여 줍니다. 완료한 과제와 추적 제외한 과제는 접어 둡니다.
+- **새 활동 표시**: 강좌 페이지를 마지막으로 연 뒤 새로 올라온 활동에 NEW를 붙이고, 메인 페이지 카드에 개수를 표시합니다.
+
+### 2. 툴바 팝업과 알림
+- **백그라운드 동기화**: LMS 페이지를 열지 않아도 30분마다(설정에서 변경) 모든 강좌의 과제를 받아 옵니다. 로그인이 만료되면 알려 줍니다.
+- **툴바 팝업**: 확장 프로그램 아이콘을 누르면 다가오는 마감 목록을 보여 주고, 바로 새로고침할 수 있습니다. 아이콘 배지에 마감 임박 과제 수를 표시합니다.
+- **마감 알림**: 설정에서 켜면 마감 24시간 전과 3시간 전(변경 가능)에 데스크톱 알림을 보냅니다. 알림 권한은 켤 때만 요청합니다.
+- **Todoist 연동**: 개인 API 토큰을 넣으면 제출하지 않은 과제를 Todoist 태스크로 만듭니다. LMS 마감 전날을 Todoist deadline으로 넣고, 원래 마감 시각은 설명에 적습니다. 제출하면 태스크를 완료 처리합니다.
+
+### 3. 화면
+- **LMS 다크 모드**: 설정에서 켬, 끔, 시스템 설정 따름을 고를 수 있습니다. [Dark Reader](https://github.com/darkreader/darkreader) 엔진을 사용합니다.
+
+### 4. PDF 다운로드 (PDF Downloader)
 - **자동 감지**: LMS 내 문서 뷰어 페이지를 자동으로 감지합니다.
 - **PDF 변환**: 이미지 기반의 교재를 PDF 파일로 변환하여 다운로드할 수 있습니다.
 - **원클릭 다운로드**: 우측 하단 플로팅 버튼을 통해 손쉽게 저장할 수 있습니다.
@@ -26,77 +38,80 @@ GIST LMS(Coursemos)의 사용자 경험을 향상시키는 Chrome/Edge 확장 �
 ## 설치 및 개발 방법
 
 ### 개발 환경 설정
-이 프로젝트는 기능별로 모듈화된 구조를 가지고 있습니다.
+[Vite+](https://viteplus.dev)(`vp`)로 빌드하고 패키지는 [Bun](https://bun.sh)으로 설치합니다. Node.js와 Bun 버전은 [mise](https://mise.jdx.dev)가 `mise.toml`에 맞춰 관리하므로 따로 전역 설치할 필요가 없습니다. `vp`도 프로젝트 의존성에 들어 있습니다.
 
 ```bash
 git clone https://github.com/enc2586/csmsplus
+cd csmsplus
+mise install
+bun install
 ```
 
 ### 개발 버전 로드
 
-1. Chrome에서 `chrome://extensions`를 엽니다. Edge에서는 `edge://extensions`를 사용합니다.
-2. 기존 설치 버전이 있으면 비활성화하고 **개발자 모드**를 켭니다.
-3. **압축해제된 확장 프로그램을 로드합니다**를 눌러 `manifest.json`이 있는 프로젝트 루트 폴더를 선택합니다. 별도 빌드는 필요 없습니다.
-4. LMS 페이지를 새로고침합니다.
-
-코드를 수정한 뒤에는 확장 프로그램 관리 화면에서 개발 버전의 새로고침 버튼을 누르고 LMS 페이지도 새로고침합니다.
+1. `bun run build`로 `dist/`를 만듭니다. 코드를 고치는 동안에는 `bun run dev`를 띄워 두면 바뀔 때마다 `dist/`가 다시 만들어집니다.
+2. Chrome에서 `chrome://extensions`를 엽니다. Edge에서는 `edge://extensions`를 사용합니다.
+3. 기존 설치 버전이 있으면 비활성화하고 **개발자 모드**를 켭니다.
+4. **압축해제된 확장 프로그램을 로드합니다**를 눌러 `dist/` 폴더를 선택합니다.
+5. LMS 페이지를 새로고침합니다.
 
 ### 검사
 
-Node.js가 설치된 환경에서 기능 회귀 검사를 실행합니다.
-
 ```bash
-node tests/tracker-check.cjs
+bun run check   # 포맷, 린트, 타입 검사
+bun run test    # 단위 테스트 (Vitest)
+bun run e2e     # 빌드한 확장을 Chromium에 올려 가짜 LMS 페이지에서 기능을 검사
 ```
 
-브라우저에서 [레이아웃 검사 페이지](tests/tracker-layout.html)를 열면 실제 표시 스크립트로 좁은 개요 카드의 줄바꿈·가운데 정렬과 주차 버튼 위치를 검사합니다. 버튼을 눌러 추적 상태를 바꾼 뒤에도 `PASS`가 유지되는지 확인합니다.
+`bun run e2e`는 LMS 요청을 `tests/e2e/lms-fixtures.ts`의 가짜 페이지로 바꿔 응답하므로 로그인이 필요 없습니다. 처음 실행하기 전에 `bunx playwright install chromium`으로 브라우저를 받습니다.
 
 ### 배포용 ZIP 생성
 
 ```bash
-./build.sh
+bun run release
 ```
 
-`dist/csmsplus-v2.1.3.zip`이 생성됩니다.
+`release/csmsplus-v<버전>.zip`이 생성됩니다.
+
+### UI 컴포넌트
+
+화면은 [shadcn/ui](https://ui.shadcn.com) 컴포넌트와 Tailwind CSS로 만듭니다. 새 컴포넌트는 `bunx shadcn@latest add <이름>`으로 추가하면 `src/ui/shadcn/`에 들어갑니다. LMS 페이지 안의 화면은 Shadow DOM에 그려지므로, 바깥으로 팝오버를 띄우는 컴포넌트(Select, Tooltip 등)는 설정 페이지와 팝업에서만 씁니다.
+
+`className`에 바로 쓰지 않는 클래스 문자열은 항상 `cn(...)`으로 감쌉니다. 그래야 Tailwind IntelliSense와 클래스 정렬이 적용됩니다.
 
 ## 프로젝트 구조
 
 ```
 /
-├── assets/
-│   └── icons/                          # 확장 프로그램 아이콘
+├── assets/icons/                       # 확장 프로그램 아이콘
 ├── demo/                               # 기능 예시 이미지
 ├── src/
-│   ├── features/
-│   │   ├── assignment-tracker/
-│   │   │   ├── content-scripts/
-│   │   │   │   ├── tracker-main.js              # 강의 페이지 초기화 및 추적 버튼
-│   │   │   │   ├── tracker-config.js            # 조회·캐시 기본 설정
-│   │   │   │   ├── tracker-utils.js             # 상태 판정·추적 제외·조회 큐
-│   │   │   │   ├── tracker-api.js               # 과제 상세 정보 조회
-│   │   │   │   ├── tracker-ui.js                # 개별 과제 상태 표시
-│   │   │   │   ├── tracker-dashboard.js         # 강의 상단 과제 요약
-│   │   │   │   ├── course-list-parser.js        # LMS 메인 강좌 카드 집계
-│   │   │   │   └── assignment-cache-updater.js  # 과제 방문 시 캐시 갱신
-│   │   │   └── styles/
-│   │   │       ├── assignment-styles.css
-│   │   │       └── course-stats-styles.css
-│   │   └── pdf-downloader/
-│   │       ├── content.js                       # PDF 다운로드 UI 및 변환
-│   │       ├── pdf-lib.min.js                   # 번들된 PDF 라이브러리
-│   │       └── styles.css
-│   ├── background/
-│   │   └── background.js                       # 다운로드 처리 및 설정 화면 열기
-│   └── options/
-│       ├── options.html
-│       ├── options.css
-│       ├── options.js                           # 설정 읽기·검증·저장
-│       └── patch_notes.json                     # 업데이트 로그
-├── tests/
-│   ├── tracker-check.cjs                        # 기능 회귀 검사
-│   └── tracker-layout.html                      # 브라우저 레이아웃 검사
-├── build.sh                                    # 배포용 ZIP 생성
-├── manifest.json                               # 권한 및 페이지별 스크립트 등록
+│   ├── background/                     # 서비스 워커: 동기화 알람, 배지, 알림, Todoist, 이미지 다운로드 중계
+│   ├── offscreen/                      # 서비스 워커 대신 HTML을 파싱하는 offscreen 문서
+│   ├── content/                        # LMS 페이지에 붙는 content script
+│   │   ├── mount.tsx                   # Shadow DOM에 React 화면을 붙이는 공통 함수
+│   │   ├── home/                       # LMS 메인: 강좌 카드별 집계, 전체 과제 목록
+│   │   ├── course-page/                # 강좌 페이지: 과제별 상태, 추적 제외, 과제 개요, NEW 표시
+│   │   ├── assignment-page/            # 과제 페이지: 방문 시 캐시 갱신
+│   │   ├── lms-theme/                  # LMS 다크 모드
+│   │   └── pdf-viewer/                 # 문서 뷰어: PDF 다운로드 버튼
+│   ├── popup/                          # 툴바 팝업
+│   ├── options/                        # 설정 페이지
+│   │   └── patch-notes.json            # 업데이트 로그
+│   ├── shared/                         # 화면과 무관한 공통 로직
+│   │   ├── options.ts                  # 설정 기본값과 검증
+│   │   ├── assignment/                 # 상태 판정, 과제 페이지 파싱, 캐시, 추적 제외, 알림 시점
+│   │   ├── sync/                       # 강좌·과제 페이지 파싱과 동기화
+│   │   └── todoist/                    # Todoist 클라이언트와 동기화 규칙
+│   ├── ui/                             # 여러 화면이 함께 쓰는 컴포넌트와 cn()
+│   │   └── shadcn/                     # shadcn/ui 컴포넌트
+│   └── styles/tailwind.css             # Tailwind 테마 (기본 이름, 값은 px)
+├── tests/e2e/                          # 빌드한 확장을 가짜 LMS 페이지에서 검사
+├── scripts/zip-release.ts              # 배포용 ZIP 생성
+├── components.json                     # shadcn/ui 설정
+├── manifest.config.ts                  # 권한 및 페이지별 스크립트 등록
+├── mise.toml                           # Node.js, Bun 버전
+├── vite.config.ts                      # Vite+ 빌드·포맷·린트·테스트 설정
 ├── README.md
 └── LICENSE
 ```

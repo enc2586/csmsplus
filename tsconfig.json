@@ -1,0 +1,10 @@
+{
+  // The shadcn CLI reads the "@" alias from here, not from the referenced projects.
+  "compilerOptions": { "paths": { "@/*": ["./src/*"] } },
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.e2e.json" }
+  ]
+}

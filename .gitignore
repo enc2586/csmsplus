@@ -28,8 +28,10 @@ ehthumbs.db
 Thumbs.db
 Desktop.ini
 
-# IDE / Editor files
-.vscode/
+# IDE / Editor files (shared editor settings are kept)
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 .idea/
 *.swp
 *.swo
@@ -59,3 +61,18 @@ coverage/
 
 # Optional: Extension store credentials (if using web-ext)
 web-ext-artifacts/
+
+# Build outputs: Vite+ and scripts/zip-release.ts
+release/
+*.timestamp-*.mjs
+*.tsbuildinfo
+
+# Test outputs: Playwright and Vitest
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Personal tool overrides
+mise.local.toml
+.mise.local.toml
