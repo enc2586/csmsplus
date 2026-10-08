@@ -2,6 +2,7 @@ import { FileText, Info, Settings } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { cn } from "../ui/cn.ts";
 import { Button } from "../ui/shadcn/button.tsx";
+import { Toaster } from "../ui/shadcn/sonner.tsx";
 import { AboutTab } from "./about-tab.tsx";
 import { PatchNotesTab } from "./patch-notes-tab.tsx";
 import { SettingsTab } from "./settings-tab.tsx";
@@ -38,6 +39,7 @@ export function App() {
           {current.content}
         </div>
       </main>
+      <Toaster position="top-center" />
     </div>
   );
 }

@@ -21,6 +21,7 @@ import {
 import { Switch } from "../ui/shadcn/switch.tsx";
 import { msToNaturalLanguage } from "./duration.ts";
 import { SaveBar } from "./save-bar.tsx";
+import { syncTodoistWithToast } from "../ui/todoist-toast.ts";
 
 type NumberField =
   | "urgentThresholdHours"
@@ -168,9 +169,13 @@ export function SettingsTab() {
   const [dirty, setDirty] = useState(false);
   const [instantHide, setInstantHide] = useState(false);
   const thresholdRef = useRef<HTMLInputElement>(null);
+  const savedRef = useRef<Options | null>(null);
 
   useEffect(() => {
-    void loadOptions().then((options) => setDraft(toDraft(options)));
+    void loadOptions().then((options) => {
+      savedRef.current = options;
+      setDraft(toDraft(options));
+    });
   }, []);
 
   useEffect(() => {
@@ -221,9 +226,22 @@ export function SettingsTab() {
 
   const save = async () => {
     if (!thresholdRef.current?.reportValidity()) return;
-    await saveOptions(fromDraft(draft));
+    const next = fromDraft(draft);
+    await saveOptions(next);
     setInstantHide(true);
     setDirty(false);
+    const before = savedRef.current?.todoist;
+    savedRef.current = next;
+    // Turning Todoist on or pointing it elsewhere syncs right away, so the user sees it work
+    // instead of waiting for the next background sync.
+    const { enable, token, projectName } = next.todoist;
+    if (
+      enable &&
+      token &&
+      (!before?.enable || before.token !== token || before.projectName !== projectName)
+    ) {
+      void syncTodoistWithToast();
+    }
   };
 
   return (

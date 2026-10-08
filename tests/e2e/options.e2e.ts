@@ -42,3 +42,37 @@ test("options page saves settings and clears only cached assignments", async ({
   // A released version, so the text does not change with upcoming notes.
   await expect(page.getByText("대시보드 로딩 속도 및 진행률 표시줄 개선")).toBeVisible();
 });
+
+test("turning Todoist on syncs right away and reports the result", async ({
+  context,
+  extensionId,
+}) => {
+  const page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/src/options/index.html`);
+  // Chrome's permission prompt cannot be clicked from a test, and the background run is
+  // covered by the sync unit tests, so both ends are stubbed to check the page in between.
+  await page.evaluate(() => {
+    const sent: unknown[] = [];
+    Object.assign(window, { sent });
+    chrome.permissions.request = async () => true;
+    chrome.runtime.sendMessage = (async (request: unknown) => {
+      sent.push(request);
+      return { state: "ok", at: Date.now(), added: 3, updated: 0, closed: 1 };
+    }) as typeof chrome.runtime.sendMessage;
+  });
+
+  await page.locator("#todoist-enable").click();
+  await page.locator("#todoist-token").fill("token");
+  await page.locator("#save-btn").click();
+  const toast = page.locator("[data-sonner-toast]");
+  await expect(toast).toContainText("Todoist와 동기화했습니다.");
+  await expect(toast).toContainText("과제 3개 추가 · 1개 완료 처리");
+  await expect(toast).toHaveScreenshot("options-todoist-toast.png");
+
+  // Saving again without touching Todoist does not sync a second time.
+  await page.locator("#tracker-urgentThresholdHours").fill("24");
+  await page.locator("#save-btn").click();
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { sent: unknown[] }).sent))
+    .toEqual([{ action: "syncTodoist" }]);
+});

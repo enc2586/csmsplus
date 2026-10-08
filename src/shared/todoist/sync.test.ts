@@ -66,7 +66,11 @@ describe("syncTodoist", () => {
       item("5", "2026-10-10 23:59"), // excluded
       { ...item("6", null), courseName: "" },
     ];
-    await syncTodoist(assignments, new Set(["5"]), gateway, "CSMS+", now);
+    expect(await syncTodoist(assignments, new Set(["5"]), gateway, "CSMS+", now)).toEqual({
+      added: 3,
+      updated: 0,
+      closed: 0,
+    });
     await syncTodoist(assignments, new Set(["5"]), gateway, "CSMS+", now);
     expect(calls).toEqual([
       "project CSMS+",
@@ -100,7 +104,11 @@ describe("syncTodoist", () => {
       item("2", "2026-10-11 23:59", true),
       item("3", "2026-10-15 23:59"),
     ];
-    await syncTodoist(later, new Set(), gateway, "CSMS+", now);
+    expect(await syncTodoist(later, new Set(), gateway, "CSMS+", now)).toEqual({
+      added: 0,
+      updated: 1,
+      closed: 1,
+    });
     await syncTodoist(later, new Set(), gateway, "CSMS+", now);
     expect(calls).toEqual([
       `update t1 ${JSON.stringify({ deadlineDate: "2026-10-11", description: taskFields(later[0]!).description })}`,

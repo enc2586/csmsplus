@@ -10,6 +10,9 @@ import { AssignmentList } from "../ui/assignment-list.tsx";
 import { cn } from "../ui/cn.ts";
 import { Alert, AlertDescription, AlertTitle } from "../ui/shadcn/alert.tsx";
 import { Button } from "../ui/shadcn/button.tsx";
+import { Toaster } from "../ui/shadcn/sonner.tsx";
+import { todoistChanges, toastTodoist } from "../ui/todoist-toast.ts";
+import type { TodoistStatus } from "../shared/todoist/sync.ts";
 
 export function App() {
   const [snapshot, setSnapshot] = useState<TrackedSnapshot | null>(null);
@@ -27,9 +30,20 @@ export function App() {
 
   const refresh = async () => {
     setSyncing(true);
+    const startedAt = Date.now();
     try {
       const request: SyncRequest = { action: "syncNow" };
       await chrome.runtime.sendMessage(request);
+      const { todoistStatus } = await chrome.storage.local.get("todoistStatus");
+      const status = todoistStatus as TodoistStatus | undefined;
+      // Stays quiet when Todoist had nothing to change; a refresh is not about Todoist.
+      if (
+        status &&
+        status.at >= startedAt &&
+        (status.state === "error" || todoistChanges(status).length)
+      ) {
+        toastTodoist(status);
+      }
     } finally {
       setSyncing(false);
     }
@@ -97,6 +111,7 @@ export function App() {
           설정 열기
         </Button>
       </footer>
+      <Toaster position="bottom-center" />
     </div>
   );
 }

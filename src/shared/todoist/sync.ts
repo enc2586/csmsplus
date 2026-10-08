@@ -13,7 +13,12 @@ export type TaskLink = {
   state: "open" | "closed" | "deleted";
 };
 
-export type TodoistStatus = { state: "ok" | "error"; message?: string; at: number };
+export type TodoistCounts = { added: number; updated: number; closed: number };
+export type TodoistStatus = {
+  state: "ok" | "error";
+  message?: string;
+  at: number;
+} & Partial<TodoistCounts>;
 
 export const taskKey = (assignmentId: string) => `todoistTask_${assignmentId}`;
 export const PROJECT_KEY = "todoistProject";
@@ -55,7 +60,8 @@ export async function syncTodoist(
   gateway: TodoistGateway,
   projectName: string,
   now: number,
-): Promise<void> {
+): Promise<TodoistCounts> {
+  const counts: TodoistCounts = { added: 0, updated: 0, closed: 0 };
   const stored = await chrome.storage.local.get(assignments.map((a) => taskKey(a.id)));
   const sections = new Map<string, Promise<string>>();
   const sectionId = async (courseName: string) => {
@@ -83,15 +89,18 @@ export async function syncTodoist(
         const taskId = await gateway.addTask(project, section, fields);
         const created: TaskLink = { taskId, ...pick(fields), sectionId: section, state: "open" };
         await chrome.storage.local.set({ [key]: created });
+        counts.added++;
       } else if (a.isSubmitted) {
         await gateway.closeTask(link.taskId);
         await chrome.storage.local.set({ [key]: { ...link, state: "closed" } });
+        counts.closed++;
       } else if (link.sectionId === undefined) {
         // Earlier tasks sat in the project root with a "[course] " title prefix and no label.
         const section = await sectionId(a.courseName);
         if (section) await gateway.moveTask(link.taskId, section);
         await gateway.updateTask(link.taskId, fields);
         await chrome.storage.local.set({ [key]: { ...link, ...pick(fields), sectionId: section } });
+        counts.updated++;
       } else if (
         link.deadlineDate !== fields.deadlineDate ||
         link.description !== fields.description
@@ -99,6 +108,7 @@ export async function syncTodoist(
         // Only the deadline and description follow the LMS; a title the user edited is kept.
         await gateway.updateTask(link.taskId, pick(fields));
         await chrome.storage.local.set({ [key]: { ...link, ...pick(fields) } });
+        counts.updated++;
       }
     } catch (error) {
       if (!(error instanceof TaskGoneError)) throw error;
@@ -108,9 +118,10 @@ export async function syncTodoist(
       }
       // Adding failed because the saved project was deleted; look it up again next sync.
       await chrome.storage.local.remove(PROJECT_KEY);
-      return;
+      return counts;
     }
   }
+  return counts;
 }
 
 const pick = ({ deadlineDate, description }: TaskFields) => ({ deadlineDate, description });
