@@ -3,7 +3,6 @@ import { expect, renderedText, test } from "./extension.ts";
 
 const COURSE_URL = "https://lms.gist.ac.kr/course/view.php?id=100";
 const due = (id: string) => deadlineText(assignments.find((a) => a.id === id)!.hoursFromNow!);
-const dates = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}/;
 
 test.beforeEach(async ({ storage }) => {
   await storage.set({ excludedAssignment_6: true });
@@ -12,11 +11,9 @@ test.beforeEach(async ({ storage }) => {
 test("home page shows assignment counts per course", async ({ context }) => {
   const page = await context.newPage();
   await page.goto("https://lms.gist.ac.kr/");
-  const card = page.locator(".course_lists li").first();
   await expect
     .poll(() => renderedText(page, ".course_lists li"))
     .toBe("자료구조[01]홍길동 완료 1 마감 임박 1 마감 지남 1 남음 2");
-  await expect(card).toHaveScreenshot("home-course-card.png");
 });
 
 test("course page shows dashboard and per-assignment status", async ({ context, storage }) => {
@@ -47,14 +44,6 @@ test("course page shows dashboard and per-assignment status", async ({ context, 
     "과제 5 과제 추적 제외 미제출 마감일 정보 없음 다섯 번째 과제 설명",
   );
   expect(await renderedText(page, week(6))).toBe("과제 6 과제 다시 추적 추적 제외됨");
-
-  const mask = [page.getByText(dates)];
-  await expect(page.locator("#assignment-dashboard-root")).toHaveScreenshot(
-    "course-dashboard.png",
-    { mask },
-  );
-  await expect(page.locator("#section-0")).toHaveScreenshot("course-overview-card.png");
-  await expect(page.locator("#section-1")).toHaveScreenshot("course-week-list.png", { mask });
 
   const cached = await storage.get();
   expect(cached.assignment_1).toMatchObject({

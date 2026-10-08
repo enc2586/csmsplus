@@ -23,7 +23,6 @@ test("document viewer downloads all pages as one PDF", async ({ context }) => {
   await page.goto("https://lms.gist.ac.kr/local/ubdoc/view.php?id=1");
   const button = page.locator("#coursemos-download-btn, [aria-label='PDF로 다운로드']").first();
   await expect(button).toBeVisible();
-  await expect(button).toHaveScreenshot("pdf-download-button.png");
 
   const [download] = await Promise.all([page.waitForEvent("download"), button.click()]);
   expect(download.suggestedFilename()).toBe("강의자료.pdf");

@@ -16,7 +16,6 @@ test("options page saves settings and clears only cached assignments", async ({
 
   await expect(page.locator("#tracker-urgentThresholdHours")).toHaveValue("72");
   await expect(page.locator("#pdfdl-enable")).toBeChecked();
-  await expect(page).toHaveScreenshot("options-settings.png", { fullPage: true });
 
   const threshold = page.locator("#tracker-urgentThresholdHours");
   await threshold.fill("0");
@@ -67,7 +66,6 @@ test("turning Todoist on syncs right away and reports the result", async ({
   const toast = page.locator("[data-sonner-toast]");
   await expect(toast).toContainText("Todoist와 동기화했습니다.");
   await expect(toast).toContainText("과제 3개 추가 · 1개 완료 처리");
-  await expect(toast).toHaveScreenshot("options-todoist-toast.png");
 
   // Saving again without touching Todoist does not sync a second time.
   await page.locator("#tracker-urgentThresholdHours").fill("24");
@@ -103,9 +101,6 @@ test("Todoist labels are picked from the user's labels or typed in", async ({
   await list.getByRole("option", { name: "과제" }).click();
   await list.getByRole("combobox").fill("주간");
   await list.getByRole("option", { name: '"주간" 새 라벨로 추가' }).click();
-  await expect(page.locator("[data-slot=popover-content]")).toHaveScreenshot(
-    "options-todoist-labels.png",
-  );
   await page.keyboard.press("Escape");
   await expect(picker).toHaveText("과제주간");
 

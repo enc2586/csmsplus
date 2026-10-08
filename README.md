@@ -65,8 +65,6 @@ bun run e2e     # 빌드한 확장을 Chromium에 올려 가짜 LMS 페이지에
 
 `bun run e2e`는 LMS 요청을 `tests/e2e/lms-fixtures.ts`의 가짜 페이지로 바꿔 응답하므로 로그인이 필요 없습니다. 처음 실행하기 전에 `bunx playwright install chromium`으로 브라우저를 받습니다.
 
-화면 비교 기준 이미지는 `tests/e2e/snapshots/`에 있습니다. 화면을 의도적으로 바꿨다면 `bun run build && bunx playwright test --update-snapshots`로 기준 이미지를 다시 만들고, 바뀐 이미지를 직접 확인한 뒤 커밋합니다.
-
 ### 배포용 ZIP 생성
 
 ```bash
