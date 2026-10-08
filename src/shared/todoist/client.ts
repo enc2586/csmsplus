@@ -1,5 +1,6 @@
 import {
   type CustomFetch,
+  type GetLabelsResponse,
   type GetSectionsResponse,
   TodoistApi,
   TodoistRequestError,
@@ -16,6 +17,9 @@ export type TaskFields = {
 export type TodoistGateway = {
   findOrCreateProject(name: string): Promise<string>;
   findOrCreateSection(projectId: string, name: string): Promise<string>;
+  getLabels(): Promise<string[]>;
+  // Tasks take labels by name, so missing ones are created first rather than left to chance.
+  createMissingLabels(names: string[]): Promise<void>;
   addTask(projectId: string, sectionId: string | null, fields: TaskFields): Promise<string>;
   updateTask(taskId: string, fields: Partial<TaskFields>): Promise<void>;
   moveTask(taskId: string, sectionId: string): Promise<void>;
@@ -64,6 +68,16 @@ export function createTodoistGateway(
   fetchImpl: Fetch = (url, init) => fetch(url, init),
 ): TodoistGateway {
   const api = new TodoistApi(token, { customFetch: toCustomFetch(fetchImpl) });
+  const getLabels = async () => {
+    const names: string[] = [];
+    let cursor: string | null = null;
+    do {
+      const page: GetLabelsResponse = await api.getLabels({ cursor });
+      names.push(...page.results.map((label) => label.name));
+      cursor = page.nextCursor;
+    } while (cursor);
+    return names;
+  };
   return {
     async findOrCreateProject(name) {
       let cursor: string | null = null;
@@ -84,6 +98,13 @@ export function createTodoistGateway(
         cursor = page.nextCursor;
       } while (cursor);
       return (await gone(api.addSection({ projectId, name }))).id;
+    },
+    getLabels,
+    async createMissingLabels(names) {
+      const existing = new Set(await getLabels());
+      for (const name of names) {
+        if (!existing.has(name)) await api.addLabel({ name });
+      }
     },
     async addTask(projectId, sectionId, { deadlineDate, ...fields }) {
       const task = await gone(

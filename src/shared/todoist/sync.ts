@@ -1,5 +1,6 @@
 import { isBefore } from "date-fns";
 import type { ListedAssignment } from "../assignment/groups.ts";
+import type { Options } from "../options.ts";
 import { formatDeadline, parseDeadline } from "../assignment/status.ts";
 import { type TaskFields, TaskGoneError, type TodoistGateway } from "./client.ts";
 import { toTodoistDeadline } from "./deadline.ts";
@@ -29,7 +30,7 @@ export function isTodoistKey(key: string): boolean {
   return key.startsWith("todoistTask_") || key === PROJECT_KEY;
 }
 
-export function taskFields(a: ListedAssignment): TaskFields {
+export function taskFields(a: ListedAssignment, labels: string[] = []): TaskFields {
   return {
     content: a.title,
     // The deadline field has no time, so the real one stays readable in the description.
@@ -37,7 +38,7 @@ export function taskFields(a: ListedAssignment): TaskFields {
       .filter(Boolean)
       .join("\n"),
     deadlineDate: toTodoistDeadline(a.deadline),
-    labels: [TASK_LABEL],
+    labels: [...new Set([TASK_LABEL, ...labels])],
   };
 }
 
@@ -58,10 +59,13 @@ export async function syncTodoist(
   assignments: ListedAssignment[],
   excluded: ReadonlySet<string>,
   gateway: TodoistGateway,
-  projectName: string,
+  { projectName, labels }: Pick<Options["todoist"], "projectName" | "labels">,
   now: number,
 ): Promise<TodoistCounts> {
   const counts: TodoistCounts = { added: 0, updated: 0, closed: 0, removed: 0 };
+  let labelsReady: Promise<void> | undefined;
+  const createLabels = (fields: TaskFields) =>
+    (labelsReady ??= gateway.createMissingLabels(fields.labels));
   const stored = await chrome.storage.local.get(assignments.map((a) => taskKey(a.id)));
   const sections = new Map<string, Promise<string>>();
   const sectionId = async (courseName: string) => {
@@ -89,7 +93,7 @@ export async function syncTodoist(
       continue;
     }
     if (link && link.state !== "open") continue;
-    const fields = taskFields(a);
+    const fields = taskFields(a, labels);
 
     try {
       if (!link) {
@@ -97,6 +101,7 @@ export async function syncTodoist(
         if (a.isSubmitted || (due && isBefore(due, now))) continue;
         const section = await sectionId(a.courseName);
         const project = await projectId(gateway, projectName);
+        await createLabels(fields);
         const taskId = await gateway.addTask(project, section, fields);
         const created: TaskLink = { taskId, ...pick(fields), sectionId: section, state: "open" };
         await chrome.storage.local.set({ [key]: created });
@@ -109,6 +114,7 @@ export async function syncTodoist(
         // Earlier tasks sat in the project root with a "[course] " title prefix and no label.
         const section = await sectionId(a.courseName);
         if (section) await gateway.moveTask(link.taskId, section);
+        await createLabels(fields);
         await gateway.updateTask(link.taskId, fields);
         await chrome.storage.local.set({ [key]: { ...link, ...pick(fields), sectionId: section } });
         counts.updated++;

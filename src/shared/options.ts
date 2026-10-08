@@ -37,6 +37,7 @@ const optionsSchema = z.object({
     enable: flag(false),
     token: z.catch(z.string(), ""),
     projectName: z.catch(z.string().check(z.minLength(1)), "CSMS+"),
+    labels: z.catch(z.array(z.string()), []),
   }),
   appearance: section({
     darkMode: z.catch(z.enum(["off", "on", "system"]), "off"),

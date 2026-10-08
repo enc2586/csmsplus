@@ -2,7 +2,7 @@ import { watchOptions } from "../shared/options.ts";
 import { BADGE_ALARM, updateBadge } from "./badge.ts";
 import { listenForReminderClicks, sendReminders } from "./reminders.ts";
 import { runSync, SYNC_ALARM, scheduleSync } from "./sync.ts";
-import { runTodoist } from "./todoist.ts";
+import { listTodoistLabels, runTodoist } from "./todoist.ts";
 
 // Document viewer images are on doc.coursemos.co.kr, which the content script cannot
 // fetch across origins, so the service worker downloads them and returns base64.
@@ -26,6 +26,8 @@ chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     void runSync().then(sendResponse);
   } else if (request.action === "syncTodoist") {
     void runTodoist().then(sendResponse);
+  } else if (request.action === "todoistLabels") {
+    void listTodoistLabels(request.token).then(sendResponse);
   } else {
     return;
   }

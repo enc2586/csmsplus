@@ -85,6 +85,14 @@ const rawSection = (id: string, name: string) => ({
   is_collapsed: false,
 });
 
+const rawLabel = (id: string, name: string) => ({
+  id,
+  name,
+  color: "charcoal",
+  order: 1,
+  is_favorite: false,
+});
+
 describe("createTodoistGateway", () => {
   it("sends the deadline and project in Todoist's API v1 format", async () => {
     const { calls, fetchImpl } = fakeFetch(() => ({ body: rawTask }));
@@ -134,6 +142,20 @@ describe("createTodoistGateway", () => {
       "POST /api/v1/sections",
     ]);
     expect(calls[2]?.body).toEqual({ project_id: "p1", name: "선형대수" });
+  });
+
+  it("creates only the labels that do not exist yet", async () => {
+    const { calls, fetchImpl } = fakeFetch((call) =>
+      call.method === "GET"
+        ? { body: { results: [rawLabel("l1", "CSMS+")], next_cursor: null } }
+        : { body: rawLabel("l2", "과제") },
+    );
+    await createTodoistGateway("token", fetchImpl).createMissingLabels(["CSMS+", "과제"]);
+    expect(calls.map((c) => `${c.method} ${c.path}`)).toEqual([
+      "GET /api/v1/labels",
+      "POST /api/v1/labels",
+    ]);
+    expect(calls[1]?.body).toEqual({ name: "과제" });
   });
 
   it("reports a task deleted in Todoist", async () => {

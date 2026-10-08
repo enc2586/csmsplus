@@ -11,3 +11,7 @@ export type SyncResponse = SyncStatus;
 
 export type TodoistSyncRequest = { action: "syncTodoist" };
 export type TodoistSyncResponse = TodoistStatus | null;
+
+// The options page asks with the token being edited, which may not be saved yet.
+export type TodoistLabelsRequest = { action: "todoistLabels"; token: string };
+export type TodoistLabelsResponse = { labels: string[] } | { error: string };

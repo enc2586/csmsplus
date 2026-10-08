@@ -76,3 +76,41 @@ test("turning Todoist on syncs right away and reports the result", async ({
     .poll(() => page.evaluate(() => (window as unknown as { sent: unknown[] }).sent))
     .toEqual([{ action: "syncTodoist" }]);
 });
+
+test("Todoist labels are picked from the user's labels or typed in", async ({
+  context,
+  extensionId,
+  storage,
+}) => {
+  const page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/src/options/index.html`);
+  await page.evaluate(() => {
+    chrome.permissions.request = async () => true;
+    chrome.runtime.sendMessage = (async (request: { action: string }) =>
+      request.action === "todoistLabels"
+        ? { labels: ["과제", "CSMS+", "시험"] }
+        : null) as typeof chrome.runtime.sendMessage;
+  });
+
+  const picker = page.locator("#todoist-labels");
+  await expect(picker).toBeDisabled();
+  await page.locator("#todoist-enable").click();
+  await page.locator("#todoist-token").fill("token");
+  await picker.click();
+  const list = page.locator("[data-slot=command]");
+  // CSMS+ is always added, so it is not offered.
+  await expect(list.getByRole("option")).toHaveText(["과제", "시험"]);
+  await list.getByRole("option", { name: "과제" }).click();
+  await list.getByRole("combobox").fill("주간");
+  await list.getByRole("option", { name: '"주간" 새 라벨로 추가' }).click();
+  await expect(page.locator("[data-slot=popover-content]")).toHaveScreenshot(
+    "options-todoist-labels.png",
+  );
+  await page.keyboard.press("Escape");
+  await expect(picker).toHaveText("과제주간");
+
+  await page.locator("#save-btn").click();
+  await expect
+    .poll(async () => (await storage.get()).options)
+    .toMatchObject({ todoist: { labels: ["과제", "주간"] } });
+});

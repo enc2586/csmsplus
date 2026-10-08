@@ -20,6 +20,7 @@ import {
 } from "../ui/shadcn/select.tsx";
 import { Switch } from "../ui/shadcn/switch.tsx";
 import { msToNaturalLanguage } from "./duration.ts";
+import { LabelPicker } from "./label-picker.tsx";
 import { SaveBar } from "./save-bar.tsx";
 import { syncTodoistWithToast } from "../ui/todoist-toast.ts";
 
@@ -435,6 +436,20 @@ export function SettingsTab() {
             className="w-60"
             value={draft.options.todoist.projectName}
             onChange={(event) => editTodoist({ projectName: event.target.value })}
+          />
+        </OptionItem>
+        <OptionItem
+          sub
+          id="todoist-labels"
+          label="라벨"
+          description="새로 만드는 태스크에 CSMS+ 라벨과 함께 붙일 라벨입니다. Todoist에 없는 라벨은 동기화할 때 만듭니다."
+        >
+          <LabelPicker
+            id="todoist-labels"
+            token={draft.options.todoist.token}
+            disabled={!draft.options.todoist.enable || !draft.options.todoist.token}
+            value={draft.options.todoist.labels}
+            onChange={(labels) => editTodoist({ labels })}
           />
         </OptionItem>
         <TodoistStatusLine />
