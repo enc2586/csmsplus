@@ -1,5 +1,6 @@
 import { createStore } from "zustand/vanilla";
 import type { AssignmentRecord } from "../../shared/assignment/cache.ts";
+import type { CourseSummary } from "../../shared/sync/pages.ts";
 
 export type CourseProgress = {
   progress: number;
@@ -11,14 +12,14 @@ export type CourseProgress = {
 
 export type HomeState = {
   courses: Record<string, CourseProgress>;
-  courseNames: Record<string, string>;
+  courseInfo: Record<string, CourseSummary>;
   excluded: ReadonlySet<string>;
   urgentThresholdHours: number;
 };
 
 export const homeStore = createStore<HomeState>()(() => ({
   courses: {},
-  courseNames: {},
+  courseInfo: {},
   excluded: new Set(),
   urgentThresholdHours: 72,
 }));

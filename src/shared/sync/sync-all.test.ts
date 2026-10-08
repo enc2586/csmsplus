@@ -24,7 +24,7 @@ function context(pages: Record<string, ParsedPage>): SyncContext & { requested: 
 const list: PageOf<"courseList"> = {
   kind: "courseList",
   signedIn: true,
-  courses: [{ id: "100", name: "자료구조" }],
+  courses: [{ id: "100", name: "자료구조", professor: "홍길동" }],
 };
 const course: PageOf<"coursePage"> = {
   kind: "coursePage",
@@ -59,7 +59,7 @@ describe("syncAll", () => {
     const status = await syncAll(ctx);
     expect(status.state).toBe("ok");
     expect(ctx.requested).toEqual(["/", "/course/view.php?id=100", "/mod/assign/view.php?id=2"]);
-    expect(store.courses).toEqual({ "100": { id: "100", name: "자료구조" } });
+    expect(store.courses).toEqual({ "100": { id: "100", name: "자료구조", professor: "홍길동" } });
     expect(store.assignment_2).toMatchObject({
       id: "2",
       courseId: "100",

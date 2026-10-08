@@ -43,7 +43,12 @@ function Row({
         {excluded ? "제외됨" : undefined}
       </StatusChip>
       <a href={assignment.url} target={target} className="group flex min-w-0 flex-1 flex-col">
-        <span className="truncate text-xs text-muted-foreground">{assignment.courseName}</span>
+        <span className="truncate text-xs text-muted-foreground">
+          {assignment.courseName}
+          {assignment.professor && (
+            <span className="text-muted-foreground/60"> · {assignment.professor}</span>
+          )}
+        </span>
         <span className="truncate text-sm text-card-foreground group-hover:underline">
           {assignment.title}
         </span>

@@ -8,7 +8,7 @@ import { homeStore } from "./store.ts";
 
 export function AllAssignments() {
   const courses = useStore(homeStore, (state) => state.courses);
-  const courseNames = useStore(homeStore, (state) => state.courseNames);
+  const courseInfo = useStore(homeStore, (state) => state.courseInfo);
   const excluded = useStore(homeStore, (state) => state.excluded);
   const threshold = useStore(homeStore, (state) => state.urgentThresholdHours);
   // Read once on mount because render must stay pure; deadlines are judged as of page load.
@@ -21,7 +21,8 @@ export function AllAssignments() {
       id: record.id,
       url: `${LMS}/mod/assign/view.php?id=${record.id}`,
       title: record.title || `과제 ${record.id}`,
-      courseName: courseNames[courseId] ?? "",
+      courseName: courseInfo[courseId]?.name ?? "",
+      professor: courseInfo[courseId]?.professor ?? "",
       deadline: record.deadline,
       isSubmitted: record.isSubmitted,
     })),

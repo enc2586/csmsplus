@@ -11,6 +11,7 @@ const item = (id: string, deadline: string | null, isSubmitted = false): ListedA
   url: `https://lms.gist.ac.kr/mod/assign/view.php?id=${id}`,
   title: `과제 ${id}`,
   courseName: "자료구조",
+  professor: "",
   deadline,
   isSubmitted,
 });

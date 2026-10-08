@@ -38,6 +38,8 @@ export async function loadTracked(): Promise<TrackedSnapshot> {
       url: `${LMS}/mod/assign/view.php?id=${record.id}`,
       title: record.title || `과제 ${record.id}`,
       courseName: record.courseId ? (courses[record.courseId]?.name ?? "") : "",
+      // Course lists saved before professors were read have no professor field.
+      professor: record.courseId ? (courses[record.courseId]?.professor ?? "") : "",
       deadline: record.deadline,
       isSubmitted: record.isSubmitted === true,
     }));

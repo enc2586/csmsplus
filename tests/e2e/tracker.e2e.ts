@@ -15,7 +15,7 @@ test("home page shows assignment counts per course", async ({ context }) => {
   const card = page.locator(".course_lists li").first();
   await expect
     .poll(() => renderedText(page, ".course_lists li"))
-    .toBe("자료구조 완료 1 마감 임박 1 마감 지남 1 남음 2");
+    .toBe("자료구조[01]홍길동 완료 1 마감 임박 1 마감 지남 1 남음 2");
   await expect(card).toHaveScreenshot("home-course-card.png");
 });
 

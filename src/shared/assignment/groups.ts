@@ -6,6 +6,7 @@ export type ListedAssignment = {
   url: string;
   title: string;
   courseName: string;
+  professor: string;
   deadline: string | null;
   isSubmitted: boolean;
 };

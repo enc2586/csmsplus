@@ -13,7 +13,9 @@ test("background sync collects every course without an LMS tab", async ({
 
   expect(await syncNow(page)).toMatchObject({ state: "ok" });
   const stored = await storage.get();
-  expect(stored.courses).toEqual({ "100": { id: "100", name: "자료구조" } });
+  expect(stored.courses).toEqual({
+    "100": { id: "100", name: "자료구조", professor: "홍길동" },
+  });
   for (const id of ["1", "2", "3", "4", "5", "6"]) {
     expect(stored[`assignment_${id}`]).toMatchObject({ id, courseId: "100" });
   }

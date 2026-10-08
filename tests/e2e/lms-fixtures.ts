@@ -62,7 +62,7 @@ const link = (a: FixtureAssignment) =>
 
 export function homePage(): string {
   return page(`<div class="progress_courses"><div class="course_lists"><ul>
-<li><div><a class="course_link" href="https://lms.gist.ac.kr/course/view.php?id=${COURSE_ID}"><span class="course-title">자료구조</span></a></div></li>
+<li><div><a class="course_link" href="https://lms.gist.ac.kr/course/view.php?id=${COURSE_ID}"><span class="course-title">자료구조[01]홍길동</span></a></div></li>
 </ul></div></div>`);
 }
 

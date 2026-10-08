@@ -6,7 +6,7 @@ import {
 
 export const LMS = "https://lms.gist.ac.kr";
 
-export type CourseSummary = { id: string; name: string };
+export type CourseSummary = { id: string; name: string; professor: string };
 export type AssignmentLink = { id: string; url: string };
 
 export type ParsedPage =
@@ -43,14 +43,20 @@ export function findModules(root: ParentNode): string[] {
 
 export const COURSE_CARDS = ".progress_courses .course_lists ul > li";
 
+// Home page cards title courses "과목명[분반]교수 / 교수", sometimes with the LMS's own "NEW"
+// marker before the professors. Titles without a section bracket are kept whole.
+export function splitCourseTitle(title: string): { name: string; professor: string } {
+  const match = title.match(/^(.*?)\s*\[[^\]]*\]\s*(?:NEW)?\s*(.*)$/);
+  if (!match) return { name: title, professor: "" };
+  return { name: match[1].trim(), professor: match[2].trim() };
+}
+
 export function courseFromCard(card: Element): CourseSummary | null {
   const link = card.querySelector("a.course_link");
   const id = link && lmsUrl(link).searchParams.get("id");
   if (!link || !id) return null;
-  return {
-    id,
-    name: normalize(link.querySelector(".course-title, h3")?.textContent ?? link.textContent),
-  };
+  const title = normalize(link.querySelector(".course-title, h3")?.textContent ?? link.textContent);
+  return { id, ...splitCourseTitle(title) };
 }
 
 export function findCourses(root: ParentNode): CourseSummary[] {

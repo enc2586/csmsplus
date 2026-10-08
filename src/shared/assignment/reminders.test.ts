@@ -9,6 +9,7 @@ const item = (id: string, deadline: string | null, isSubmitted = false): ListedA
   url: "",
   title: `과제 ${id}`,
   courseName: "",
+  professor: "",
   deadline,
   isSubmitted,
 });

@@ -1,6 +1,12 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from "vite-plus/test";
-import { findAssignmentLinks, findCourses, isLoginPage, parsePage } from "./pages.ts";
+import {
+  findAssignmentLinks,
+  findCourses,
+  isLoginPage,
+  parsePage,
+  splitCourseTitle,
+} from "./pages.ts";
 
 const doc = (body: string) => new DOMParser().parseFromString(`<body>${body}</body>`, "text/html");
 
@@ -24,9 +30,30 @@ describe("findCourses", () => {
       <li><div><a class="course_link" href="/course/view.php">이상한 링크</a></div></li>
     </ul></div></div>`);
     expect(findCourses(page)).toEqual([
-      { id: "100", name: "자료구조" },
-      { id: "200", name: "운영체제" },
+      { id: "100", name: "자료구조", professor: "" },
+      { id: "200", name: "운영체제", professor: "" },
     ]);
+  });
+});
+
+describe("splitCourseTitle", () => {
+  it("separates the course name from its professors", () => {
+    expect(splitCourseTitle("선형대수학과 응용[01]박정례 / 유현주")).toEqual({
+      name: "선형대수학과 응용",
+      professor: "박정례 / 유현주",
+    });
+    expect(splitCourseTitle("컴퓨터 네트워킹 [02] 수만 판데")).toEqual({
+      name: "컴퓨터 네트워킹",
+      professor: "수만 판데",
+    });
+  });
+
+  it("drops the LMS's NEW marker and keeps titles without a section whole", () => {
+    expect(splitCourseTitle("일반화학실험 I[01]NEW이호재 / 조춘실")).toEqual({
+      name: "일반화학실험 I",
+      professor: "이호재 / 조춘실",
+    });
+    expect(splitCourseTitle("자료구조")).toEqual({ name: "자료구조", professor: "" });
   });
 });
 

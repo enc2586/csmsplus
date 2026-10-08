@@ -65,7 +65,7 @@ async function main() {
     courses: Object.fromEntries(summaries.map((course) => [course.id, course])),
   });
   homeStore.setState({
-    courseNames: Object.fromEntries(summaries.map((course) => [course.id, course.name])),
+    courseInfo: Object.fromEntries(summaries.map((course) => [course.id, course])),
   });
   const courses = findCards();
   for (const { id } of courses) updateCourse(id, { progress: 0, records: null });
