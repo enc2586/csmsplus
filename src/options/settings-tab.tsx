@@ -381,7 +381,7 @@ export function SettingsTab() {
         <OptionItem
           id="todoist-enable"
           label="Todoist에 과제 추가"
-          description="제출하지 않은 과제를 Todoist 태스크로 만들고, LMS 마감 전날을 deadline으로 넣습니다. 제출하면 완료 처리합니다. 켤 때 Todoist 접근 권한을 요청합니다."
+          description="제출하지 않은 과제를 과목별 섹션에 Todoist 태스크로 만들고 CSMS+ 라벨을 붙입니다. LMS 마감 전날을 deadline으로 넣고, 제출하면 완료 처리합니다. 켤 때 Todoist 접근 권한을 요청합니다."
         >
           <Switch
             id="todoist-enable"

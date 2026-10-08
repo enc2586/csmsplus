@@ -43,7 +43,7 @@ const rawTask = {
   due: null,
   priority: 1,
   child_order: 1,
-  content: "[자료구조] 과제 1",
+  content: "과제 1",
   description: "d",
   day_order: 1,
   is_collapsed: false,
@@ -70,23 +70,41 @@ const rawProject = (id: string, name: string) => ({
   is_collapsed: false,
 });
 
+const rawSection = (id: string, name: string) => ({
+  id,
+  name,
+  user_id: "u1",
+  project_id: "p1",
+  added_at: "2026-09-30T03:00:00.000000Z",
+  updated_at: "2026-09-30T03:00:00.000000Z",
+  archived_at: null,
+  description: null,
+  section_order: 1,
+  is_archived: false,
+  is_deleted: false,
+  is_collapsed: false,
+});
+
 describe("createTodoistGateway", () => {
   it("sends the deadline and project in Todoist's API v1 format", async () => {
     const { calls, fetchImpl } = fakeFetch(() => ({ body: rawTask }));
     const todoist = createTodoistGateway("token", fetchImpl);
-    await todoist.addTask("p1", {
-      content: "[자료구조] 과제 1",
+    await todoist.addTask("p1", "s1", {
+      content: "과제 1",
       description: "d",
       deadlineDate: "2026-10-09",
+      labels: ["CSMS+"],
     });
     expect(calls[0]).toMatchObject({
       method: "POST",
       path: "/api/v1/tasks",
       body: {
         project_id: "p1",
-        content: "[자료구조] 과제 1",
+        section_id: "s1",
+        content: "과제 1",
         description: "d",
         deadline_date: "2026-10-09",
+        labels: ["CSMS+"],
       },
     });
   });
@@ -99,6 +117,23 @@ describe("createTodoistGateway", () => {
     );
     expect(await createTodoistGateway("token", fetchImpl).findOrCreateProject("CSMS+")).toBe("p9");
     expect(calls.map((c) => c.method)).toEqual(["GET"]);
+  });
+
+  it("finds a course section in the project before creating one", async () => {
+    const { calls, fetchImpl } = fakeFetch((call) =>
+      call.method === "GET"
+        ? { body: { results: [rawSection("s9", "자료구조")], next_cursor: null } }
+        : { body: rawSection("new", "선형대수") },
+    );
+    const todoist = createTodoistGateway("token", fetchImpl);
+    expect(await todoist.findOrCreateSection("p1", "자료구조")).toBe("s9");
+    expect(await todoist.findOrCreateSection("p1", "선형대수")).toBe("new");
+    expect(calls.map((c) => `${c.method} ${c.path}`)).toEqual([
+      "GET /api/v1/sections?project_id=p1",
+      "GET /api/v1/sections?project_id=p1",
+      "POST /api/v1/sections",
+    ]);
+    expect(calls[2]?.body).toEqual({ project_id: "p1", name: "선형대수" });
   });
 
   it("reports a task deleted in Todoist", async () => {

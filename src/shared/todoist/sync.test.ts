@@ -3,7 +3,7 @@ import { parse } from "date-fns";
 import { installFakeChrome } from "../../test-utils/fake-chrome.ts";
 import type { ListedAssignment } from "../assignment/groups.ts";
 import { type TaskFields, TaskGoneError, type TodoistGateway } from "./client.ts";
-import { PROJECT_KEY, syncTodoist, taskKey } from "./sync.ts";
+import { PROJECT_KEY, syncTodoist, taskFields, taskKey } from "./sync.ts";
 
 const now = parse("2026-09-30 12:00", "yyyy-MM-dd HH:mm", 0).getTime();
 const item = (id: string, deadline: string | null, isSubmitted = false): ListedAssignment => ({
@@ -25,13 +25,22 @@ function fakeTodoist() {
       calls.push(`project ${name}`);
       return "p1";
     },
-    async addTask(projectId, fields: TaskFields) {
-      calls.push(`add ${projectId} ${fields.content} ${fields.deadlineDate}`);
+    async findOrCreateSection(projectId, name) {
+      calls.push(`section ${projectId} ${name}`);
+      return `s-${name}`;
+    },
+    async addTask(projectId, sectionId, fields: TaskFields) {
+      calls.push(
+        `add ${projectId}/${sectionId} ${fields.content} ${fields.deadlineDate} ${fields.labels.join()}`,
+      );
       return `t${next++}`;
     },
     async updateTask(taskId, fields) {
       if (gone.has(taskId)) throw new TaskGoneError("not found");
-      calls.push(`update ${taskId} ${fields.deadlineDate}`);
+      calls.push(`update ${taskId} ${JSON.stringify(fields)}`);
+    },
+    async moveTask(taskId, sectionId) {
+      calls.push(`move ${taskId} ${sectionId}`);
     },
     async closeTask(taskId) {
       if (gone.has(taskId)) throw new TaskGoneError("not found");
@@ -47,7 +56,7 @@ describe("syncTodoist", () => {
     store = installFakeChrome().store;
   });
 
-  it("adds open assignments once, with the deadline a day early", async () => {
+  it("adds open assignments once under their course, with the deadline a day early", async () => {
     const { gateway, calls } = fakeTodoist();
     const assignments = [
       item("1", "2026-10-10 23:59"),
@@ -55,13 +64,16 @@ describe("syncTodoist", () => {
       item("3", "2026-09-29 12:00"), // already overdue: not added late
       item("4", "2026-10-10 23:59", true), // submitted
       item("5", "2026-10-10 23:59"), // excluded
+      { ...item("6", null), courseName: "" },
     ];
     await syncTodoist(assignments, new Set(["5"]), gateway, "CSMS+", now);
     await syncTodoist(assignments, new Set(["5"]), gateway, "CSMS+", now);
     expect(calls).toEqual([
       "project CSMS+",
-      "add p1 [자료구조] 과제 1 2026-10-09",
-      "add p1 [자료구조] 과제 2 null",
+      "section p1 자료구조",
+      "add p1/s-자료구조 과제 1 2026-10-09 CSMS+",
+      "add p1/s-자료구조 과제 2 null CSMS+",
+      "add p1/null 과제 6 null CSMS+",
     ]);
     expect(store[taskKey("1")]).toMatchObject({
       taskId: "t1",
@@ -90,9 +102,30 @@ describe("syncTodoist", () => {
     ];
     await syncTodoist(later, new Set(), gateway, "CSMS+", now);
     await syncTodoist(later, new Set(), gateway, "CSMS+", now);
-    expect(calls).toEqual(["update t1 2026-10-11", "close t2"]);
+    expect(calls).toEqual([
+      `update t1 ${JSON.stringify({ deadlineDate: "2026-10-11", description: taskFields(later[0]!).description })}`,
+      "close t2",
+    ]);
     expect(store[taskKey("2")]).toMatchObject({ state: "closed" });
     expect(store[taskKey("3")]).toMatchObject({ state: "deleted" });
+  });
+
+  it("moves tasks added before sections into their course and labels them", async () => {
+    const { gateway, calls } = fakeTodoist();
+    const a = item("1", "2026-10-10 23:59");
+    store[taskKey("1")] = {
+      taskId: "t9",
+      deadlineDate: "2026-10-09",
+      description: "",
+      state: "open",
+    };
+    await syncTodoist([a], new Set(), gateway, "CSMS+", now);
+    await syncTodoist([a], new Set(), gateway, "CSMS+", now);
+    expect(calls.slice(2)).toEqual([
+      "move t9 s-자료구조",
+      `update t9 ${JSON.stringify(taskFields(a))}`,
+    ]);
+    expect(store[taskKey("1")]).toMatchObject({ sectionId: "s-자료구조" });
   });
 
   it("looks the project up again when it was deleted", async () => {

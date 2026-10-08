@@ -1,16 +1,24 @@
-import { type CustomFetch, TodoistApi, TodoistRequestError } from "@doist/todoist-sdk";
+import {
+  type CustomFetch,
+  type GetSectionsResponse,
+  TodoistApi,
+  TodoistRequestError,
+} from "@doist/todoist-sdk";
 
-export type TaskFields = { content: string; description: string; deadlineDate: string | null };
+export type TaskFields = {
+  content: string;
+  description: string;
+  deadlineDate: string | null;
+  labels: string[];
+};
 
 // The sync rules only need these calls, which keeps them testable without the SDK.
 export type TodoistGateway = {
   findOrCreateProject(name: string): Promise<string>;
-  addTask(projectId: string, fields: TaskFields): Promise<string>;
-  // Only the deadline and description follow the LMS; a title the user edited is kept.
-  updateTask(
-    taskId: string,
-    fields: Pick<TaskFields, "deadlineDate" | "description">,
-  ): Promise<void>;
+  findOrCreateSection(projectId: string, name: string): Promise<string>;
+  addTask(projectId: string, sectionId: string | null, fields: TaskFields): Promise<string>;
+  updateTask(taskId: string, fields: Partial<TaskFields>): Promise<void>;
+  moveTask(taskId: string, sectionId: string): Promise<void>;
   closeTask(taskId: string): Promise<void>;
 };
 
@@ -66,14 +74,32 @@ export function createTodoistGateway(
       } while (cursor);
       return (await api.addProject({ name })).id;
     },
-    async addTask(projectId, { content, description, deadlineDate }) {
+    async findOrCreateSection(projectId, name) {
+      let cursor: string | null = null;
+      do {
+        const page: GetSectionsResponse = await gone(api.getSections({ projectId, cursor }));
+        const found = page.results.find((section) => section.name === name && !section.isArchived);
+        if (found) return found.id;
+        cursor = page.nextCursor;
+      } while (cursor);
+      return (await gone(api.addSection({ projectId, name }))).id;
+    },
+    async addTask(projectId, sectionId, { deadlineDate, ...fields }) {
       const task = await gone(
-        api.addTask({ projectId, content, description, deadlineDate: deadlineDate ?? undefined }),
+        api.addTask({
+          ...fields,
+          projectId,
+          sectionId: sectionId ?? undefined,
+          deadlineDate: deadlineDate ?? undefined,
+        }),
       );
       return task.id;
     },
-    async updateTask(taskId, { description, deadlineDate }) {
-      await gone(api.updateTask(taskId, { description, deadlineDate }));
+    async updateTask(taskId, fields) {
+      await gone(api.updateTask(taskId, fields));
+    },
+    async moveTask(taskId, sectionId) {
+      await gone(api.moveTask(taskId, { sectionId }));
     },
     async closeTask(taskId) {
       await gone(api.closeTask(taskId));

@@ -8,6 +8,8 @@ export type TaskLink = {
   taskId: string;
   deadlineDate: string | null;
   description: string;
+  // Missing on tasks added before courses became sections; null when there is no course.
+  sectionId?: string | null;
   state: "open" | "closed" | "deleted";
 };
 
@@ -15,6 +17,8 @@ export type TodoistStatus = { state: "ok" | "error"; message?: string; at: numbe
 
 export const taskKey = (assignmentId: string) => `todoistTask_${assignmentId}`;
 export const PROJECT_KEY = "todoistProject";
+// Marks tasks as managed by the extension, so users know the LMS will keep changing them.
+export const TASK_LABEL = "CSMS+";
 
 export function isTodoistKey(key: string): boolean {
   return key.startsWith("todoistTask_") || key === PROJECT_KEY;
@@ -22,12 +26,13 @@ export function isTodoistKey(key: string): boolean {
 
 export function taskFields(a: ListedAssignment): TaskFields {
   return {
-    content: a.courseName ? `[${a.courseName}] ${a.title}` : a.title,
+    content: a.title,
     // The deadline field has no time, so the real one stays readable in the description.
     description: [a.url, a.deadline ? `${formatDeadline(a.deadline)}까지` : ""]
       .filter(Boolean)
       .join("\n"),
     deadlineDate: toTodoistDeadline(a.deadline),
+    labels: [TASK_LABEL],
   };
 }
 
@@ -40,9 +45,10 @@ async function projectId(gateway: TodoistGateway, name: string): Promise<string>
   return id;
 }
 
-// Tasks follow the LMS: created for open assignments, moved when the deadline moves, and
-// completed once submitted. Excluded assignments and tasks the user deleted in Todoist are
-// left alone, and assignments already past their deadline are not added late.
+// Tasks follow the LMS: created for open assignments under a section per course, moved when
+// the deadline moves, and completed once submitted. Excluded assignments and tasks the user
+// deleted in Todoist are left alone, and assignments already past their deadline are not
+// added late.
 export async function syncTodoist(
   assignments: ListedAssignment[],
   excluded: ReadonlySet<string>,
@@ -51,6 +57,16 @@ export async function syncTodoist(
   now: number,
 ): Promise<void> {
   const stored = await chrome.storage.local.get(assignments.map((a) => taskKey(a.id)));
+  const sections = new Map<string, Promise<string>>();
+  const sectionId = async (courseName: string) => {
+    if (!courseName) return null;
+    const project = await projectId(gateway, projectName);
+    if (!sections.has(courseName)) {
+      sections.set(courseName, gateway.findOrCreateSection(project, courseName));
+    }
+    return sections.get(courseName)!;
+  };
+
   for (const a of assignments) {
     if (excluded.has(a.id)) continue;
     const key = taskKey(a.id);
@@ -62,17 +78,26 @@ export async function syncTodoist(
       if (!link) {
         const due = parseDeadline(a.deadline);
         if (a.isSubmitted || (due && isBefore(due, now))) continue;
-        const taskId = await gateway.addTask(await projectId(gateway, projectName), fields);
-        const created: TaskLink = { taskId, ...pick(fields), state: "open" };
+        const section = await sectionId(a.courseName);
+        const project = await projectId(gateway, projectName);
+        const taskId = await gateway.addTask(project, section, fields);
+        const created: TaskLink = { taskId, ...pick(fields), sectionId: section, state: "open" };
         await chrome.storage.local.set({ [key]: created });
       } else if (a.isSubmitted) {
         await gateway.closeTask(link.taskId);
         await chrome.storage.local.set({ [key]: { ...link, state: "closed" } });
+      } else if (link.sectionId === undefined) {
+        // Earlier tasks sat in the project root with a "[course] " title prefix and no label.
+        const section = await sectionId(a.courseName);
+        if (section) await gateway.moveTask(link.taskId, section);
+        await gateway.updateTask(link.taskId, fields);
+        await chrome.storage.local.set({ [key]: { ...link, ...pick(fields), sectionId: section } });
       } else if (
         link.deadlineDate !== fields.deadlineDate ||
         link.description !== fields.description
       ) {
-        await gateway.updateTask(link.taskId, fields);
+        // Only the deadline and description follow the LMS; a title the user edited is kept.
+        await gateway.updateTask(link.taskId, pick(fields));
         await chrome.storage.local.set({ [key]: { ...link, ...pick(fields) } });
       }
     } catch (error) {
