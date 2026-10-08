@@ -57,6 +57,11 @@ watchOptions(() => void scheduleSync());
 listenForReminderClicks();
 
 // Sync results, exclusions and options all live in storage, so any change can move the count.
-chrome.storage.onChanged.addListener((_changes, area) => {
-  if (area === "local") void updateBadge();
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local") return;
+  void updateBadge();
+  // Excluding an assignment removes its task right away instead of at the next sync.
+  if (Object.keys(changes).some((key) => key.startsWith("excludedAssignment_"))) {
+    void runTodoist();
+  }
 });

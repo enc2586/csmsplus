@@ -42,6 +42,9 @@ function fakeTodoist() {
     async moveTask(taskId, sectionId) {
       calls.push(`move ${taskId} ${sectionId}`);
     },
+    async deleteTask(taskId) {
+      calls.push(`delete ${taskId}`);
+    },
     async closeTask(taskId) {
       if (gone.has(taskId)) throw new TaskGoneError("not found");
       calls.push(`close ${taskId}`);
@@ -70,6 +73,7 @@ describe("syncTodoist", () => {
       added: 3,
       updated: 0,
       closed: 0,
+      removed: 0,
     });
     await syncTodoist(assignments, new Set(["5"]), gateway, "CSMS+", now);
     expect(calls).toEqual([
@@ -108,6 +112,7 @@ describe("syncTodoist", () => {
       added: 0,
       updated: 1,
       closed: 1,
+      removed: 0,
     });
     await syncTodoist(later, new Set(), gateway, "CSMS+", now);
     expect(calls).toEqual([
@@ -134,6 +139,25 @@ describe("syncTodoist", () => {
       `update t9 ${JSON.stringify(taskFields(a))}`,
     ]);
     expect(store[taskKey("1")]).toMatchObject({ sectionId: "s-자료구조" });
+  });
+
+  it("deletes the task of an excluded assignment and adds it back when tracked again", async () => {
+    const { gateway, calls } = fakeTodoist();
+    const a = [item("1", "2026-10-10 23:59")];
+    await syncTodoist(a, new Set(), gateway, "CSMS+", now);
+    calls.length = 0;
+
+    expect(await syncTodoist(a, new Set(["1"]), gateway, "CSMS+", now)).toMatchObject({
+      removed: 1,
+    });
+    expect(store).not.toHaveProperty(taskKey("1"));
+    await syncTodoist(a, new Set(["1"]), gateway, "CSMS+", now);
+    await syncTodoist(a, new Set(), gateway, "CSMS+", now);
+    expect(calls).toEqual([
+      "delete t1",
+      "section p1 자료구조",
+      "add p1/s-자료구조 과제 1 2026-10-09 CSMS+",
+    ]);
   });
 
   it("looks the project up again when it was deleted", async () => {

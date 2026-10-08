@@ -20,6 +20,7 @@ export type TodoistGateway = {
   updateTask(taskId: string, fields: Partial<TaskFields>): Promise<void>;
   moveTask(taskId: string, sectionId: string): Promise<void>;
   closeTask(taskId: string): Promise<void>;
+  deleteTask(taskId: string): Promise<void>;
 };
 
 // A task the user deleted in Todoist answers 404; the sync stops touching it.
@@ -103,6 +104,9 @@ export function createTodoistGateway(
     },
     async closeTask(taskId) {
       await gone(api.closeTask(taskId));
+    },
+    async deleteTask(taskId) {
+      await gone(api.deleteTask(taskId));
     },
   };
 }

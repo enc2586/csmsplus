@@ -2,11 +2,17 @@ import { toast } from "sonner";
 import type { TodoistSyncRequest, TodoistSyncResponse } from "../shared/messages.ts";
 import type { TodoistStatus } from "../shared/todoist/sync.ts";
 
-export function todoistChanges({ added = 0, closed = 0, updated = 0 }: TodoistStatus): string[] {
+export function todoistChanges({
+  added = 0,
+  closed = 0,
+  updated = 0,
+  removed = 0,
+}: TodoistStatus): string[] {
   return [
     added && `과제 ${added}개 추가`,
     closed && `${closed}개 완료 처리`,
     updated && `${updated}개 수정`,
+    removed && `${removed}개 삭제`,
   ].filter((part): part is string => Boolean(part));
 }
 

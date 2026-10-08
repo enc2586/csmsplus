@@ -13,7 +13,7 @@ export type TaskLink = {
   state: "open" | "closed" | "deleted";
 };
 
-export type TodoistCounts = { added: number; updated: number; closed: number };
+export type TodoistCounts = { added: number; updated: number; closed: number; removed: number };
 export type TodoistStatus = {
   state: "ok" | "error";
   message?: string;
@@ -51,9 +51,9 @@ async function projectId(gateway: TodoistGateway, name: string): Promise<string>
 }
 
 // Tasks follow the LMS: created for open assignments under a section per course, moved when
-// the deadline moves, and completed once submitted. Excluded assignments and tasks the user
-// deleted in Todoist are left alone, and assignments already past their deadline are not
-// added late.
+// the deadline moves, completed once submitted, and deleted when the assignment is excluded
+// from tracking. Tasks the user deleted in Todoist are left alone, and assignments already
+// past their deadline are not added late.
 export async function syncTodoist(
   assignments: ListedAssignment[],
   excluded: ReadonlySet<string>,
@@ -61,7 +61,7 @@ export async function syncTodoist(
   projectName: string,
   now: number,
 ): Promise<TodoistCounts> {
-  const counts: TodoistCounts = { added: 0, updated: 0, closed: 0 };
+  const counts: TodoistCounts = { added: 0, updated: 0, closed: 0, removed: 0 };
   const stored = await chrome.storage.local.get(assignments.map((a) => taskKey(a.id)));
   const sections = new Map<string, Promise<string>>();
   const sectionId = async (courseName: string) => {
@@ -74,9 +74,20 @@ export async function syncTodoist(
   };
 
   for (const a of assignments) {
-    if (excluded.has(a.id)) continue;
     const key = taskKey(a.id);
     const link = stored[key] as TaskLink | undefined;
+    if (excluded.has(a.id)) {
+      if (link?.state !== "open") continue;
+      try {
+        await gateway.deleteTask(link.taskId);
+        counts.removed++;
+      } catch (error) {
+        if (!(error instanceof TaskGoneError)) throw error;
+      }
+      // Forgetting the link lets the task come back if the assignment is tracked again.
+      await chrome.storage.local.remove(key);
+      continue;
+    }
     if (link && link.state !== "open") continue;
     const fields = taskFields(a);
 
