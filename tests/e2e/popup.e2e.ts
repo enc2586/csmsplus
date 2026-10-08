@@ -21,6 +21,14 @@ test("popup syncs on demand and lists assignments", async ({ context, extensionI
   await expect(page.getByText("남음 2")).toBeVisible();
   await expect(page.getByText(/동기화$/)).toBeVisible();
   await page.screenshot({ path: "test-results/popup.png" });
+
+  // The popup would otherwise navigate itself, so assignments open in a new tab.
+  const [opened] = await Promise.all([
+    context.waitForEvent("page"),
+    page.getByRole("link", { name: /과제 1/ }).click(),
+  ]);
+  expect(opened.url()).toBe("https://lms.gist.ac.kr/mod/assign/view.php?id=1");
+  expect(page.url()).toContain("/src/popup/index.html");
 });
 
 test("badge counts urgent assignments and follows exclusions and options", async ({

@@ -79,6 +79,7 @@ export function App() {
           </p>
         ) : (
           <AssignmentList
+            openInNewTab
             groups={groupAssignments(
               assignments,
               excluded,
